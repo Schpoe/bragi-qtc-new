@@ -51,6 +51,7 @@ import Teams from './pages/Teams';
 import WorkAreas from './pages/WorkAreas';
 import SprintPlanning from './pages/SprintPlanning';
 import Dashboard from './pages/Dashboard';
+import TeamSprintOverview from './pages/TeamSprintOverview';
 import __Layout from './Layout.jsx';
 
 
@@ -59,6 +60,7 @@ export const PAGES = {
     "WorkAreas": WorkAreas,
     "SprintPlanning": SprintPlanning,
     "Dashboard": Dashboard,
+    "TeamSprintOverview": TeamSprintOverview,
 }
 
 export const pagesConfig = {

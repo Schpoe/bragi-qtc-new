@@ -13,26 +13,34 @@ for (let y = currentYear; y <= currentYear + 1; y++) {
   }
 }
 
-export default function SprintFormDialog({ open, onOpenChange, sprint, existingSprints, onSave }) {
-  const [form, setForm] = useState({ name: "", quarter: quarters[0], start_date: "", end_date: "", order: 1 });
+export default function SprintFormDialog({ open, onOpenChange, sprint, existingSprints, teams, defaultTeamId, defaultQuarter, onSave }) {
+  const [form, setForm] = useState({ name: "", quarter: quarters[0], team_id: "", start_date: "", end_date: "", order: 1 });
 
   useEffect(() => {
     if (sprint) {
       setForm({
         name: sprint.name,
         quarter: sprint.quarter,
+        team_id: sprint.team_id || "",
         start_date: sprint.start_date || "",
         end_date: sprint.end_date || "",
         order: sprint.order || 1,
       });
     } else {
       const nextOrder = existingSprints ? existingSprints.length + 1 : 1;
-      setForm({ name: `Sprint ${nextOrder}`, quarter: quarters[0], start_date: "", end_date: "", order: nextOrder });
+      setForm({
+        name: `Sprint ${nextOrder}`,
+        quarter: defaultQuarter || quarters[0],
+        team_id: defaultTeamId || (teams && teams.length > 0 ? teams[0].id : ""),
+        start_date: "",
+        end_date: "",
+        order: nextOrder,
+      });
     }
-  }, [sprint, open, existingSprints]);
+  }, [sprint, open, existingSprints, defaultTeamId, defaultQuarter]);
 
   const handleSave = () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim() || !form.team_id) return;
     onSave(form);
     onOpenChange(false);
   };
@@ -44,6 +52,15 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
           <DialogTitle>{sprint ? "Sprint bearbeiten" : "Neuer Sprint"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label>Team</Label>
+            <Select value={form.team_id} onValueChange={(v) => setForm({ ...form, team_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Team wählen" /></SelectTrigger>
+              <SelectContent>
+                {(teams || []).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label>Name</Label>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="z.B. Sprint 1" />
@@ -74,7 +91,7 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Abbrechen</Button>
-          <Button onClick={handleSave} disabled={!form.name.trim()}>Speichern</Button>
+          <Button onClick={handleSave} disabled={!form.name.trim() || !form.team_id}>Speichern</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

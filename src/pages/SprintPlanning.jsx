@@ -5,7 +5,6 @@ import { Plus, CalendarRange, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import PageHeader from "../components/shared/PageHeader";
 import EmptyState from "../components/shared/EmptyState";
@@ -19,7 +18,7 @@ export default function SprintPlanning() {
   const [sprintDialogOpen, setSprintDialogOpen] = useState(false);
   const [editingSprint, setEditingSprint] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState(`Q${currentQ} ${currentYear}`);
-  const [selectedTeamId, setSelectedTeamId] = useState("all");
+  const [selectedTeamId, setSelectedTeamId] = useState("");
   const queryClient = useQueryClient();
 
   const { data: sprints = [], isLoading: sprintsLoading } = useQuery({
@@ -27,9 +26,12 @@ export default function SprintPlanning() {
     queryFn: () => base44.entities.Sprint.list(),
   });
 
-  const { data: teams = [] } = useQuery({
+  const { data: teams = [], isLoading: teamsLoading } = useQuery({
     queryKey: ["teams"],
     queryFn: () => base44.entities.Team.list(),
+    onSuccess: (data) => {
+      if (data.length > 0 && !selectedTeamId) setSelectedTeamId(data[0].id);
+    },
   });
 
   const { data: members = [] } = useQuery({
@@ -46,6 +48,9 @@ export default function SprintPlanning() {
     queryKey: ["allocations"],
     queryFn: () => base44.entities.Allocation.list(),
   });
+
+  // Auto-select first team if none selected
+  const effectiveTeamId = selectedTeamId || (teams.length > 0 ? teams[0].id : "");
 
   const createSprint = useMutation({
     mutationFn: (data) => base44.entities.Sprint.create(data),
@@ -97,26 +102,17 @@ export default function SprintPlanning() {
         updateAllocation.mutate({ id: existing.id, data: { percent: value } });
       }
     } else if (value > 0) {
-      createAllocation.mutate({
-        team_member_id: memberId,
-        sprint_id: sprintId,
-        work_area_id: workAreaId,
-        percent: value,
-      });
+      createAllocation.mutate({ team_member_id: memberId, sprint_id: sprintId, work_area_id: workAreaId, percent: value });
     }
   };
 
+  // Filter sprints: must belong to selected team AND quarter
   const quarterSprints = sprints
-    .filter(s => s.quarter === selectedQuarter)
+    .filter(s => s.quarter === selectedQuarter && s.team_id === effectiveTeamId)
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-  const filteredMembers = selectedTeamId === "all"
-    ? members
-    : members.filter(m => m.team_id === selectedTeamId);
-
-  const filteredWorkAreas = selectedTeamId === "all"
-    ? workAreas
-    : workAreas.filter(wa => wa.is_cross_team || wa.team_id === selectedTeamId);
+  const teamMembers = members.filter(m => m.team_id === effectiveTeamId);
+  const teamWorkAreas = workAreas.filter(wa => wa.is_cross_team || wa.team_id === effectiveTeamId);
 
   const quarters = [...new Set(sprints.map(s => s.quarter))];
   if (!quarters.includes(selectedQuarter)) quarters.push(selectedQuarter);
@@ -124,41 +120,45 @@ export default function SprintPlanning() {
 
   return (
     <div>
-      <PageHeader title="Sprintplanung" subtitle="Kapazitäten pro Sprint zuweisen">
-        <Button onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}>
+      <PageHeader title="Sprintplanung" subtitle="Kapazitäten pro Team und Sprint erfassen">
+        <Button
+          onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}
+          disabled={!effectiveTeamId}
+        >
           <Plus className="w-4 h-4 mr-2" /> Neuer Sprint
         </Button>
       </PageHeader>
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <Select value={effectiveTeamId} onValueChange={setSelectedTeamId}>
+          <SelectTrigger className="w-52">
+            <SelectValue placeholder="Team wählen" />
+          </SelectTrigger>
+          <SelectContent>
+            {teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
         <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-36">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {quarters.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Team filtern" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Alle Teams</SelectItem>
-            {teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
       </div>
 
-      {sprintsLoading ? (
+      {teamsLoading || sprintsLoading ? (
         <div className="space-y-4">
           {[1, 2].map(i => <Skeleton key={i} className="h-48 rounded-xl" />)}
         </div>
+      ) : teams.length === 0 ? (
+        <EmptyState icon={CalendarRange} title="Noch keine Teams" description="Erstelle zuerst ein Team unter 'Teams'." />
       ) : quarterSprints.length === 0 ? (
         <EmptyState
           icon={CalendarRange}
-          title="Keine Sprints in diesem Quartal"
-          description="Erstelle Sprints, um die Kapazitätsplanung zu starten."
+          title="Keine Sprints für dieses Team & Quartal"
+          description="Erstelle Sprints für dieses Team, um die Kapazitätsplanung zu starten."
         >
           <Button onClick={() => setSprintDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" /> Sprint erstellen
@@ -189,8 +189,8 @@ export default function SprintPlanning() {
               <CardContent>
                 <SprintAllocationTable
                   sprint={sprint}
-                  members={filteredMembers}
-                  workAreas={filteredWorkAreas}
+                  members={teamMembers}
+                  workAreas={teamWorkAreas}
                   allocations={allocations}
                   onAllocationChange={handleAllocationChange}
                 />
@@ -205,6 +205,9 @@ export default function SprintPlanning() {
         onOpenChange={setSprintDialogOpen}
         sprint={editingSprint}
         existingSprints={quarterSprints}
+        teams={teams}
+        defaultTeamId={effectiveTeamId}
+        defaultQuarter={selectedQuarter}
         onSave={handleSaveSprint}
       />
     </div>
