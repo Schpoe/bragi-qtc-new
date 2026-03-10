@@ -64,7 +64,7 @@ export default function Layout({ children, currentPageName }) {
           <aside className="relative w-64 h-full bg-card border-r border-border">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <h1 className="text-lg font-bold">
-                Kapazitäts<span className="text-primary">planung</span>
+                Capacity<span className="text-primary">Planning</span>
               </h1>
               <button onClick={() => setMobileOpen(false)}>
                 <X className="w-5 h-5" />
