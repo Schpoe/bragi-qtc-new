@@ -30,7 +30,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, workAre
   };
 
   if (sprints.length === 0 || filteredWorkAreas.length === 0) {
-    return <div className="text-center py-8 text-sm text-muted-foreground">Keine Daten vorhanden.</div>;
+    return <div className="text-center py-8 text-sm text-muted-foreground">No data available.</div>;
   }
 
   return (
@@ -47,7 +47,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, workAre
                 </div>
               </TableHead>
             ))}
-            <TableHead className="text-center min-w-[100px]">Auslastung</TableHead>
+            <TableHead className="text-center min-w-[100px]">Utilization</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

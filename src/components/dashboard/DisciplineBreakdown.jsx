@@ -32,7 +32,7 @@ export default function DisciplineBreakdown({ sprints, members, allocations, sel
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold">Auslastung nach Bereich</CardTitle>
+        <CardTitle className="text-base font-semibold">Utilization by Discipline</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -67,7 +67,7 @@ export default function DisciplineBreakdown({ sprints, members, allocations, sel
             );
           })}
           {disciplines.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">Keine Daten</p>
+            <p className="text-sm text-muted-foreground text-center py-4">No data</p>
           )}
         </div>
       </CardContent>

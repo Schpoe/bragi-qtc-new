@@ -43,7 +43,7 @@ export default function TeamCard({ team, members, onEdit, onDelete, onClick }) {
         )}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
           <Users className="w-4 h-4" />
-          <span>{members.length} Mitglieder</span>
+          <span>{members.length} {members.length === 1 ? "Member" : "Members"}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {disciplines.map(d => <DisciplineBadge key={d} discipline={d} />)}

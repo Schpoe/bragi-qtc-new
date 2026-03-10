@@ -7,9 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const colors = [
-  { value: "blue", label: "Blau", class: "bg-blue-500" },
-  { value: "green", label: "Grün", class: "bg-emerald-500" },
-  { value: "purple", label: "Lila", class: "bg-purple-500" },
+  { value: "blue", label: "Blue", class: "bg-blue-500" },
+  { value: "green", label: "Green", class: "bg-emerald-500" },
+  { value: "purple", label: "Purple", class: "bg-purple-500" },
   { value: "orange", label: "Orange", class: "bg-orange-500" },
   { value: "pink", label: "Pink", class: "bg-pink-500" },
   { value: "teal", label: "Teal", class: "bg-teal-500" },
@@ -36,19 +36,19 @@ export default function TeamFormDialog({ open, onOpenChange, team, onSave }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{team ? "Team bearbeiten" : "Neues Team"}</DialogTitle>
+          <DialogTitle>{team ? "Edit Team" : "New Team"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>Name</Label>
-            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="z.B. Mobile Team" />
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Mobile Team" />
           </div>
           <div className="space-y-2">
-            <Label>Beschreibung</Label>
+            <Label>Description</Label>
             <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Optional" rows={2} />
           </div>
           <div className="space-y-2">
-            <Label>Farbe</Label>
+            <Label>Color</Label>
             <div className="flex gap-2">
               {colors.map(c => (
                 <button
@@ -61,8 +61,8 @@ export default function TeamFormDialog({ open, onOpenChange, team, onSave }) {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Abbrechen</Button>
-          <Button onClick={handleSave} disabled={!form.name.trim()}>Speichern</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={handleSave} disabled={!form.name.trim()}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

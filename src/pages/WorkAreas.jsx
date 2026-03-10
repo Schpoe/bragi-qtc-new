@@ -53,9 +53,9 @@ export default function WorkAreas() {
 
   return (
     <div>
-      <PageHeader title="Bereiche" subtitle="Produkte, Features, Projekte & Support">
+      <PageHeader title="Work Areas" subtitle="Products, Features, Projects & Support">
         <Button onClick={() => { setEditing(null); setDialogOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" /> Neuer Bereich
+          <Plus className="w-4 h-4 mr-2" /> New Work Area
         </Button>
       </PageHeader>
 
@@ -64,9 +64,9 @@ export default function WorkAreas() {
           {[1, 2, 3].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}
         </div>
       ) : workAreas.length === 0 ? (
-        <EmptyState icon={FolderKanban} title="Noch keine Bereiche" description="Definiere Produkte, Features oder Projekte für die Kapazitätsplanung.">
+        <EmptyState icon={FolderKanban} title="No work areas yet" description="Define products, features or projects for capacity planning.">
           <Button onClick={() => setDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Ersten Bereich erstellen
+            <Plus className="w-4 h-4 mr-2" /> Create First Work Area
           </Button>
         </EmptyState>
       ) : (
@@ -83,7 +83,7 @@ export default function WorkAreas() {
                         <Badge variant="outline" className="text-xs">{wa.type}</Badge>
                         {wa.is_cross_team ? (
                           <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Globe className="w-3 h-3" /> Übergreifend
+                            <Globe className="w-3 h-3" /> Cross-team
                           </span>
                         ) : (
                           <span className="text-xs text-muted-foreground flex items-center gap-1">

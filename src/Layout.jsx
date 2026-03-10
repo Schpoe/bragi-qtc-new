@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
   { name: "Teams", page: "Teams", icon: Users },
-  { name: "Bereiche", page: "WorkAreas", icon: FolderKanban },
-  { name: "Sprintplanung", page: "SprintPlanning", icon: CalendarRange },
-  { name: "Team-Übersicht", page: "TeamSprintOverview", icon: BarChart3 },
+  { name: "Work Areas", page: "WorkAreas", icon: FolderKanban },
+  { name: "Sprint Planning", page: "SprintPlanning", icon: CalendarRange },
+  { name: "Team Overview", page: "TeamSprintOverview", icon: BarChart3 },
 ];
 
 export default function Layout({ children, currentPageName }) {
@@ -21,9 +21,9 @@ export default function Layout({ children, currentPageName }) {
       <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card fixed h-full z-30">
         <div className="p-6 border-b border-border">
           <h1 className="text-lg font-bold text-foreground tracking-tight">
-            Kapazitäts<span className="text-primary">planung</span>
+            Capacity<span className="text-primary">Planning</span>
           </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Sprint & Quartal</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Sprint & Quarter</p>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map((item) => {

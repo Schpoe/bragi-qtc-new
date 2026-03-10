@@ -120,19 +120,19 @@ export default function SprintPlanning() {
 
   return (
     <div>
-      <PageHeader title="Sprintplanung" subtitle="Kapazitäten pro Team und Sprint erfassen">
+      <PageHeader title="Sprint Planning" subtitle="Record capacities per team and sprint">
         <Button
           onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}
           disabled={!effectiveTeamId}
         >
-          <Plus className="w-4 h-4 mr-2" /> Neuer Sprint
+          <Plus className="w-4 h-4 mr-2" /> New Sprint
         </Button>
       </PageHeader>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <Select value={effectiveTeamId} onValueChange={setSelectedTeamId}>
           <SelectTrigger className="w-52">
-            <SelectValue placeholder="Team wählen" />
+            <SelectValue placeholder="Select team" />
           </SelectTrigger>
           <SelectContent>
             {teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
@@ -153,15 +153,15 @@ export default function SprintPlanning() {
           {[1, 2].map(i => <Skeleton key={i} className="h-48 rounded-xl" />)}
         </div>
       ) : teams.length === 0 ? (
-        <EmptyState icon={CalendarRange} title="Noch keine Teams" description="Erstelle zuerst ein Team unter 'Teams'." />
+        <EmptyState icon={CalendarRange} title="No teams yet" description="First create a team under 'Teams'." />
       ) : quarterSprints.length === 0 ? (
         <EmptyState
           icon={CalendarRange}
-          title="Keine Sprints für dieses Team & Quartal"
-          description="Erstelle Sprints für dieses Team, um die Kapazitätsplanung zu starten."
+          title="No sprints for this team & quarter"
+          description="Create sprints for this team to start capacity planning."
         >
           <Button onClick={() => setSprintDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Sprint erstellen
+            <Plus className="w-4 h-4 mr-2" /> Create Sprint
           </Button>
         </EmptyState>
       ) : (

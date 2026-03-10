@@ -49,13 +49,13 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{sprint ? "Sprint bearbeiten" : "Neuer Sprint"}</DialogTitle>
+          <DialogTitle>{sprint ? "Edit Sprint" : "New Sprint"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>Team</Label>
             <Select value={form.team_id} onValueChange={(v) => setForm({ ...form, team_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Team wählen" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select team" /></SelectTrigger>
               <SelectContent>
                 {(teams || []).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
               </SelectContent>
@@ -63,10 +63,10 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
           </div>
           <div className="space-y-2">
             <Label>Name</Label>
-            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="z.B. Sprint 1" />
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Sprint 1" />
           </div>
           <div className="space-y-2">
-            <Label>Quartal</Label>
+            <Label>Quarter</Label>
             <Select value={form.quarter} onValueChange={(v) => setForm({ ...form, quarter: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -76,22 +76,22 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Startdatum</Label>
+              <Label>Start Date</Label>
               <Input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label>Enddatum</Label>
+              <Label>End Date</Label>
               <Input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} />
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Reihenfolge</Label>
+            <Label>Order</Label>
             <Input type="number" min={1} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Abbrechen</Button>
-          <Button onClick={handleSave} disabled={!form.name.trim() || !form.team_id}>Speichern</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={handleSave} disabled={!form.name.trim() || !form.team_id}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

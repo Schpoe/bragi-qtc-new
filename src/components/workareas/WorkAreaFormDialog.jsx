@@ -6,14 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
-const types = ["Produkt", "Feature", "Projekt", "Support/Maintenance"];
+const types = ["Product", "Feature", "Project", "Support/Maintenance"];
 const areaColors = [
   "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#6366f1"
 ];
 
 export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams, onSave }) {
   const [form, setForm] = useState({
-    name: "", type: "Produkt", team_id: "", is_cross_team: true, color: areaColors[0]
+    name: "", type: "Product", team_id: "", is_cross_team: true, color: areaColors[0]
   });
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
         color: workArea.color || areaColors[0],
       });
     } else {
-      setForm({ name: "", type: "Produkt", team_id: "", is_cross_team: true, color: areaColors[Math.floor(Math.random() * areaColors.length)] });
+      setForm({ name: "", type: "Product", team_id: "", is_cross_team: true, color: areaColors[Math.floor(Math.random() * areaColors.length)] });
     }
   }, [workArea, open]);
 
@@ -42,15 +42,15 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{workArea ? "Bereich bearbeiten" : "Neuer Bereich"}</DialogTitle>
+          <DialogTitle>{workArea ? "Edit Work Area" : "New Work Area"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>Name</Label>
-            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="z.B. Payment Feature" />
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Payment Feature" />
           </div>
           <div className="space-y-2">
-            <Label>Typ</Label>
+            <Label>Type</Label>
             <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -59,14 +59,14 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
             </Select>
           </div>
           <div className="flex items-center justify-between">
-            <Label>Teamübergreifend</Label>
+            <Label>Cross-team</Label>
             <Switch checked={form.is_cross_team} onCheckedChange={(v) => setForm({ ...form, is_cross_team: v })} />
           </div>
           {!form.is_cross_team && (
             <div className="space-y-2">
               <Label>Team</Label>
               <Select value={form.team_id} onValueChange={(v) => setForm({ ...form, team_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Team wählen" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select team" /></SelectTrigger>
                 <SelectContent>
                   {teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
                 </SelectContent>
@@ -74,7 +74,7 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
             </div>
           )}
           <div className="space-y-2">
-            <Label>Farbe</Label>
+            <Label>Color</Label>
             <div className="flex gap-2">
               {areaColors.map(c => (
                 <button
@@ -88,8 +88,8 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Abbrechen</Button>
-          <Button onClick={handleSave} disabled={!form.name.trim()}>Speichern</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={handleSave} disabled={!form.name.trim()}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

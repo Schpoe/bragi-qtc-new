@@ -19,7 +19,7 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
   if (members.length === 0 || workAreas.length === 0) {
     return (
       <div className="text-center py-8 text-sm text-muted-foreground">
-        {members.length === 0 ? "Keine Teammitglieder vorhanden." : "Keine Bereiche definiert."}
+        {members.length === 0 ? "No team members found." : "No work areas defined."}
       </div>
     );
   }
@@ -29,7 +29,7 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
-            <TableHead className="min-w-[160px] sticky left-0 bg-muted/50 z-10">Mitglied</TableHead>
+            <TableHead className="min-w-[160px] sticky left-0 bg-muted/50 z-10">Member</TableHead>
             {workAreas.map(wa => (
               <TableHead key={wa.id} className="text-center min-w-[80px]">
                 <div className="flex items-center justify-center gap-1.5">

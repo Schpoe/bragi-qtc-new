@@ -28,15 +28,15 @@ export default function MemberFormDialog({ open, onOpenChange, member, teamId, o
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{member ? "Mitglied bearbeiten" : "Neues Mitglied"}</DialogTitle>
+          <DialogTitle>{member ? "Edit Member" : "New Member"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>Name</Label>
-            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Vor- und Nachname" />
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="First and last name" />
           </div>
           <div className="space-y-2">
-            <Label>Bereich</Label>
+            <Label>Discipline</Label>
             <Select value={form.discipline} onValueChange={(v) => setForm({ ...form, discipline: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -45,13 +45,13 @@ export default function MemberFormDialog({ open, onOpenChange, member, teamId, o
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Verfügbarkeit (%)</Label>
+            <Label>Availability (%)</Label>
             <Input type="number" min={0} max={100} value={form.availability_percent} onChange={(e) => setForm({ ...form, availability_percent: Number(e.target.value) })} />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Abbrechen</Button>
-          <Button onClick={handleSave} disabled={!form.name.trim()}>Speichern</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={handleSave} disabled={!form.name.trim()}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

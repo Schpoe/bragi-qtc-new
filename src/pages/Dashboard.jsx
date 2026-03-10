@@ -57,7 +57,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <PageHeader title="Dashboard" subtitle="Kapazitätsübersicht">
+      <PageHeader title="Dashboard" subtitle="Capacity Overview">
         <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
           <SelectTrigger className="w-36">
             <SelectValue />
@@ -71,7 +71,7 @@ export default function Dashboard() {
             <SelectValue placeholder="Team filtern" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Alle Teams</SelectItem>
+            <SelectItem value="all">All Teams</SelectItem>
             {teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
           </SelectContent>
         </Select>
@@ -100,7 +100,7 @@ export default function Dashboard() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-semibold">
-                    Kapazitätsübersicht — {selectedQuarter}
+                    Capacity Overview — {selectedQuarter}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

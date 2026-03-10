@@ -67,7 +67,7 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
           <TeamCardTitle team={team} memberCount={teamMembers.length} />
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-6">Keine Sprints in diesem Quartal.</p>
+          <p className="text-sm text-muted-foreground text-center py-6">No sprints in this quarter.</p>
         </CardContent>
       </Card>
     );
@@ -83,7 +83,7 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40">
-                <TableHead className="text-xs min-w-[90px]">Bereich</TableHead>
+                <TableHead className="text-xs min-w-[90px]">Area</TableHead>
                 {teamSprints.map(s => (
                   <TableHead key={s.id} className="text-center text-xs min-w-[70px]">{s.name}</TableHead>
                 ))}
@@ -113,13 +113,13 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
               {teamWorkAreas.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={teamSprints.length + 1} className="text-center text-xs text-muted-foreground py-4">
-                    Keine Bereiche zugewiesen.
+                    No work areas assigned.
                   </TableCell>
                 </TableRow>
               )}
               {/* Total row */}
               <TableRow className="border-t-2 bg-muted/30">
-                <TableCell className="py-2 text-xs font-semibold">Auslastung</TableCell>
+                <TableCell className="py-2 text-xs font-semibold">Utilization</TableCell>
                 {teamSprints.map(s => {
                   const total = getSprintTotal(s.id);
                   return (
@@ -188,7 +188,7 @@ export default function TeamSprintOverview() {
 
   return (
     <div>
-      <PageHeader title="Team-Übersicht" subtitle="Sprintauslastung aller Teams auf einen Blick">
+      <PageHeader title="Team Overview" subtitle="Sprint utilization of all teams at a glance">
         <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
           <SelectTrigger className="w-36">
             <SelectValue />
@@ -204,7 +204,7 @@ export default function TeamSprintOverview() {
           {[1, 2, 3].map(i => <Skeleton key={i} className="h-64 rounded-xl" />)}
         </div>
       ) : teams.length === 0 ? (
-        <EmptyState icon={BarChart3} title="Noch keine Teams" description="Erstelle zuerst Teams und Sprints unter 'Teams' und 'Sprintplanung'." />
+        <EmptyState icon={BarChart3} title="No teams yet" description="First create teams and sprints under 'Teams' and 'Sprint Planning'." />
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {teams.map(team => (

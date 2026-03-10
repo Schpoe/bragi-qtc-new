@@ -61,9 +61,9 @@ export default function Teams() {
 
   return (
     <div>
-      <PageHeader title="Teams" subtitle="Verwalte deine Teams und Mitglieder">
+      <PageHeader title="Teams" subtitle="Manage your teams and members">
         <Button onClick={() => { setEditingTeam(null); setTeamDialogOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" /> Neues Team
+          <Plus className="w-4 h-4 mr-2" /> New Team
         </Button>
       </PageHeader>
 
@@ -72,9 +72,9 @@ export default function Teams() {
           {[1, 2, 3].map(i => <Skeleton key={i} className="h-40 rounded-xl" />)}
         </div>
       ) : teams.length === 0 ? (
-        <EmptyState icon={Users} title="Noch keine Teams" description="Erstelle dein erstes Team, um mit der Planung zu beginnen.">
+        <EmptyState icon={Users} title="No teams yet" description="Create your first team to get started with planning.">
           <Button onClick={() => setTeamDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Erstes Team erstellen
+            <Plus className="w-4 h-4 mr-2" /> Create First Team
           </Button>
         </EmptyState>
       ) : (
