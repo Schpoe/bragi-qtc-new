@@ -65,11 +65,11 @@ export default function SprintPlanning() {
       queryClient.invalidateQueries({ queryKey: ["sprints"] });
       // If this was a copied sprint, show success and navigate to that team
       if (isCopyOperation && newSprint.team_id) {
-        const team = teams.find(t => t.id === newSprint.team_id);
-        toast.success(`Sprint copied to ${team?.name || "team"}`);
-        setSelectedTeamId(newSprint.team_id);
-        setIsCopyOperation(false);
-      }
+         const team = teams.find(t => t.id === newSprint.team_id);
+         toast.success(`Sprint copied to ${team?.name || "team"} and switched to this team`);
+         setSelectedTeamId(newSprint.team_id);
+         setIsCopyOperation(false);
+       }
       setSprintToCopy(null);
       setTeamSelectDialogOpen(false);
       setTeamSelectValue("");
