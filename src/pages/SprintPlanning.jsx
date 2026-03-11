@@ -191,20 +191,43 @@ export default function SprintPlanning() {
           </Button>
         </EmptyState>
       ) : quarterSprints.length === 0 && crossTeamSprints.length > 0 ? (
-        <EmptyState
-          icon={CalendarRange}
-          title="No team-specific sprints yet"
-          description="Copy a cross-team sprint or create a new sprint for this team."
-        >
-          <div className="flex gap-3">
+        <div className="space-y-6">
+          <EmptyState
+            icon={CalendarRange}
+            title="No team-specific sprints yet"
+            description="Copy a cross-team sprint or create a new sprint for this team."
+          >
             <Button onClick={() => setSprintDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" /> New Sprint
             </Button>
-            <Button variant="outline" onClick={() => {}}>
-              <Copy className="w-4 h-4 mr-2" /> Copy Cross-team Sprint
-            </Button>
+          </EmptyState>
+          
+          {/* Show available cross-team sprints to copy */}
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Available Cross-team Sprints</h3>
+            <div className="space-y-3">
+              {crossTeamSprints.map(sprint => (
+                <Card key={sprint.id} className="border-border/60">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base font-semibold">
+                        {sprint.name}
+                        <span className="ml-2 text-xs font-normal text-muted-foreground">(Cross-team)</span>
+                      </CardTitle>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleCopyCrossTeamSprint(sprint)}
+                      >
+                        <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy to Team
+                      </Button>
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
           </div>
-        </EmptyState>
+        </div>
       ) : (
         <div className="space-y-6">
           {quarterSprints.map(sprint => {
