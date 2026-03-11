@@ -152,7 +152,8 @@ Deno.serve(async (req) => {
       workAreaTypes: Array.from(workAreaTypes),
       teams: Array.from(teams),
       workAreas: workAreas,
-      totalIssues: issues.length
+      totalIssues: issues.length,
+      sampleCustomFields: sampleCustomFields
     });
 
   } catch (error) {
