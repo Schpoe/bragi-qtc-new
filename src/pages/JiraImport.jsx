@@ -14,7 +14,6 @@ export default function JiraImport() {
   const [uploading, setUploading] = useState(false);
   const [mapping, setMapping] = useState({
     defaultType: "Product",
-    leadingTeamId: "",
   });
   const [result, setResult] = useState(null);
   const queryClient = useQueryClient();
@@ -78,22 +77,48 @@ export default function JiraImport() {
       let imported = 0;
       let failed = 0;
 
+      // Create team name -> ID lookup
+      const teamNameMap = Object.fromEntries(
+        teams.map(t => [t.name.toLowerCase().trim(), t.id])
+      );
+
       for (const item of items) {
-        // Try various common column names for the work area name
-        const itemName = item.Name || item.name || item.Title || item.title || 
-                        item.Summary || item.summary || item.Subject || item.subject;
+        // Use "Summary" field for work area name
+        const itemName = item.Summary || item.summary || 
+                        item.Name || item.name || item.Title || item.title;
         
         if (!itemName || !itemName.trim()) {
           console.log("Skipping item without name:", item);
           continue;
         }
 
+        // Map leading team
+        const leadingTeamName = item['Leading Team'] || item['leading team'] || item.LeadingTeam;
+        const leadingTeamId = leadingTeamName 
+          ? teamNameMap[leadingTeamName.toLowerCase().trim()] 
+          : null;
+
+        if (!leadingTeamId) {
+          console.log("Skipping item without valid leading team:", itemName, leadingTeamName);
+          failed++;
+          continue;
+        }
+
+        // Map supporting teams (comma-separated)
+        const contributingTeamsField = item['Contributing Teams'] || item['contributing teams'] || item.ContributingTeams || '';
+        const supportingTeamIds = contributingTeamsField
+          .split(',')
+          .map(name => name.trim())
+          .filter(name => name.length > 0)
+          .map(name => teamNameMap[name.toLowerCase()])
+          .filter(id => id); // Remove undefined/null values
+
         try {
           await createWorkArea.mutateAsync({
             name: itemName.trim(),
             type: item.Type || item.type || mapping.defaultType,
-            leading_team_id: mapping.leadingTeamId,
-            supporting_team_ids: [],
+            leading_team_id: leadingTeamId,
+            supporting_team_ids: supportingTeamIds,
             color: colors[imported % colors.length],
           });
           imported++;
@@ -143,7 +168,7 @@ export default function JiraImport() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                Export your Jira Product Discovery items as CSV or JSON. The file should contain at least a "name" column/field.
+                Export your Jira Product Discovery items as CSV. Required columns: "Summary" and "Leading Team".
               </p>
             </div>
 
@@ -159,16 +184,14 @@ export default function JiraImport() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Leading Team *</Label>
-                <Select value={mapping.leadingTeamId} onValueChange={(v) => setMapping({ ...mapping, leadingTeamId: v })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select leading team" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+              <div className="p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground space-y-1">
+                <p><strong>Expected CSV columns:</strong></p>
+                <ul className="list-disc list-inside space-y-0.5 ml-1">
+                  <li><strong>Summary</strong> - Work area name (required)</li>
+                  <li><strong>Leading Team</strong> - Team name for leading team (required)</li>
+                  <li><strong>Contributing Teams</strong> - Comma-separated team names (optional)</li>
+                  <li><strong>Type</strong> - Work area type (optional, defaults to "{mapping.defaultType}")</li>
+                </ul>
               </div>
             </div>
 
@@ -202,7 +225,7 @@ export default function JiraImport() {
 
             <Button 
               onClick={handleImport} 
-              disabled={!file || uploading || !mapping.leadingTeamId}
+              disabled={!file || uploading}
               className="w-full"
             >
               <Upload className="w-4 h-4 mr-2" />
@@ -220,8 +243,8 @@ export default function JiraImport() {
               <li>Open your Jira Product Discovery project</li>
               <li>Go to the list view of your products/ideas</li>
               <li>Click the "..." menu and select "Export"</li>
-              <li>Choose CSV or JSON format</li>
-              <li>Ensure your export includes at least the "name" or "title" field</li>
+              <li>Choose CSV format</li>
+              <li>Ensure your export includes "Summary", "Leading Team", and optionally "Contributing Teams" columns</li>
               <li>Upload the exported file above</li>
             </ol>
           </CardContent>
