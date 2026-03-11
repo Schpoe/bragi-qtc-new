@@ -68,12 +68,12 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
             <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
               <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
               <SelectContent>
-                {allTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            {allTypes.length === 0 && (
-              <p className="text-xs text-muted-foreground">No types available. Create types in Work Area Types page.</p>
-            )}
+                  {workAreaTypes.map(t => <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              {workAreaTypes.length === 0 && (
+                <p className="text-xs text-muted-foreground">No types available. Create types in Work Area Types page.</p>
+              )}
           </div>
           <div className="space-y-2">
             <Label>Leading Team *</Label>
