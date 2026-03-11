@@ -124,7 +124,7 @@ export default function Dashboard() {
              <Card>
                <CardHeader className="pb-3">
                  <CardTitle className="text-base font-semibold">
-                   Work Area Types Distribution
+                   Work Item Types Distribution
                  </CardTitle>
                </CardHeader>
                <CardContent>
