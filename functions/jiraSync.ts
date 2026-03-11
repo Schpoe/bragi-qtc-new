@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     let total = 0;
 
     do {
-      const searchUrl = `${jiraBaseUrl}/rest/api/3/search/jql?jql=${encodeURIComponent(jql)}&startAt=${startAt}&maxResults=${maxResults}&fields=summary,issuetype,customfield_*`;
+      const searchUrl = `${jiraBaseUrl}/rest/api/3/search?jql=${encodeURIComponent(jql)}&startAt=${startAt}&maxResults=${maxResults}&fields=summary,issuetype,customfield_*`;
       
       const response = await fetch(searchUrl, { headers });
       
