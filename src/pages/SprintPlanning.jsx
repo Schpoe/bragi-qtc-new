@@ -35,9 +35,6 @@ export default function SprintPlanning() {
   const { data: teams = [], isLoading: teamsLoading } = useQuery({
     queryKey: ["teams"],
     queryFn: () => base44.entities.Team.list(),
-    onSuccess: (data) => {
-      if (data.length > 0 && !selectedTeamId) setSelectedTeamId(data[0].id);
-    },
   });
 
   const { data: members = [] } = useQuery({
