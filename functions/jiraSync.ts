@@ -30,23 +30,28 @@ Deno.serve(async (req) => {
       'Content-Type': 'application/json'
     };
 
-    // Fetch all issues from Jira with pagination
+    // Fetch all issues from Jira with pagination using nextPageToken
     let allIssues = [];
-    let startAt = 0;
-    const maxResults = 100; // Jira's maximum per request
-    let total = 0;
+    let nextPageToken = null;
+    const maxResults = 100;
 
     do {
       const searchUrl = `${jiraBaseUrl}/rest/api/3/search/jql`;
       
+      const requestBody = {
+        jql: jql,
+        maxResults: maxResults,
+        fields: ['summary', 'issuetype']
+      };
+      
+      if (nextPageToken) {
+        requestBody.nextPageToken = nextPageToken;
+      }
+      
       const response = await fetch(searchUrl, { 
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          jql: jql,
-          startAt: startAt,
-          maxResults: maxResults
-        })
+        body: JSON.stringify(requestBody)
       });
       
       if (!response.ok) {
@@ -60,9 +65,8 @@ Deno.serve(async (req) => {
 
       const data = await response.json();
       allIssues = allIssues.concat(data.issues || []);
-      total = data.total || 0;
-      startAt += maxResults;
-    } while (startAt < total);
+      nextPageToken = data.nextPageToken || null;
+    } while (nextPageToken);
 
     const issues = allIssues;
 
