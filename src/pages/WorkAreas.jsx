@@ -140,6 +140,16 @@ export default function WorkAreas() {
             </TabsList>
           </Tabs>
         )}
+
+        {/* Counters */}
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div>
+            <span className="font-semibold text-foreground">{filteredWorkAreas.length}</span> work area{filteredWorkAreas.length !== 1 ? 's' : ''}
+          </div>
+          <div>
+            <span className="font-semibold text-foreground">{new Set(filteredWorkAreas.map(wa => wa.type)).size}</span> type{new Set(filteredWorkAreas.map(wa => wa.type)).size !== 1 ? 's' : ''}
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
