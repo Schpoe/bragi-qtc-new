@@ -97,9 +97,9 @@ export default function CapacityOverviewTable({ sprints, teams, members, allocat
               </TableHeader>
               <TableBody>
                 {sprints.map(sprint => (
-                  <TableRow key={sprint.id}>
-                    <TableCell className="font-medium text-sm">{sprint.name}</TableCell>
-                    {teamsToDisplay.map(team => {
+                    <TableRow key={sprint.id}>
+                      <TableCell className="font-medium text-sm">{sprint.name}</TableCell>
+                      {getSortedTeams().map(team => {
                       const capacity = getTeamCapacity(sprint.id, team.id);
                       const maxCapacity = getTeamMaxCapacity(team.id);
                       const utilPct = maxCapacity > 0 ? Math.round((capacity / maxCapacity) * 100) : 0;
