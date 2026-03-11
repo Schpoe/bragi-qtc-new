@@ -146,6 +146,7 @@ export default function SprintPlanning() {
     if (isViewingAllTeams) {
       setSprintToCopy(crossTeamSprint);
       setTeamSelectValue("");
+      setIsCopyOperation(true);
       setTeamSelectDialogOpen(true);
       return;
     }
@@ -164,6 +165,7 @@ export default function SprintPlanning() {
       order: teamSpecificSprints.length + 1,
       relevant_work_area_ids: crossTeamSprint.relevant_work_area_ids || [],
     };
+    setIsCopyOperation(true);
     createSprint.mutate(newSprint);
   };
 
