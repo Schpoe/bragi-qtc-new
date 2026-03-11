@@ -61,7 +61,7 @@ export default function WorkAreas() {
 
   return (
     <div>
-      <PageHeader title="Work Areas" subtitle="Products, Features, Projects & Support">
+      <PageHeader title="PROD items and work packages" subtitle="Products, Features, Projects & Support">
         <Link to={createPageUrl("JiraImport")}>
           <Button variant="outline">
             <Upload className="w-4 h-4 mr-2" /> Import from Jira
