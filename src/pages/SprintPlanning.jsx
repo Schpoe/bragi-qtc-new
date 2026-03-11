@@ -203,14 +203,14 @@ export default function SprintPlanning() {
       </PageHeader>
 
       <FilterBar
-        quarter={selectedQuarter}
-        onQuarterChange={setSelectedQuarter}
-        team={effectiveTeamId}
-        onTeamChange={setSelectedTeamId}
-        teams={teams}
-        quarters={quarters}
-        showTeamFilter={true}
-      />
+         quarter={selectedQuarter}
+         onQuarterChange={setSelectedQuarter}
+         team={selectedTeamId}
+         onTeamChange={setSelectedTeamId}
+         teams={teams}
+         quarters={quarters}
+         showTeamFilter={true}
+       />
 
       {teamsLoading || sprintsLoading ? (
         <div className="space-y-4">
