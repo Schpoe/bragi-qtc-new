@@ -41,7 +41,7 @@ function UtilBar({ value, max }) {
 }
 
 function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
-  const teamSprints = sprints.filter(s => s.team_id === team.id).sort((a, b) => (a.order || 0) - (b.order || 0));
+  const teamSprints = sprints.filter(s => s.is_cross_team || s.team_id === team.id).sort((a, b) => (a.order || 0) - (b.order || 0));
   const teamMembers = members.filter(m => m.team_id === team.id);
   const teamWorkAreas = workAreas.filter(wa => wa.is_cross_team || wa.team_id === team.id);
   const memberIds = new Set(teamMembers.map(m => m.id));
