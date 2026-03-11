@@ -136,10 +136,11 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
                     />
                     <span className="text-sm">{wa.name}</span>
                   </label>
-                ))
-              )}
-            </div>
-          </div>
+                  ))
+                  );
+                  })()}
+                  </div>
+                  </div>
           </div>
           <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
