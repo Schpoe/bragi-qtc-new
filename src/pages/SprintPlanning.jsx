@@ -382,7 +382,18 @@ export default function SprintPlanning() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Toaster />
+      <Toaster 
+        position="top-center"
+        richColors
+        closeButton
+        toastOptions={{
+          style: {
+            fontSize: '16px',
+            padding: '16px',
+            minWidth: '400px',
+          },
+        }}
+      />
     </div>
     </>
   );
