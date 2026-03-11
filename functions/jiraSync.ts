@@ -1,0 +1,108 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { projectKey, teamMapping } = await req.json();
+
+    if (!projectKey) {
+      return Response.json({ error: 'projectKey is required' }, { status: 400 });
+    }
+
+    const jiraBaseUrl = Deno.env.get('JIRA_BASE_URL');
+    const jiraEmail = Deno.env.get('JIRA_EMAIL');
+    const jiraApiToken = Deno.env.get('JIRA_API_TOKEN');
+
+    if (!jiraBaseUrl || !jiraEmail || !jiraApiToken) {
+      return Response.json({ error: 'Jira credentials not configured' }, { status: 500 });
+    }
+
+    const auth = btoa(`${jiraEmail}:${jiraApiToken}`);
+    const headers = {
+      'Authorization': `Basic ${auth}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+
+    // Fetch issues from Jira
+    const jql = `project = ${projectKey} AND type = "Product discovery"`;
+    const searchUrl = `${jiraBaseUrl}/rest/api/3/search?jql=${encodeURIComponent(jql)}&maxResults=1000&fields=summary,issuetype,customfield_*`;
+    
+    const response = await fetch(searchUrl, { headers });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      return Response.json({ 
+        error: 'Failed to fetch from Jira', 
+        details: errorText,
+        status: response.status 
+      }, { status: response.status });
+    }
+
+    const data = await response.json();
+    const issues = data.issues || [];
+
+    // Process issues and extract unique types and teams
+    const workAreaTypes = new Set();
+    const teams = new Set();
+    const workAreas = [];
+
+    for (const issue of issues) {
+      const fields = issue.fields;
+      const issueType = fields.issuetype?.name || '';
+      const summary = fields.summary || '';
+      
+      // Extract teams from custom fields (adjust field names based on your Jira setup)
+      let leadingTeam = '';
+      let supportingTeams = [];
+      
+      // Look for team fields in custom fields
+      for (const [key, value] of Object.entries(fields)) {
+        if (key.includes('team') || key.includes('Team')) {
+          if (Array.isArray(value)) {
+            value.forEach(v => {
+              const teamName = v.value || v.name || v;
+              if (teamName) teams.add(teamName);
+            });
+          } else if (value && typeof value === 'object') {
+            const teamName = value.value || value.name;
+            if (teamName) teams.add(teamName);
+          } else if (value) {
+            teams.add(value);
+          }
+        }
+      }
+
+      if (issueType) {
+        workAreaTypes.add(issueType);
+      }
+
+      workAreas.push({
+        key: issue.key,
+        name: summary,
+        type: issueType,
+        leadingTeam: leadingTeam,
+        supportingTeams: supportingTeams,
+        rawFields: fields
+      });
+    }
+
+    return Response.json({
+      success: true,
+      workAreaTypes: Array.from(workAreaTypes),
+      teams: Array.from(teams),
+      workAreas: workAreas,
+      totalIssues: issues.length
+    });
+
+  } catch (error) {
+    console.error('Jira sync error:', error);
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+});

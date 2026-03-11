@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { LayoutDashboard, Users, FolderKanban, CalendarRange, BarChart3, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, FolderKanban, CalendarRange, BarChart3, Menu, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
+  { name: "Jira Sync", page: "JiraSync", icon: RefreshCw },
   { name: "Teams", page: "Teams", icon: Users },
   { name: "Work Areas", page: "WorkAreas", icon: FolderKanban },
   { name: "Work Area Types", page: "WorkAreaTypes", icon: FolderKanban },

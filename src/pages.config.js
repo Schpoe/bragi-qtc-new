@@ -54,6 +54,7 @@ import TeamSprintOverview from './pages/TeamSprintOverview';
 import Teams from './pages/Teams';
 import WorkAreaTypes from './pages/WorkAreaTypes';
 import WorkAreas from './pages/WorkAreas';
+import JiraSync from './pages/JiraSync';
 import __Layout from './Layout.jsx';
 
 
@@ -65,6 +66,7 @@ export const PAGES = {
     "Teams": Teams,
     "WorkAreaTypes": WorkAreaTypes,
     "WorkAreas": WorkAreas,
+    "JiraSync": JiraSync,
 }
 
 export const pagesConfig = {
