@@ -9,10 +9,10 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { projectKey, teamMapping } = await req.json();
+    const { jql } = await req.json();
 
-    if (!projectKey) {
-      return Response.json({ error: 'projectKey is required' }, { status: 400 });
+    if (!jql) {
+      return Response.json({ error: 'jql is required' }, { status: 400 });
     }
 
     const jiraBaseUrl = Deno.env.get('JIRA_BASE_URL');
@@ -31,7 +31,6 @@ Deno.serve(async (req) => {
     };
 
     // Fetch issues from Jira
-    const jql = `project = ${projectKey} AND type = "Product discovery"`;
     const searchUrl = `${jiraBaseUrl}/rest/api/3/search?jql=${encodeURIComponent(jql)}&maxResults=1000&fields=summary,issuetype,customfield_*`;
     
     const response = await fetch(searchUrl, { headers });

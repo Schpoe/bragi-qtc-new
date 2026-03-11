@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,7 +10,7 @@ import { Loader2, RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
 import PageHeader from "@/components/shared/PageHeader";
 
 export default function JiraSync() {
-  const [projectKey, setProjectKey] = useState("");
+  const [jql, setJql] = useState('project = PROJ AND type = "Product discovery"');
   const [syncResult, setSyncResult] = useState(null);
   const [error, setError] = useState(null);
   const [importing, setImporting] = useState(false);
@@ -48,7 +48,7 @@ export default function JiraSync() {
     
     try {
       const response = await base44.functions.invoke('jiraSync', {
-        projectKey: projectKey.trim()
+        jql: jql.trim()
       });
 
       if (response.data.error) {
@@ -167,29 +167,33 @@ export default function JiraSync() {
         <CardHeader>
           <CardTitle>Connect to Jira</CardTitle>
           <CardDescription>
-            Enter your Jira project key to fetch Product Discovery issues
+            Enter a JQL query to fetch Product Discovery issues from Jira
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="projectKey">Project Key</Label>
-            <div className="flex gap-2">
-              <Input
-                id="projectKey"
-                placeholder="e.g., PROJ"
-                value={projectKey}
-                onChange={(e) => setProjectKey(e.target.value)}
-                disabled={importing}
-              />
-              <Button 
-                onClick={fetchFromJira} 
-                disabled={!projectKey.trim() || importing}
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Fetch
-              </Button>
-            </div>
+            <Label htmlFor="jql">JQL Query</Label>
+            <Textarea
+              id="jql"
+              placeholder='e.g., project = PROJ AND type = "Product discovery"'
+              value={jql}
+              onChange={(e) => setJql(e.target.value)}
+              disabled={importing}
+              rows={3}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              Example: project = MYPROJ AND type = "Product discovery" AND status != Done
+            </p>
           </div>
+          <Button 
+            onClick={fetchFromJira} 
+            disabled={!jql.trim() || importing}
+            className="w-full"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Fetch from Jira
+          </Button>
 
           {error && (
             <Alert variant="destructive">
@@ -225,12 +229,17 @@ export default function JiraSync() {
               </AlertDescription>
             </Alert>
           )}
+        </CardContent>
+      </Card>
 
-          {syncResult && !syncResult.importStats && (
+      {syncResult && !syncResult.importStats && (
+        <Card>
+          <CardContent className="pt-6">
             <Button 
               onClick={importData} 
               disabled={importing}
               className="w-full"
+              size="lg"
             >
               {importing ? (
                 <>
@@ -241,9 +250,9 @@ export default function JiraSync() {
                 'Import to Database'
               )}
             </Button>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {syncResult && syncResult.workAreas && syncResult.workAreas.length > 0 && (
         <Card>
