@@ -359,6 +359,7 @@ export default function SprintPlanning() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Select Team to Copy Sprint</DialogTitle>
+            <DialogDescription>Choose which team to copy this sprint to.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
