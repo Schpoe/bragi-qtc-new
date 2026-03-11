@@ -15,6 +15,7 @@ export default function JiraSync() {
   const [syncResult, setSyncResult] = useState(null);
   const [error, setError] = useState(null);
   const [importing, setImporting] = useState(false);
+  const [fetching, setFetching] = useState(false);
   
   const queryClient = useQueryClient();
 
