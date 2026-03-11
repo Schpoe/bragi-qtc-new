@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-export default function CapacityOverviewTable({ sprints, teams, members, allocations, selectedTeamId }) {
+export default function CapacityOverviewTable({ sprints, teams, members, allocations, selectedTeamId, workAreas }) {
   const [sortTeamsBy, setSortTeamsBy] = useState("name");
   const [sortMembersBy, setSortMembersBy] = useState("name");
   // If all teams selected, show team-level overview
