@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, FolderKanban, Pencil, Trash2, Globe, Users } from "lucide-react";
+import { Plus, FolderKanban, Pencil, Trash2, Globe, Users, Upload } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +56,11 @@ export default function WorkAreas() {
   return (
     <div>
       <PageHeader title="Work Areas" subtitle="Products, Features, Projects & Support">
+        <Link to={createPageUrl("JiraImport")}>
+          <Button variant="outline">
+            <Upload className="w-4 h-4 mr-2" /> Import from Jira
+          </Button>
+        </Link>
         <Button onClick={() => { setEditing(null); setDialogOpen(true); }}>
           <Plus className="w-4 h-4 mr-2" /> New Work Area
         </Button>
