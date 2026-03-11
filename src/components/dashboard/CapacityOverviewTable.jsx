@@ -316,7 +316,19 @@ export default function CapacityOverviewTable({ sprints, teams, members, allocat
 
       {/* Team member-level view */}
       <div>
-        <h3 className="text-sm font-semibold mb-3">Capacity by Team Member</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold">Capacity by Team Member</h3>
+          <Select value={sortMembersBy} onValueChange={setSortMembersBy}>
+            <SelectTrigger className="w-28">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="utilization-asc">Low to High</SelectItem>
+              <SelectItem value="utilization-desc">High to Low</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="overflow-x-auto border rounded-lg">
           <Table>
             <TableHeader>
@@ -330,7 +342,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, allocat
               </TableRow>
             </TableHeader>
             <TableBody>
-              {teamMembers.map(member => (
+              {getSortedMembers().map(member => (
                 <TableRow key={member.id}>
                   <TableCell className="text-sm">
                     <div>
