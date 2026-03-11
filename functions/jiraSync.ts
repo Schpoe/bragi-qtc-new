@@ -73,11 +73,16 @@ Deno.serve(async (req) => {
       
       if (!response.ok) {
         const errorText = await response.text();
+        let errorDetails = errorText;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorDetails = errorJson.errorMessages?.join(', ') || errorJson.errors || errorText;
+        } catch {}
         return Response.json({ 
           error: 'Failed to fetch from Jira', 
-          details: errorText,
+          details: errorDetails,
           status: response.status 
-        }, { status: response.status });
+        }, { status: 500 });
       }
 
       const data = await response.json();
