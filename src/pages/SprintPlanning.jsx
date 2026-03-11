@@ -52,8 +52,9 @@ export default function SprintPlanning() {
     queryFn: () => base44.entities.Allocation.list(),
   });
 
-  // Auto-select first team if none selected
-  const effectiveTeamId = selectedTeamId || (teams.length > 0 ? teams[0].id : "");
+  // Only auto-select first team when actually viewing a specific team (not "all")
+  const effectiveTeamId = selectedTeamId && selectedTeamId !== "all" ? selectedTeamId : (teams.length > 0 && (!selectedTeamId || selectedTeamId === "all") ? teams[0].id : "");
+  const isViewingAllTeams = !selectedTeamId || selectedTeamId === "all";
 
   const createSprint = useMutation({
     mutationFn: (data) => base44.entities.Sprint.create(data),
