@@ -29,6 +29,11 @@ export default function JiraSync() {
     queryFn: () => base44.entities.WorkAreaType.list(),
   });
 
+  const { data: existingWorkAreas = [] } = useQuery({
+    queryKey: ['workAreas'],
+    queryFn: () => base44.entities.WorkArea.list(),
+  });
+
   const createTeam = useMutation({
     mutationFn: (teamData) => base44.entities.Team.create(teamData),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['teams'] }),
