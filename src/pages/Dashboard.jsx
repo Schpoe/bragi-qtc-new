@@ -97,29 +97,48 @@ export default function Dashboard() {
           />
 
           <div className="space-y-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold">
-                  Capacity Overview — {selectedQuarter}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CapacityOverviewTable
-                  sprints={quarterSprints}
-                  teams={teams}
-                  members={members}
-                  workAreas={filteredWorkAreas}
-                  allocations={allocations}
-                  selectedTeamId={selectedTeamId}
-                />
-              </CardContent>
-            </Card>
-            <DisciplineBreakdown
-              sprints={quarterSprints}
-              members={members}
-              allocations={allocations}
-              selectedTeamId={selectedTeamId}
-            />
+           <Card>
+             <CardHeader className="pb-3">
+               <CardTitle className="text-base font-semibold">
+                 Capacity Overview — {selectedQuarter}
+               </CardTitle>
+             </CardHeader>
+             <CardContent>
+               <CapacityOverviewTable
+                 sprints={quarterSprints}
+                 teams={teams}
+                 members={members}
+                 workAreas={filteredWorkAreas}
+                 allocations={allocations}
+                 selectedTeamId={selectedTeamId}
+               />
+             </CardContent>
+           </Card>
+           <DisciplineBreakdown
+             sprints={quarterSprints}
+             members={members}
+             allocations={allocations}
+             selectedTeamId={selectedTeamId}
+           />
+           {selectedTeamId !== "all" && (
+             <Card>
+               <CardHeader className="pb-3">
+                 <CardTitle className="text-base font-semibold">
+                   Work Area Distribution
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <WorkAreaDistribution
+                   teams={teams}
+                   members={members}
+                   workAreas={filteredWorkAreas}
+                   allocations={allocations}
+                   sprints={quarterSprints}
+                   selectedTeamId={selectedTeamId}
+                 />
+               </CardContent>
+             </Card>
+           )}
           </div>
         </>
       )}
