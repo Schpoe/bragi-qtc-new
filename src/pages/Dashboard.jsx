@@ -8,7 +8,6 @@ import PageHeader from "../components/shared/PageHeader";
 import StatsRow from "../components/dashboard/StatsRow";
 import CapacityOverviewTable from "../components/dashboard/CapacityOverviewTable";
 import DisciplineBreakdown from "../components/dashboard/DisciplineBreakdown";
-import WorkAreaDistribution from "../components/dashboard/WorkAreaDistribution";
 import WorkAreaTypeDistribution from "../components/dashboard/WorkAreaTypeDistribution";
 
 const currentYear = new Date().getFullYear();
