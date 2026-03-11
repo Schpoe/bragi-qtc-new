@@ -47,6 +47,7 @@ export default function JiraSync() {
   const fetchFromJira = async () => {
     setError(null);
     setSyncResult(null);
+    setFetching(true);
     
     try {
       const response = await base44.functions.invoke('jiraSync', {
@@ -61,6 +62,8 @@ export default function JiraSync() {
       setSyncResult(response.data);
     } catch (err) {
       setError(err.message || 'Failed to fetch from Jira');
+    } finally {
+      setFetching(false);
     }
   };
 
