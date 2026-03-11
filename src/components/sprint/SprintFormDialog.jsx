@@ -110,12 +110,16 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
             <Input type="number" min={1} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
           </div>
           <div className="space-y-2">
-            <Label>Relevant Work Areas</Label>
-            <div className="border rounded-md p-3 space-y-2 max-h-48 overflow-y-auto">
-              {workAreas.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No work areas available</p>
-              ) : (
-                workAreas.map(wa => (
+          <Label>Relevant Work Areas</Label>
+          <div className="border rounded-md p-3 space-y-2 max-h-48 overflow-y-auto">
+            {(() => {
+              const filteredWAs = form.team_id 
+                ? workAreas.filter(wa => wa.leading_team_id === form.team_id || wa.supporting_team_ids?.includes(form.team_id))
+                : workAreas;
+              return filteredWAs.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No work areas available for this team</p>
+            ) : (
+              filteredWAs.map(wa => (
                   <label key={wa.id} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
