@@ -2,7 +2,7 @@ import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-export default function CapacityOverviewTable({ sprints, teams, members, workAreas, allocations, selectedTeamId }) {
+export default function CapacityOverviewTable({ sprints, teams, members, allocations, selectedTeamId }) {
   // If all teams selected, show team-level overview
   if (selectedTeamId === "all") {
     const teamsToDisplay = teams;
