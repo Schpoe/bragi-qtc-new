@@ -207,6 +207,12 @@ export default function WorkAreas() {
         teams={teams}
         onSave={handleSave}
       />
+
+      <JiraImportDialog
+        open={jiraDialogOpen}
+        onOpenChange={setJiraDialogOpen}
+        teams={teams}
+      />
     </div>
   );
 }
