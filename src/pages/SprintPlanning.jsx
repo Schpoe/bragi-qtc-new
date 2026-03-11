@@ -130,6 +130,14 @@ export default function SprintPlanning() {
   };
 
   const handleCopyCrossTeamSprint = (crossTeamSprint) => {
+    // If viewing "All Teams" (no team selected), prompt for team selection
+    if (!selectedTeamId) {
+      setSprintToCopy(crossTeamSprint);
+      setTeamSelectValue("");
+      setTeamSelectDialogOpen(true);
+      return;
+    }
+
     const teamSpecificSprints = sprints.filter(s => s.quarter === selectedQuarter && s.team_id === effectiveTeamId);
     const team = teams.find(t => t.id === effectiveTeamId);
     const teamName = team ? team.name : "";
@@ -144,6 +152,28 @@ export default function SprintPlanning() {
       relevant_work_area_ids: crossTeamSprint.relevant_work_area_ids || [],
     };
     createSprint.mutate(newSprint);
+  };
+
+  const handleConfirmTeamSelect = () => {
+    if (!teamSelectValue || !sprintToCopy) return;
+
+    const teamSpecificSprints = sprints.filter(s => s.quarter === selectedQuarter && s.team_id === teamSelectValue);
+    const team = teams.find(t => t.id === teamSelectValue);
+    const teamName = team ? team.name : "";
+    const newSprint = {
+      name: teamName ? `${teamName} - ${sprintToCopy.name}` : sprintToCopy.name,
+      quarter: sprintToCopy.quarter,
+      team_id: teamSelectValue,
+      is_cross_team: false,
+      start_date: sprintToCopy.start_date || "",
+      end_date: sprintToCopy.end_date || "",
+      order: teamSpecificSprints.length + 1,
+      relevant_work_area_ids: sprintToCopy.relevant_work_area_ids || [],
+    };
+    createSprint.mutate(newSprint);
+    setTeamSelectDialogOpen(false);
+    setSprintToCopy(null);
+    setTeamSelectValue("");
   };
 
   // Filter sprints: must belong to selected team OR be cross-team, AND match quarter
