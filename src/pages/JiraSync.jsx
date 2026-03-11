@@ -311,8 +311,7 @@ export default function JiraSync() {
                 <div className="space-y-1">
                   <p>Import completed:</p>
                   <ul className="list-disc list-inside text-sm">
-                    <li>Teams created: {syncResult.importStats.teamsCreated}</li>
-                    <li>Types created: {syncResult.importStats.typesCreated}</li>
+                     <li>Types created: {syncResult.importStats.typesCreated}</li>
                     <li>Work Areas created: {syncResult.importStats.workAreasCreated}</li>
                     <li>Work Areas updated: {syncResult.importStats.workAreasUpdated}</li>
                     <li>Work Areas skipped: {syncResult.importStats.workAreasSkipped}</li>
