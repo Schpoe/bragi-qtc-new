@@ -382,8 +382,8 @@ export default function SprintPlanning() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Toaster />
     </div>
-    <Toaster />
     </>
   );
 }
