@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const disciplineColors = {
@@ -11,6 +12,7 @@ const disciplineColors = {
 };
 
 export default function DisciplineBreakdown({ sprints, members, allocations, selectedTeamId }) {
+  const [sortBy, setSortBy] = useState("name");
   const filteredMembers = selectedTeamId === "all"
     ? members
     : members.filter(m => m.team_id === selectedTeamId);
