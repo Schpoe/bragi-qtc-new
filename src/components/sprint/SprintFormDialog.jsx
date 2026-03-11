@@ -34,6 +34,7 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
         start_date: sprint.start_date || "",
         end_date: sprint.end_date || "",
         order: sprint.order || 1,
+        relevant_work_area_ids: sprint.relevant_work_area_ids || [],
       });
     } else {
       const nextOrder = existingSprints ? existingSprints.length + 1 : 1;
@@ -45,6 +46,7 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
         start_date: "",
         end_date: "",
         order: nextOrder,
+        relevant_work_area_ids: [],
       });
     }
   }, [sprint, open, existingSprints, defaultTeamId, defaultQuarter]);
