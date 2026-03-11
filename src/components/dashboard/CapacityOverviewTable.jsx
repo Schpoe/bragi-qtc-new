@@ -38,17 +38,48 @@ export default function CapacityOverviewTable({ sprints, teams, members, allocat
     };
 
     if (sprints.length === 0 || teamsToDisplay.length === 0) {
-      return <div className="text-center py-8 text-sm text-muted-foreground">No data available.</div>;
-    }
+       return <div className="text-center py-8 text-sm text-muted-foreground">No data available.</div>;
+     }
 
-    // Get all disciplines across all teams
-    const allDisciplines = [...new Set(members.map(m => m.discipline))].sort();
+     // Get all disciplines across all teams
+     const allDisciplines = [...new Set(members.map(m => m.discipline))].sort();
 
-    return (
-      <div className="space-y-6">
-        {/* Team-level overview */}
-        <div>
-          <h3 className="text-sm font-semibold mb-3">Team Capacity</h3>
+     const getSortedTeams = () => {
+       const getAvgUtil = (teamId) => {
+         const teamMembers = members.filter(m => m.team_id === teamId);
+         const memberIds = new Set(teamMembers.map(m => m.id));
+         const totalAlloc = allocations
+           .filter(a => memberIds.has(a.team_member_id))
+           .reduce((sum, a) => sum + (a.percent || 0), 0);
+         const maxCapacity = teamMembers.reduce((sum, m) => sum + (m.availability_percent || 100), 0);
+         return maxCapacity > 0 ? Math.round((totalAlloc / maxCapacity) * 100) : 0;
+       };
+
+       return [...teamsToDisplay].sort((a, b) => {
+         if (sortTeamsBy === "name") return a.name.localeCompare(b.name);
+         if (sortTeamsBy === "utilization-asc") return getAvgUtil(a.id) - getAvgUtil(b.id);
+         if (sortTeamsBy === "utilization-desc") return getAvgUtil(b.id) - getAvgUtil(a.id);
+         return 0;
+       });
+     };
+
+     return (
+       <div className="space-y-6">
+         {/* Team-level overview */}
+         <div>
+           <div className="flex items-center justify-between mb-3">
+             <h3 className="text-sm font-semibold">Team Capacity</h3>
+             <Select value={sortTeamsBy} onValueChange={setSortTeamsBy}>
+               <SelectTrigger className="w-28">
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem value="name">Name</SelectItem>
+                 <SelectItem value="utilization-asc">Low to High</SelectItem>
+                 <SelectItem value="utilization-desc">High to Low</SelectItem>
+               </SelectContent>
+             </Select>
+           </div>
           <div className="overflow-x-auto border rounded-lg">
             <Table>
               <TableHeader>
