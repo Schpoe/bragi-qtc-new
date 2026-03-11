@@ -31,14 +31,33 @@ export default function DisciplineBreakdown({ sprints, members, allocations, sel
     return maxCapacity > 0 ? Math.round((totalAlloc / maxCapacity) * 100) : 0;
   };
 
+  const sortedDisciplines = [...disciplines].sort((a, b) => {
+    const utilA = getAvgUtilization(a);
+    const utilB = getAvgUtilization(b);
+    if (sortBy === "name") return a.localeCompare(b);
+    if (sortBy === "utilization-asc") return utilA - utilB;
+    if (sortBy === "utilization-desc") return utilB - utilA;
+    return 0;
+  });
+
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <CardTitle className="text-base font-semibold">Utilization by Discipline</CardTitle>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name">Sort by Name</SelectItem>
+            <SelectItem value="utilization-asc">Low to High</SelectItem>
+            <SelectItem value="utilization-desc">High to Low</SelectItem>
+          </SelectContent>
+        </Select>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {disciplines.map(disc => {
+          {sortedDisciplines.map(disc => {
             const util = getAvgUtilization(disc);
             const count = filteredMembers.filter(m => m.discipline === disc).length;
             return (
