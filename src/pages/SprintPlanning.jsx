@@ -137,7 +137,7 @@ export default function SprintPlanning() {
     );
     if (existing) {
       if (value === 0) {
-        deleteAllocation.mutate(existing.id);
+        setDeleteAllocationId(existing.id);
       } else {
         updateAllocation.mutate({ id: existing.id, data: { percent: value } });
       }
