@@ -59,7 +59,18 @@ export default function SprintPlanning() {
 
   const createSprint = useMutation({
     mutationFn: (data) => base44.entities.Sprint.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sprints"] }),
+    onSuccess: (newSprint) => {
+      queryClient.invalidateQueries({ queryKey: ["sprints"] });
+      // If this was a copied sprint, show success and navigate to that team
+      if (sprintToCopy && newSprint.team_id) {
+        const team = teams.find(t => t.id === newSprint.team_id);
+        toast.success(`Sprint copied to ${team?.name || "team"}`);
+        setSelectedTeamId(newSprint.team_id);
+        setSprintToCopy(null);
+        setTeamSelectDialogOpen(false);
+        setTeamSelectValue("");
+      }
+    },
   });
 
   const updateSprint = useMutation({
