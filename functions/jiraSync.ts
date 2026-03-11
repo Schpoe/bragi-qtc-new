@@ -104,49 +104,47 @@ Deno.serve(async (req) => {
       const issueType = fields.issuetype?.name || '';
       const summary = fields.summary || '';
       
-      // Extract teams from custom fields
+      // Extract teams and type from mapped custom fields
       let leadingTeam = '';
       let supportingTeams = [];
+      let workAreaType = issueType;
       
-      // Look for team fields in custom fields
-      for (const [key, value] of Object.entries(fields)) {
-        const lowerKey = key.toLowerCase();
-        
-        if (lowerKey.includes('leading') && lowerKey.includes('team')) {
-          // Leading team field
-          if (value && typeof value === 'object') {
-            leadingTeam = value.value || value.name || '';
-          } else if (value) {
-            leadingTeam = value;
+      // Leading Team
+      if (leadingTeamField && fields[leadingTeamField]) {
+        const value = fields[leadingTeamField];
+        if (value && typeof value === 'object') {
+          leadingTeam = value.value || value.name || '';
+        } else if (value) {
+          leadingTeam = value;
+        }
+        if (leadingTeam) teams.add(leadingTeam);
+      }
+      
+      // Contributing Teams
+      if (contributingTeamsField && fields[contributingTeamsField]) {
+        const value = fields[contributingTeamsField];
+        if (Array.isArray(value)) {
+          supportingTeams = value.map(v => v.value || v.name || v).filter(Boolean);
+          supportingTeams.forEach(t => teams.add(t));
+        } else if (value && typeof value === 'object') {
+          const teamName = value.value || value.name;
+          if (teamName) {
+            supportingTeams.push(teamName);
+            teams.add(teamName);
           }
-          if (leadingTeam) teams.add(leadingTeam);
-        } else if (lowerKey.includes('supporting') || lowerKey.includes('contributing')) {
-          // Supporting/contributing teams field
-          if (Array.isArray(value)) {
-            supportingTeams = value.map(v => v.value || v.name || v).filter(Boolean);
-            supportingTeams.forEach(t => teams.add(t));
-          } else if (value && typeof value === 'object') {
-            const teamName = value.value || value.name;
-            if (teamName) {
-              supportingTeams.push(teamName);
-              teams.add(teamName);
-            }
-          } else if (value) {
-            supportingTeams.push(value);
-            teams.add(value);
-          }
-        } else if (lowerKey.includes('team') && !leadingTeam) {
-          // Generic team field as fallback for leading team
-          if (value && typeof value === 'object') {
-            const teamName = value.value || value.name;
-            if (teamName) {
-              leadingTeam = teamName;
-              teams.add(teamName);
-            }
-          } else if (value) {
-            leadingTeam = value;
-            teams.add(value);
-          }
+        } else if (value) {
+          supportingTeams.push(value);
+          teams.add(value);
+        }
+      }
+      
+      // Type (override issue type if custom field exists)
+      if (typeField && fields[typeField]) {
+        const value = fields[typeField];
+        if (value && typeof value === 'object') {
+          workAreaType = value.value || value.name || issueType;
+        } else if (value) {
+          workAreaType = value;
         }
       }
 
