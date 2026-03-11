@@ -128,21 +128,22 @@ export default function SprintPlanning() {
   };
 
   const handleCopyCrossTeamSprint = (crossTeamSprint) => {
-    // If viewing "All Teams" (no team selected), prompt for team selection
-    if (!selectedTeamId || selectedTeamId === "all") {
+    // If viewing "All Teams", prompt for team selection
+    if (isViewingAllTeams) {
       setSprintToCopy(crossTeamSprint);
       setTeamSelectValue("");
       setTeamSelectDialogOpen(true);
       return;
     }
 
-    const teamSpecificSprints = sprints.filter(s => s.quarter === selectedQuarter && s.team_id === effectiveTeamId);
-    const team = teams.find(t => t.id === effectiveTeamId);
+    // Copy to currently selected team
+    const teamSpecificSprints = sprints.filter(s => s.quarter === selectedQuarter && s.team_id === selectedTeamId);
+    const team = teams.find(t => t.id === selectedTeamId);
     const teamName = team ? team.name : "";
     const newSprint = {
       name: teamName ? `${teamName} - ${crossTeamSprint.name}` : crossTeamSprint.name,
       quarter: crossTeamSprint.quarter,
-      team_id: effectiveTeamId,
+      team_id: selectedTeamId,
       is_cross_team: false,
       start_date: crossTeamSprint.start_date || "",
       end_date: crossTeamSprint.end_date || "",
