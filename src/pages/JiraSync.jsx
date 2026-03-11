@@ -16,6 +16,34 @@ export default function JiraSync() {
   const [error, setError] = useState(null);
   const [importing, setImporting] = useState(false);
   const [fetching, setFetching] = useState(false);
+
+  const calculateWorkAreaStats = (workAreas) => {
+    if (!workAreas) return { toAdd: 0, toUpdate: 0, toSkip: 0 };
+    
+    let toAdd = 0, toUpdate = 0, toSkip = 0;
+    
+    for (const wa of workAreas) {
+      const existing = existingWorkAreas.find(ewa => ewa.prod_id === wa.key);
+      
+      if (!existing) {
+        toAdd++;
+      } else {
+        const hasChanged = 
+          existing.name !== wa.name ||
+          existing.type !== wa.type ||
+          existing.leading_team_id !== wa.leadingTeam ||
+          JSON.stringify(existing.supporting_team_ids || []) !== JSON.stringify(wa.supportingTeams);
+        
+        if (hasChanged) {
+          toUpdate++;
+        } else {
+          toSkip++;
+        }
+      }
+    }
+    
+    return { toAdd, toUpdate, toSkip };
+  };
   
   const queryClient = useQueryClient();
 
