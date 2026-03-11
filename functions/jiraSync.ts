@@ -79,22 +79,47 @@ Deno.serve(async (req) => {
       const issueType = fields.issuetype?.name || '';
       const summary = fields.summary || '';
       
-      // Extract teams from custom fields (adjust field names based on your Jira setup)
+      // Extract teams from custom fields
       let leadingTeam = '';
       let supportingTeams = [];
       
       // Look for team fields in custom fields
       for (const [key, value] of Object.entries(fields)) {
-        if (key.includes('team') || key.includes('Team')) {
+        const lowerKey = key.toLowerCase();
+        
+        if (lowerKey.includes('leading') && lowerKey.includes('team')) {
+          // Leading team field
+          if (value && typeof value === 'object') {
+            leadingTeam = value.value || value.name || '';
+          } else if (value) {
+            leadingTeam = value;
+          }
+          if (leadingTeam) teams.add(leadingTeam);
+        } else if (lowerKey.includes('supporting') || lowerKey.includes('contributing')) {
+          // Supporting/contributing teams field
           if (Array.isArray(value)) {
-            value.forEach(v => {
-              const teamName = v.value || v.name || v;
-              if (teamName) teams.add(teamName);
-            });
+            supportingTeams = value.map(v => v.value || v.name || v).filter(Boolean);
+            supportingTeams.forEach(t => teams.add(t));
           } else if (value && typeof value === 'object') {
             const teamName = value.value || value.name;
-            if (teamName) teams.add(teamName);
+            if (teamName) {
+              supportingTeams.push(teamName);
+              teams.add(teamName);
+            }
           } else if (value) {
+            supportingTeams.push(value);
+            teams.add(value);
+          }
+        } else if (lowerKey.includes('team') && !leadingTeam) {
+          // Generic team field as fallback for leading team
+          if (value && typeof value === 'object') {
+            const teamName = value.value || value.name;
+            if (teamName) {
+              leadingTeam = teamName;
+              teams.add(teamName);
+            }
+          } else if (value) {
+            leadingTeam = value;
             teams.add(value);
           }
         }
