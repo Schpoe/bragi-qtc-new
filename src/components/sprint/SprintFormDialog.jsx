@@ -79,7 +79,7 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
           {!form.is_cross_team && (
             <div className="space-y-2">
               <Label>Team</Label>
-              <Select value={form.team_id} onValueChange={(v) => setForm({ ...form, team_id: v })}>
+              <Select value={form.team_id || ""} onValueChange={(v) => setForm({ ...form, team_id: v, relevant_work_area_ids: [] })}>
                 <SelectTrigger><SelectValue placeholder="Select team" /></SelectTrigger>
                 <SelectContent>
                   {(teams || []).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
