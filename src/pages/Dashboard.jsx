@@ -106,6 +106,7 @@ export default function Dashboard() {
                  members={members}
                  allocations={allocations}
                  selectedTeamId={selectedTeamId}
+                 workAreas={filteredWorkAreas}
                />
              </CardContent>
            </Card>
