@@ -31,7 +31,7 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
         <TableHeader>
           <TableRow className="bg-muted/50">
             <TableHead className="min-w-[160px] sticky left-0 bg-muted/50 z-10">Member</TableHead>
-            {workAreas.map(wa => (
+            {relevantWorkAreas.map(wa => (
               <TableHead key={wa.id} className="text-center min-w-[80px]">
                 <div className="flex items-center justify-center gap-1.5">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
