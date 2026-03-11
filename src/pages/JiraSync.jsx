@@ -284,6 +284,8 @@ export default function JiraSync() {
                     <li>Teams created: {syncResult.importStats.teamsCreated}</li>
                     <li>Types created: {syncResult.importStats.typesCreated}</li>
                     <li>Work Areas created: {syncResult.importStats.workAreasCreated}</li>
+                    <li>Work Areas updated: {syncResult.importStats.workAreasUpdated}</li>
+                    <li>Work Areas skipped: {syncResult.importStats.workAreasSkipped}</li>
                     {syncResult.importStats.errors.length > 0 && (
                       <li className="text-destructive">Errors: {syncResult.importStats.errors.length}</li>
                     )}
