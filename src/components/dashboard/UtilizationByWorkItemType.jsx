@@ -94,7 +94,9 @@ export default function UtilizationByWorkItemType({ workAreas, allocations, memb
             </div>
           </div>
         );
-      })}
-    </div>
-  );
-}
+          })}
+        </div>
+        </CardContent>
+        </Card>
+        );
+        }
