@@ -180,7 +180,7 @@ export default function SprintPlanning() {
         </div>
       ) : teams.length === 0 ? (
         <EmptyState icon={CalendarRange} title="No teams yet" description="First create a team under 'Teams'." />
-      ) : quarterSprints.length === 0 ? (
+      ) : quarterSprints.length === 0 && crossTeamSprints.length === 0 ? (
         <EmptyState
           icon={CalendarRange}
           title="No sprints for this team & quarter"
@@ -189,6 +189,21 @@ export default function SprintPlanning() {
           <Button onClick={() => setSprintDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" /> Create Sprint
           </Button>
+        </EmptyState>
+      ) : quarterSprints.length === 0 && crossTeamSprints.length > 0 ? (
+        <EmptyState
+          icon={CalendarRange}
+          title="No team-specific sprints yet"
+          description="Copy a cross-team sprint or create a new sprint for this team."
+        >
+          <div className="flex gap-3">
+            <Button onClick={() => setSprintDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" /> New Sprint
+            </Button>
+            <Button variant="outline" onClick={() => {}}>
+              <Copy className="w-4 h-4 mr-2" /> Copy Cross-team Sprint
+            </Button>
+          </div>
         </EmptyState>
       ) : (
         <div className="space-y-6">
