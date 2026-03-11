@@ -151,10 +151,12 @@ export default function JiraImport() {
           .filter(id => id); // Remove undefined/null values
 
         const workAreaType = (item.Type || item.type || '').trim();
+        const prodId = (item.Key || item.key || '').trim();
 
         try {
           await createWorkArea.mutateAsync({
             name: itemName.trim(),
+            prod_id: prodId,
             type: workAreaType,
             leading_team_id: leadingTeamId,
             supporting_team_ids: supportingTeamIds,
