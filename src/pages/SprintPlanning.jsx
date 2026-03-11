@@ -27,8 +27,9 @@ export default function SprintPlanning() {
   const [teamSelectDialogOpen, setTeamSelectDialogOpen] = useState(false);
   const [teamSelectValue, setTeamSelectValue] = useState("");
   const [sprintToCopy, setSprintToCopy] = useState(null);
-  const [isCopyOperation, setIsCopyOperation] = useState(false);
-  const queryClient = useQueryClient();
+   const [isCopyOperation, setIsCopyOperation] = useState(false);
+   const [copiedToTeamName, setCopiedToTeamName] = useState("");
+   const queryClient = useQueryClient();
 
   const { data: sprints = [], isLoading: sprintsLoading } = useQuery({
     queryKey: ["sprints"],
