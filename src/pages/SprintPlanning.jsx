@@ -383,5 +383,7 @@ export default function SprintPlanning() {
         </DialogContent>
       </Dialog>
     </div>
+    <Toaster />
+    </>
   );
 }
