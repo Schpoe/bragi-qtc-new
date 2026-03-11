@@ -125,8 +125,10 @@ export default function SprintPlanning() {
 
   const handleCopyCrossTeamSprint = (crossTeamSprint) => {
     const teamSpecificSprints = sprints.filter(s => s.quarter === selectedQuarter && s.team_id === effectiveTeamId);
+    const team = teams.find(t => t.id === effectiveTeamId);
+    const teamName = team ? team.name : "";
     const newSprint = {
-      name: crossTeamSprint.name,
+      name: teamName ? `${teamName} - ${crossTeamSprint.name}` : crossTeamSprint.name,
       quarter: crossTeamSprint.quarter,
       team_id: effectiveTeamId,
       is_cross_team: false,
