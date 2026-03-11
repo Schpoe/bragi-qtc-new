@@ -23,8 +23,6 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
     queryFn: () => base44.entities.WorkAreaType.list("order"),
   });
 
-  const allTypes = workAreaTypes.map(t => t.name);
-
   useEffect(() => {
     if (workArea) {
       setForm({
@@ -35,9 +33,9 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
         color: workArea.color || areaColors[0],
       });
     } else {
-      setForm({ name: "", type: allTypes[0] || "", leading_team_id: "", supporting_team_ids: [], color: areaColors[Math.floor(Math.random() * areaColors.length)] });
+      setForm({ name: "", type: workAreaTypes[0]?.name || "", leading_team_id: "", supporting_team_ids: [], color: areaColors[Math.floor(Math.random() * areaColors.length)] });
     }
-  }, [workArea, open, allTypes]);
+  }, [workArea, open, workAreaTypes]);
 
   const toggleSupportingTeam = (teamId) => {
     const current = form.supporting_team_ids || [];
