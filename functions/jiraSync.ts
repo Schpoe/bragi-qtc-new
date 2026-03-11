@@ -77,6 +77,12 @@ Deno.serve(async (req) => {
 
     for (const issue of issues) {
       const fields = issue.fields || {};
+      
+      // Log first issue fields to debug
+      if (issues.indexOf(issue) === 0) {
+        console.log('First issue fields:', JSON.stringify(fields, null, 2));
+      }
+      
       const issueType = fields.issuetype?.name || '';
       const summary = fields.summary || '';
       
