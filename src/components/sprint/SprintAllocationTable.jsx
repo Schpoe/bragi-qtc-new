@@ -54,8 +54,8 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
                     <DisciplineBadge discipline={member.discipline} />
                   </div>
                 </TableCell>
-                {workAreas.map(wa => (
-                  <TableCell key={wa.id} className="text-center p-1">
+                {relevantWorkAreas.map(wa => (
+                   <TableCell key={wa.id} className="text-center p-1">
                     <div className="flex justify-center">
                       <AllocationCell
                         value={getAllocation(member.id, wa.id)}
