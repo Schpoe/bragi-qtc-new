@@ -1,50 +1,73 @@
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { cn } from "@/lib/utils";
 
-export default function UtilizationByWorkItemType({ workAreas, allocations, members, selectedTeamId }) {
+const typeColors = {
+  Feature: "hsl(var(--chart-1))",
+  Bug: "hsl(var(--chart-2))",
+  Epic: "hsl(var(--chart-3))",
+  Task: "hsl(var(--chart-4))",
+  Improvement: "hsl(var(--chart-5))",
+};
+
+export default function UtilizationByWorkItemType({ workAreas, allocations, members, sprints, selectedTeamId }) {
   const filteredMembers = selectedTeamId === "all"
     ? members
     : members.filter(m => m.team_id === selectedTeamId);
 
   const memberIds = new Set(filteredMembers.map(m => m.id));
-  const relevantAllocations = allocations.filter(a => memberIds.has(a.team_member_id));
+  const sprintIds = new Set(sprints.map(s => s.id));
 
-  const typeUtilization = {};
+  const types = [...new Set(workAreas.map(wa => wa.type))];
 
-  relevantAllocations.forEach(allocation => {
-    const workArea = workAreas.find(wa => wa.id === allocation.work_area_id);
-    if (workArea) {
-      if (!typeUtilization[workArea.type]) {
-        typeUtilization[workArea.type] = 0;
-      }
-      typeUtilization[workArea.type] += allocation.percent || 0;
-    }
-  });
+  const getUtilization = (type) => {
+    const typeWorkAreas = workAreas.filter(wa => wa.type === type);
+    const typeWorkAreaIds = new Set(typeWorkAreas.map(wa => wa.id));
+    const totalAlloc = allocations
+      .filter(a => memberIds.has(a.team_member_id) && sprintIds.has(a.sprint_id) && typeWorkAreaIds.has(a.work_area_id))
+      .reduce((sum, a) => sum + (a.percent || 0), 0);
+    const maxCapacity = filteredMembers.reduce((sum, m) => sum + (m.availability_percent || 100), 0) * sprints.length;
+    return maxCapacity > 0 ? Math.round((totalAlloc / maxCapacity) * 100) : 0;
+  };
 
-  const data = Object.entries(typeUtilization)
-    .map(([type, utilization]) => ({
-      name: type,
-      utilization: Math.round(utilization),
-    }))
-    .sort((a, b) => b.utilization - a.utilization);
-
-  if (data.length === 0) {
+  if (types.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-sm text-muted-foreground">
-        No utilization data available
-      </div>
+      <p className="text-sm text-muted-foreground text-center py-4">No data</p>
     );
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip formatter={(value) => `${value}%`} />
-        <Bar dataKey="utilization" fill="hsl(var(--chart-1))" />
-      </BarChart>
-    </ResponsiveContainer>
+    <div className="space-y-4">
+      {types.map(type => {
+        const util = getUtilization(type);
+        const count = workAreas.filter(wa => wa.type === type).length;
+        const color = typeColors[type] || "hsl(var(--chart-1))";
+        return (
+          <div key={type}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                <span className="text-sm font-medium">{type}</span>
+                <span className="text-xs text-muted-foreground">({count})</span>
+              </div>
+              <span className={cn(
+                "text-sm font-semibold tabular-nums",
+                util > 100 ? "text-destructive" : util > 80 ? "text-amber-600" : "text-foreground"
+              )}>
+                {util}%
+              </span>
+            </div>
+            <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${Math.min(util, 100)}%`,
+                  backgroundColor: color,
+                }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
