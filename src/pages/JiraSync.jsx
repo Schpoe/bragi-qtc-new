@@ -261,12 +261,28 @@ export default function JiraSync() {
             <CardDescription>Issues found in Jira</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            <div className="space-y-3 max-h-96 overflow-y-auto">
               {syncResult.workAreas.slice(0, 20).map((wa, idx) => (
-                <div key={idx} className="flex items-center gap-2 p-2 border rounded text-sm">
-                  <span className="font-mono text-muted-foreground">{wa.key}</span>
-                  <span className="flex-1">{wa.name}</span>
-                  {wa.type && <span className="text-xs bg-secondary px-2 py-1 rounded">{wa.type}</span>}
+                <div key={idx} className="p-3 border rounded space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="font-mono text-xs text-muted-foreground">{wa.key}</span>
+                    <span className="flex-1 font-medium text-sm">{wa.name}</span>
+                    {wa.type && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">{wa.type}</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    {wa.leadingTeam && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground">Leading:</span>
+                        <span className="bg-secondary px-2 py-0.5 rounded">{wa.leadingTeam}</span>
+                      </div>
+                    )}
+                    {wa.supportingTeams && wa.supportingTeams.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground">Supporting:</span>
+                        <span className="bg-secondary px-2 py-0.5 rounded">{wa.supportingTeams.join(', ')}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
               {syncResult.workAreas.length > 20 && (
