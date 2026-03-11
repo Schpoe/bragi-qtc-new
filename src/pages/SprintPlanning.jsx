@@ -15,6 +15,7 @@ import EmptyState from "../components/shared/EmptyState";
 import FilterBar from "../components/shared/FilterBar";
 import SprintFormDialog from "../components/sprint/SprintFormDialog";
 import SprintAllocationTable from "../components/sprint/SprintAllocationTable";
+import ConfirmDeleteDialog from "../components/shared/ConfirmDeleteDialog";
 
 const currentYear = new Date().getFullYear();
 const currentQ = Math.ceil((new Date().getMonth() + 1) / 3);
