@@ -114,12 +114,29 @@ export default function Dashboard() {
                />
              </CardContent>
            </Card>
-           <DisciplineBreakdown
-             sprints={quarterSprints}
-             members={members}
-             allocations={allocations}
-             selectedTeamId={selectedTeamId}
-           />
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+             <DisciplineBreakdown
+               sprints={quarterSprints}
+               members={members}
+               allocations={allocations}
+               selectedTeamId={selectedTeamId}
+             />
+             <Card>
+               <CardHeader className="pb-3">
+                 <CardTitle className="text-base font-semibold">
+                   Utilization by Work Item Types
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <UtilizationByWorkItemType
+                   workAreas={filteredWorkAreas}
+                   allocations={allocations}
+                   members={members}
+                   selectedTeamId={selectedTeamId}
+                 />
+               </CardContent>
+             </Card>
+           </div>
            </div>
         </>
       )}
