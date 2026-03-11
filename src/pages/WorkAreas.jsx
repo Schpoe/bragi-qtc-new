@@ -60,9 +60,30 @@ export default function WorkAreas() {
 
   const teamMap = Object.fromEntries(teams.map(t => [t.id, t.name]));
 
-  const filteredWorkAreas = filterTeamId === "all"
+  // Filter by team
+  let filteredByTeam = filterTeamId === "all"
     ? workAreas
     : workAreas.filter(wa => wa.leading_team_id === filterTeamId || (wa.supporting_team_ids || []).includes(filterTeamId));
+
+  // Filter by role (All, Leading, Supporting, Other)
+  let filteredByRole = filteredByTeam;
+  if (filterTeamId !== "all") {
+    if (roleTab === "leading") {
+      filteredByRole = filteredByTeam.filter(wa => wa.leading_team_id === filterTeamId);
+    } else if (roleTab === "supporting") {
+      filteredByRole = filteredByTeam.filter(wa => (wa.supporting_team_ids || []).includes(filterTeamId));
+    } else if (roleTab === "other") {
+      filteredByRole = filteredByTeam.filter(wa => 
+        wa.leading_team_id !== filterTeamId && !(wa.supporting_team_ids || []).includes(filterTeamId)
+      );
+    }
+  }
+
+  // Filter by search query
+  const filteredWorkAreas = filteredByRole.filter(wa =>
+    wa.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    wa.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div>
