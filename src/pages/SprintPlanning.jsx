@@ -112,7 +112,6 @@ export default function SprintPlanning() {
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 
   const teamMembers = members.filter(m => m.team_id === effectiveTeamId);
-  const teamWorkAreas = workAreas.filter(wa => wa.is_cross_team || wa.leading_team_id === effectiveTeamId || wa.supporting_team_ids?.includes(effectiveTeamId));
 
   const quarters = [...new Set(sprints.map(s => s.quarter))];
   if (!quarters.includes(selectedQuarter)) quarters.push(selectedQuarter);
