@@ -387,19 +387,43 @@ export default function SprintPlanning() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Toaster 
-        position="top-center"
-        richColors
-        closeButton
-        toastOptions={{
-          style: {
-            fontSize: '16px',
-            padding: '16px',
-            minWidth: '400px',
-          },
+      <ConfirmDeleteDialog
+        open={deleteSprintId !== null}
+        title="Delete Sprint?"
+        description="Are you sure you want to delete this sprint? This action cannot be undone."
+        onConfirm={() => {
+          deleteSprint.mutate(deleteSprintId);
+          setDeleteSprintId(null);
         }}
+        onCancel={() => setDeleteSprintId(null)}
+        isLoading={deleteSprint.isPending}
       />
-    </div>
-    </>
-  );
-}
+
+      <ConfirmDeleteDialog
+        open={deleteAllocationId !== null}
+        title="Delete Allocation?"
+        description="Are you sure you want to delete this allocation? This action cannot be undone."
+        onConfirm={() => {
+          deleteAllocation.mutate(deleteAllocationId);
+          setDeleteAllocationId(null);
+        }}
+        onCancel={() => setDeleteAllocationId(null)}
+        isLoading={deleteAllocation.isPending}
+      />
+
+      <Toaster 
+         position="top-center"
+         richColors
+         closeButton
+         toastOptions={{
+           style: {
+             fontSize: '16px',
+             padding: '16px',
+             minWidth: '400px',
+           },
+         }}
+       />
+      </div>
+      </>
+      );
+      }
