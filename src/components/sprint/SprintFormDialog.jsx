@@ -109,8 +109,35 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
             <Label>Order</Label>
             <Input type="number" min={1} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
           </div>
-        </div>
-        <DialogFooter>
+          <div className="space-y-2">
+            <Label>Relevant Work Areas</Label>
+            <div className="border rounded-md p-3 space-y-2 max-h-48 overflow-y-auto">
+              {workAreas.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No work areas available</p>
+              ) : (
+                workAreas.map(wa => (
+                  <label key={wa.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={(form.relevant_work_area_ids || []).includes(wa.id)}
+                      onChange={(e) => {
+                        const ids = form.relevant_work_area_ids || [];
+                        if (e.target.checked) {
+                          setForm({ ...form, relevant_work_area_ids: [...ids, wa.id] });
+                        } else {
+                          setForm({ ...form, relevant_work_area_ids: ids.filter(id => id !== wa.id) });
+                        }
+                      }}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm">{wa.name}</span>
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
+          </div>
+          <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={handleSave} disabled={!form.name.trim() || (!form.is_cross_team && !form.team_id)}>Save</Button>
         </DialogFooter>
