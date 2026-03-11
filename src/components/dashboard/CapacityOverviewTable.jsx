@@ -20,60 +20,139 @@ export default function CapacityOverviewTable({ sprints, teams, members, workAre
       return teamMembers.reduce((sum, m) => sum + (m.availability_percent || 100), 0);
     };
 
+    const getDisciplineCapacityForTeam = (sprintId, teamId, discipline) => {
+      const teamMembers = members.filter(m => m.team_id === teamId && m.discipline === discipline);
+      const memberIds = new Set(teamMembers.map(m => m.id));
+      return allocations
+        .filter(a => a.sprint_id === sprintId && memberIds.has(a.team_member_id))
+        .reduce((sum, a) => sum + (a.percent || 0), 0);
+    };
+
+    const getDisciplineMaxCapacityForTeam = (teamId, discipline) => {
+      return members
+        .filter(m => m.team_id === teamId && m.discipline === discipline)
+        .reduce((sum, m) => sum + (m.availability_percent || 100), 0);
+    };
+
     if (sprints.length === 0 || teamsToDisplay.length === 0) {
       return <div className="text-center py-8 text-sm text-muted-foreground">No data available.</div>;
     }
 
+    // Get all disciplines across all teams
+    const allDisciplines = [...new Set(members.map(m => m.discipline))].sort();
+
     return (
-      <div className="overflow-x-auto border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="min-w-[120px]">Sprint</TableHead>
-              {teamsToDisplay.map(team => (
-                <TableHead key={team.id} className="text-center min-w-[100px]">
-                  <div className="flex items-center justify-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color || "#3b82f6" }} />
-                    <span className="text-xs font-medium">{team.name}</span>
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sprints.map(sprint => (
-              <TableRow key={sprint.id}>
-                <TableCell className="font-medium text-sm">{sprint.name}</TableCell>
-                {teamsToDisplay.map(team => {
-                  const capacity = getTeamCapacity(sprint.id, team.id);
-                  const maxCapacity = getTeamMaxCapacity(team.id);
-                  const utilPct = maxCapacity > 0 ? Math.round((capacity / maxCapacity) * 100) : 0;
-                  return (
-                    <TableCell key={team.id} className="text-center">
-                      <div className="flex flex-col items-center gap-1">
-                        <span className={cn(
-                          "text-sm font-semibold tabular-nums",
-                          utilPct > 100 ? "text-destructive" : utilPct > 80 ? "text-amber-600" : "text-foreground"
-                        )}>
-                          {utilPct}%
-                        </span>
-                        <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className={cn(
-                              "h-full rounded-full transition-all",
-                              utilPct > 100 ? "bg-destructive" : utilPct > 80 ? "bg-amber-500" : "bg-primary"
-                            )}
-                            style={{ width: `${Math.min(utilPct, 100)}%` }}
-                          />
-                        </div>
+      <div className="space-y-6">
+        {/* Team-level overview */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3">Team Capacity</h3>
+          <div className="overflow-x-auto border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="min-w-[120px]">Sprint</TableHead>
+                  {teamsToDisplay.map(team => (
+                    <TableHead key={team.id} className="text-center min-w-[100px]">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color || "#3b82f6" }} />
+                        <span className="text-xs font-medium">{team.name}</span>
                       </div>
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sprints.map(sprint => (
+                  <TableRow key={sprint.id}>
+                    <TableCell className="font-medium text-sm">{sprint.name}</TableCell>
+                    {teamsToDisplay.map(team => {
+                      const capacity = getTeamCapacity(sprint.id, team.id);
+                      const maxCapacity = getTeamMaxCapacity(team.id);
+                      const utilPct = maxCapacity > 0 ? Math.round((capacity / maxCapacity) * 100) : 0;
+                      return (
+                        <TableCell key={team.id} className="text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <span className={cn(
+                              "text-sm font-semibold tabular-nums",
+                              utilPct > 100 ? "text-destructive" : utilPct > 80 ? "text-amber-600" : "text-foreground"
+                            )}>
+                              {utilPct}%
+                            </span>
+                            <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className={cn(
+                                  "h-full rounded-full transition-all",
+                                  utilPct > 100 ? "bg-destructive" : utilPct > 80 ? "bg-amber-500" : "bg-primary"
+                                )}
+                                style={{ width: `${Math.min(utilPct, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Discipline breakdown per team */}
+        <div>
+          <h3 className="text-sm font-semibold mb-3">Discipline Breakdown by Team</h3>
+          <div className="space-y-4">
+            {teamsToDisplay.map(team => {
+              const teamDisciplines = [...new Set(members.filter(m => m.team_id === team.id).map(m => m.discipline))].sort();
+              if (teamDisciplines.length === 0) return null;
+              
+              return (
+                <div key={team.id}>
+                  <div className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color || "#3b82f6" }} />
+                    {team.name}
+                  </div>
+                  <div className="overflow-x-auto border rounded-lg bg-muted/30">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/50">
+                          <TableHead className="min-w-[100px] text-xs">Discipline</TableHead>
+                          {sprints.map(sprint => (
+                            <TableHead key={sprint.id} className="text-center min-w-[80px]">
+                              <span className="text-xs font-medium">{sprint.name}</span>
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {teamDisciplines.map(discipline => (
+                          <TableRow key={`${team.id}-${discipline}`}>
+                            <TableCell className="text-xs font-medium">{discipline}</TableCell>
+                            {sprints.map(sprint => {
+                              const capacity = getDisciplineCapacityForTeam(sprint.id, team.id, discipline);
+                              const maxCapacity = getDisciplineMaxCapacityForTeam(team.id, discipline);
+                              const utilPct = maxCapacity > 0 ? Math.round((capacity / maxCapacity) * 100) : 0;
+                              return (
+                                <TableCell key={sprint.id} className="text-center">
+                                  <span className={cn(
+                                    "text-xs font-semibold tabular-nums",
+                                    utilPct > 100 ? "text-destructive" : utilPct > 80 ? "text-amber-600" : "text-foreground"
+                                  )}>
+                                    {utilPct}%
+                                  </span>
+                                </TableCell>
+                              );
+                            })}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     );
   }
