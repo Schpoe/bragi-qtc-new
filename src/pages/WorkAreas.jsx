@@ -89,13 +89,13 @@ export default function WorkAreas() {
 
   return (
     <div>
-      <PageHeader title="WorkArea" subtitle="Products, Features, Projects & Support">
-        <Button variant="outline" onClick={() => setJiraDialogOpen(true)}>
-          <Upload className="w-4 h-4 mr-2" /> Import from Jira
-        </Button>
-        <Button onClick={() => { setEditing(null); setDialogOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" /> New Work Area
-        </Button>
+      <PageHeader title="Work Items" subtitle="Products, Features, Projects & Support">
+         <Button variant="outline" onClick={() => setJiraDialogOpen(true)}>
+           <Upload className="w-4 h-4 mr-2" /> Import from Jira
+         </Button>
+         <Button onClick={() => { setEditing(null); setDialogOpen(true); }}>
+           <Plus className="w-4 h-4 mr-2" /> New Work Item
+         </Button>
       </PageHeader>
 
       <div className="mb-6 space-y-4">
