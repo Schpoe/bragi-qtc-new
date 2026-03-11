@@ -132,14 +132,13 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
                    let otherWAs = [];
                    let tabKey = "all";
 
-                   if (form.is_cross_team) {
-                      otherWAs = workAreas;
-                      tabKey = "cross";
-                    } else if (form.team_id) {
-                      leadingWAs = workAreas.filter(wa => wa.leading_team_id === form.team_id);
-                      supportingWAs = workAreas.filter(wa => wa.supporting_team_ids?.includes(form.team_id) && wa.leading_team_id !== form.team_id);
-                      otherWAs = [];
-                      tabKey = form.team_id;
+                   const activeTeamId = form.is_cross_team ? defaultTeamId : form.team_id;
+                    
+                    if (activeTeamId) {
+                      leadingWAs = workAreas.filter(wa => wa.leading_team_id === activeTeamId);
+                      supportingWAs = workAreas.filter(wa => wa.supporting_team_ids?.includes(activeTeamId) && wa.leading_team_id !== activeTeamId);
+                      otherWAs = workAreas.filter(wa => wa.leading_team_id !== activeTeamId && !wa.supporting_team_ids?.includes(activeTeamId));
+                      tabKey = form.is_cross_team ? "cross" : activeTeamId;
                     }
 
                    const filterBySearch = (items) => items.filter(wa => wa.name.toLowerCase().includes(searchQuery.toLowerCase()));
