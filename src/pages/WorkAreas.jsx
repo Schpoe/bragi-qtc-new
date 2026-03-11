@@ -18,6 +18,7 @@ import JiraImportDialog from "../components/workareas/JiraImportDialog";
 
 export default function WorkAreas() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [jiraDialogOpen, setJiraDialogOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [filterTeamId, setFilterTeamId] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
