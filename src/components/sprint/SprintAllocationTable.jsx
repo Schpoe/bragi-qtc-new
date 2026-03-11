@@ -5,7 +5,7 @@ import AllocationCell from "./AllocationCell";
 import { cn } from "@/lib/utils";
 
 export default function SprintAllocationTable({ sprint, members, workAreas, allocations, onAllocationChange }) {
-  const relevantWorkAreas = sprint.relevant_work_area_ids && sprint.relevant_work_area_ids.length > 0 
+  const relevantWorkAreas = (sprint?.relevant_work_area_ids?.length ?? 0) > 0 
     ? workAreas.filter(wa => sprint.relevant_work_area_ids.includes(wa.id))
     : [];
   const getAllocation = (memberId, workAreaId) => {
