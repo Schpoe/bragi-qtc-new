@@ -24,20 +24,20 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
   });
 
   useEffect(() => {
-    if (open) {
-      if (workArea) {
-        setForm({
-          name: workArea.name,
-          type: workArea.type,
-          leading_team_id: workArea.leading_team_id || "",
-          supporting_team_ids: workArea.supporting_team_ids || [],
-          color: workArea.color || areaColors[0],
-        });
-      } else {
-        setForm({ name: "", type: workAreaTypes[0]?.name || "", leading_team_id: "", supporting_team_ids: [], color: areaColors[Math.floor(Math.random() * areaColors.length)] });
-      }
+    if (!open) return;
+    
+    if (workArea) {
+      setForm({
+        name: workArea.name,
+        type: workArea.type,
+        leading_team_id: workArea.leading_team_id || "",
+        supporting_team_ids: workArea.supporting_team_ids || [],
+        color: workArea.color || areaColors[0],
+      });
+    } else if (workAreaTypes.length > 0) {
+      setForm({ name: "", type: workAreaTypes[0].name, leading_team_id: "", supporting_team_ids: [], color: areaColors[Math.floor(Math.random() * areaColors.length)] });
     }
-  }, [workArea, open]);
+  }, [workArea, open, workAreaTypes]);
 
   const toggleSupportingTeam = (teamId) => {
     const current = form.supporting_team_ids || [];
