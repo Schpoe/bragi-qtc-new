@@ -147,24 +147,15 @@ export default function SprintPlanning() {
         </Button>
       </PageHeader>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <Select value={effectiveTeamId} onValueChange={setSelectedTeamId}>
-          <SelectTrigger className="w-52">
-            <SelectValue placeholder="Select team" />
-          </SelectTrigger>
-          <SelectContent>
-            {teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-          <SelectTrigger className="w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {quarters.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
+      <FilterBar
+        quarter={selectedQuarter}
+        onQuarterChange={setSelectedQuarter}
+        team={effectiveTeamId}
+        onTeamChange={setSelectedTeamId}
+        teams={teams}
+        quarters={quarters}
+        showTeamFilter={true}
+      />
 
       {teamsLoading || sprintsLoading ? (
         <div className="space-y-4">
