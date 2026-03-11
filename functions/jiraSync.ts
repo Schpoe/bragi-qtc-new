@@ -40,8 +40,7 @@ Deno.serve(async (req) => {
       
       const requestBody = {
         jql: jql,
-        maxResults: maxResults,
-        fields: ['summary', 'issuetype']
+        maxResults: maxResults
       };
       
       if (nextPageToken) {
