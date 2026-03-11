@@ -194,7 +194,7 @@ export default function SprintPlanning() {
                 <SprintAllocationTable
                    sprint={sprint}
                    members={teamMembers}
-                   workAreas={workAreas}
+                   workAreas={filteredWorkAreas}
                    allocations={allocations}
                    onAllocationChange={handleAllocationChange}
                  />
