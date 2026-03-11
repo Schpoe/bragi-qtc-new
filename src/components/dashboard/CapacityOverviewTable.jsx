@@ -11,6 +11,12 @@ export default function CapacityOverviewTable({ sprints, teams, members, workAre
     ? workAreas
     : workAreas.filter(wa => wa.is_cross_team || wa.team_id === selectedTeamId);
 
+  // Filter to only show work areas with allocations
+  const workAreasWithEffort = filteredWorkAreas.filter(wa => {
+    const memberIds = new Set(filteredMembers.map(m => m.id));
+    return allocations.some(a => a.work_area_id === wa.id && memberIds.has(a.team_member_id) && a.percent > 0);
+  });
+
   const getSprintWorkAreaTotal = (sprintId, workAreaId) => {
     const memberIds = new Set(filteredMembers.map(m => m.id));
     return allocations
@@ -29,7 +35,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, workAre
     return filteredMembers.reduce((sum, m) => sum + (m.availability_percent || 100), 0);
   };
 
-  if (sprints.length === 0 || filteredWorkAreas.length === 0) {
+  if (sprints.length === 0 || workAreasWithEffort.length === 0) {
     return <div className="text-center py-8 text-sm text-muted-foreground">No data available.</div>;
   }
 
@@ -39,7 +45,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, workAre
         <TableHeader>
           <TableRow className="bg-muted/50">
             <TableHead className="min-w-[120px]">Sprint</TableHead>
-            {filteredWorkAreas.map(wa => (
+            {workAreasWithEffort.map(wa => (
               <TableHead key={wa.id} className="text-center min-w-[90px]">
                 <div className="flex items-center justify-center gap-1.5">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
@@ -58,7 +64,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, workAre
             return (
               <TableRow key={sprint.id}>
                 <TableCell className="font-medium text-sm">{sprint.name}</TableCell>
-                {filteredWorkAreas.map(wa => {
+                {workAreasWithEffort.map(wa => {
                   const val = getSprintWorkAreaTotal(sprint.id, wa.id);
                   return (
                     <TableCell key={wa.id} className="text-center">
