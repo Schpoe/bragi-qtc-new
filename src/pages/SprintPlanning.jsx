@@ -128,7 +128,7 @@ export default function SprintPlanning() {
 
   const handleCopyCrossTeamSprint = (crossTeamSprint) => {
     // If viewing "All Teams" (no team selected), prompt for team selection
-    if (!selectedTeamId) {
+    if (!selectedTeamId || selectedTeamId === "all") {
       setSprintToCopy(crossTeamSprint);
       setTeamSelectValue("");
       setTeamSelectDialogOpen(true);
