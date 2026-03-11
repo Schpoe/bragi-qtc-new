@@ -19,6 +19,8 @@ export default function WorkAreas() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [filterTeamId, setFilterTeamId] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleTab, setRoleTab] = useState("all");
   const queryClient = useQueryClient();
 
   const { data: workAreas = [], isLoading } = useQuery({
