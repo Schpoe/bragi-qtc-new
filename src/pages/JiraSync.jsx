@@ -49,6 +49,11 @@ export default function JiraSync() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workAreas'] }),
   });
 
+  const updateWorkArea = useMutation({
+    mutationFn: ({ id, workAreaData }) => base44.entities.WorkArea.update(id, workAreaData),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['workAreas'] }),
+  });
+
   const fetchFromJira = async () => {
     setError(null);
     setSyncResult(null);
