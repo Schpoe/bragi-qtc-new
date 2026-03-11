@@ -140,7 +140,23 @@ export default function Dashboard() {
                </CardContent>
              </Card>
            )}
-          </div>
+           <Card>
+             <CardHeader className="pb-3">
+               <CardTitle className="text-base font-semibold">
+                 Work Area Types Distribution
+               </CardTitle>
+             </CardHeader>
+             <CardContent>
+               <WorkAreaTypeDistribution
+                 teams={teams}
+                 workAreas={filteredWorkAreas}
+                 allocations={allocations}
+                 members={members}
+                 selectedTeamId={selectedTeamId}
+               />
+             </CardContent>
+           </Card>
+           </div>
         </>
       )}
     </div>
