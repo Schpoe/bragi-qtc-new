@@ -94,6 +94,14 @@ export default function Dashboard() {
           />
 
           <div className="space-y-6">
+           <TeamCapacityChart
+             teams={teams}
+             sprints={sprints}
+             members={members}
+             allocations={allocations}
+             selectedTeamId={selectedTeamId}
+             selectedQuarter={selectedQuarter}
+           />
            <Card>
              <CardHeader className="pb-3">
                <CardTitle className="text-base font-semibold">
