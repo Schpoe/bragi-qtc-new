@@ -86,10 +86,12 @@ export default function JiraSync() {
     try {
       const colors = ['blue', 'green', 'purple', 'orange', 'pink', 'teal'];
       let stats = {
-        teamsCreated: 0,
-        typesCreated: 0,
-        workAreasCreated: 0,
-        errors: []
+       teamsCreated: 0,
+       typesCreated: 0,
+       workAreasCreated: 0,
+       workAreasUpdated: 0,
+       workAreasSkipped: 0,
+       errors: []
       };
 
       // Import teams
