@@ -95,6 +95,23 @@ export default function Dashboard() {
           />
 
           <div className="space-y-6">
+           <Card>
+             <CardHeader className="pb-3">
+               <CardTitle className="text-base font-semibold">
+                 Executive Summary — {selectedQuarter}
+               </CardTitle>
+             </CardHeader>
+             <CardContent>
+               <ExecutiveSummary
+                 teams={teams}
+                 sprints={sprints}
+                 members={members}
+                 allocations={allocations}
+                 workAreas={workAreas}
+                 selectedQuarter={selectedQuarter}
+               />
+             </CardContent>
+           </Card>
            <TeamCapacityChart
              teams={teams}
              sprints={sprints}
