@@ -63,12 +63,13 @@ export default function TeamFormDialog({ open, onOpenChange, team, onSave }) {
           </div>
           <div className="space-y-2">
             <Label>Color</Label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-10 gap-2">
               {colors.map(c => (
                 <button
                   key={c.value}
                   onClick={() => setForm({ ...form, color: c.value })}
                   className={`w-8 h-8 rounded-full ${c.class} transition-all ${form.color === c.value ? "ring-2 ring-offset-2 ring-primary" : "opacity-60 hover:opacity-100"}`}
+                  title={c.label}
                 />
               ))}
             </div>
