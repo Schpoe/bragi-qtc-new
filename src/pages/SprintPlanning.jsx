@@ -133,6 +133,18 @@ export default function SprintPlanning() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["quarterlyAllocations"] }),
   });
 
+  const updateWorkAreaSelection = useMutation({
+    mutationFn: ({ teamId, quarter, workAreaIds }) => {
+      const existing = workAreaSelections.find(s => s.team_id === teamId && s.quarter === quarter);
+      if (existing) {
+        return base44.entities.QuarterlyWorkAreaSelection.update(existing.id, { work_area_ids: workAreaIds });
+      } else {
+        return base44.entities.QuarterlyWorkAreaSelection.create({ team_id: teamId, quarter, work_area_ids: workAreaIds });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workAreaSelections"] }),
+  });
+
   const handleSaveSprint = async (data) => {
     if (editingSprint) {
       // When updating a sprint, clean up allocations for removed work areas
