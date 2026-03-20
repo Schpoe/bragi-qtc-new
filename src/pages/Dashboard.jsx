@@ -105,7 +105,7 @@ export default function Dashboard() {
 
   const filteredWorkAreas = selectedTeamId === "all"
     ? workAreas
-    : workAreas.filter(wa => wa.is_cross_team || wa.team_id === selectedTeamId);
+    : workAreas.filter(wa => wa.is_cross_team || wa.leading_team_id === selectedTeamId || wa.supporting_team_ids.includes(selectedTeamId));
 
   const isLoading = teamsLoading;
 
