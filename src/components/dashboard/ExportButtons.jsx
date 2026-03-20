@@ -139,31 +139,52 @@ export default function ExportButtons({ data, selectedQuarter }) {
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const contentWidth = pdfWidth - (2 * margin);
+      const headerHeight = 15;
+      const footerHeight = 10;
+      const availableHeight = pdfHeight - headerHeight - footerHeight - (2 * margin);
+
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
-      const ratio = canvasWidth / canvasHeight;
       
-      let width = pdfWidth - 20;
-      let height = width / ratio;
+      // Calculate how much content fits per page
+      const imgWidth = contentWidth;
+      const imgHeight = (canvasHeight * contentWidth) / canvasWidth;
       
-      if (height > pdfHeight - 20) {
-        height = pdfHeight - 20;
-        width = height * ratio;
+      let heightLeft = imgHeight;
+      let position = 0;
+      let pageNumber = 1;
+
+      // Add first page with header
+      pdf.setFontSize(16);
+      pdf.text(`Executive Summary - ${selectedQuarter}`, pdfWidth / 2, margin + 5, { align: "center" });
+      
+      // Add first page content
+      pdf.addImage(imgData, "PNG", margin, headerHeight + margin, imgWidth, imgHeight, undefined, "FAST");
+      heightLeft -= availableHeight;
+
+      // Add subsequent pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pageNumber++;
+        pdf.addImage(imgData, "PNG", margin, position + margin, imgWidth, imgHeight, undefined, "FAST");
+        heightLeft -= availableHeight;
       }
 
-      const xOffset = (pdfWidth - width) / 2;
-      const yOffset = 10;
-
-      // Add header
-      pdf.setFontSize(16);
-      pdf.text(`Executive Summary - ${selectedQuarter}`, pdfWidth / 2, yOffset, { align: "center" });
-      
-      // Add content
-      pdf.addImage(imgData, "PNG", xOffset, yOffset + 10, width, height);
-      
-      // Add footer
-      pdf.setFontSize(8);
-      pdf.text(`Generated on ${new Date().toLocaleDateString()}`, pdfWidth / 2, pdfHeight - 5, { align: "center" });
+      // Add footer to all pages
+      const totalPages = pdf.internal.pages.length - 1;
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(8);
+        pdf.text(
+          `Generated on ${new Date().toLocaleDateString()} | Page ${i} of ${totalPages}`,
+          pdfWidth / 2,
+          pdfHeight - 5,
+          { align: "center" }
+        );
+      }
 
       pdf.save(`Executive_Summary_${selectedQuarter.replace(/ /g, "_")}.pdf`);
     } catch (error) {
@@ -201,7 +222,7 @@ export default function ExportButtons({ data, selectedQuarter }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={exportToPDF}>
           <FileText className="w-4 h-4 mr-2 text-red-600" />
-          PDF (A4)
+          PDF (Multi-page)
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
