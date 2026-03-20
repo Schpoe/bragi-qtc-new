@@ -63,9 +63,14 @@ export default function SprintPlanning() {
   });
 
   const { data: quarterlyAllocations = [] } = useQuery({
-    queryKey: ["quarterlyAllocations"],
-    queryFn: () => base44.entities.QuarterlyAllocation.list(),
-  });
+     queryKey: ["quarterlyAllocations"],
+     queryFn: () => base44.entities.QuarterlyAllocation.list(),
+   });
+
+   const { data: workAreaSelections = [] } = useQuery({
+     queryKey: ["workAreaSelections"],
+     queryFn: () => base44.entities.QuarterlyWorkAreaSelection.list(),
+   });
 
   // Only auto-select first team when actually viewing a specific team (not "all")
   const effectiveTeamId = selectedTeamId && selectedTeamId !== "all" ? selectedTeamId : (teams.length > 0 && (!selectedTeamId || selectedTeamId === "all") ? teams[0].id : "");
