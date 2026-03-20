@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, FolderKanban, Pencil, Trash2, Globe, Users, Upload, Filter, Search, X } from "lucide-react";
+import { Plus, FolderKanban, Pencil, Trash2, Globe, Users, Upload, Filter, Search, X, Link as LinkIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,18 @@ import PageHeader from "../components/shared/PageHeader";
 import EmptyState from "../components/shared/EmptyState";
 import WorkAreaFormDialog from "../components/workareas/WorkAreaFormDialog";
 import JiraImportDialog from "../components/workareas/JiraImportDialog";
+import JiraSyncButton from "../components/workareas/JiraSyncButton";
+import EpicLinkDialog from "../components/workareas/EpicLinkDialog";
+import { useAuth } from "@/lib/AuthContext";
+import { canManageWorkAreas } from "@/lib/permissions";
 
 export default function WorkAreas() {
+  const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [jiraDialogOpen, setJiraDialogOpen] = useState(false);
+  const [epicDialogOpen, setEpicDialogOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [linkingWorkArea, setLinkingWorkArea] = useState(null);
   const [filterTeamId, setFilterTeamId] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [roleTab, setRoleTab] = useState("all");
@@ -87,9 +94,14 @@ export default function WorkAreas() {
     wa.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleEpicLinked = () => {
+    queryClient.invalidateQueries({ queryKey: ["workAreas"] });
+  };
+
   return (
     <div>
       <PageHeader title="Work Items" subtitle="Products, Features, Projects & Support">
+         <JiraSyncButton />
          <Button variant="outline" onClick={() => setJiraDialogOpen(true)}>
            <Upload className="w-4 h-4 mr-2" /> Import from Jira
          </Button>
@@ -164,39 +176,91 @@ export default function WorkAreas() {
         </EmptyState>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredWorkAreas.map(wa => (
-            <Card key={wa.id} className="group border-border/60 hover:shadow-md transition-all">
-              <CardContent className="py-4 px-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
-                    <div>
-                      <p className="font-medium text-sm">{wa.name}</p>
-                      <div className="flex items-center gap-2 mt-2 flex-wrap">
-                        <Badge variant="outline" className="text-xs">{wa.type}</Badge>
-                        <Badge className="text-xs bg-primary/20 text-primary border-0">
-                          <Users className="w-3 h-3 mr-1" /> {teamMap[wa.leading_team_id] || "—"}
-                        </Badge>
-                        {wa.supporting_team_ids && wa.supporting_team_ids.length > 0 && (
-                          <span className="text-xs text-muted-foreground">
-                            + {wa.supporting_team_ids.map(id => teamMap[id]).filter(Boolean).join(", ")}
-                          </span>
+          {filteredWorkAreas.map(wa => {
+            const canManage = canManageWorkAreas(user, wa.leading_team_id);
+            
+            return (
+              <Card key={wa.id} className="group border-border/60 hover:shadow-md transition-all">
+                <CardContent className="py-4 px-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-sm">{wa.name}</p>
+                          {wa.jira_key && (
+                            <Badge variant="outline" className="text-xs">
+                              {wa.jira_key}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                          <Badge variant="outline" className="text-xs">{wa.type}</Badge>
+                          <Badge className="text-xs bg-primary/20 text-primary border-0">
+                            <Users className="w-3 h-3 mr-1" /> {teamMap[wa.leading_team_id] || "—"}
+                          </Badge>
+                          {wa.supporting_team_ids && wa.supporting_team_ids.length > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              + {wa.supporting_team_ids.map(id => teamMap[id]).filter(Boolean).join(", ")}
+                            </span>
+                          )}
+                        </div>
+                        {wa.jira_status && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs text-muted-foreground">
+                              Status: {wa.jira_status}
+                            </span>
+                            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden max-w-[100px]">
+                              <div
+                                className="h-full bg-primary rounded-full transition-all"
+                                style={{ width: `${wa.jira_progress || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {wa.jira_progress || 0}%
+                            </span>
+                          </div>
+                        )}
+                        {wa.linked_epic_keys && wa.linked_epic_keys.length > 0 && (
+                          <div className="flex items-center gap-1 mt-2 flex-wrap">
+                            {wa.linked_epic_keys.map(key => (
+                              <Badge key={key} variant="secondary" className="text-xs">
+                                {key}
+                              </Badge>
+                            ))}
+                          </div>
                         )}
                       </div>
                     </div>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      {canManage && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            title="Link Jira Epics"
+                            onClick={() => {
+                              setLinkingWorkArea(wa);
+                              setEpicDialogOpen(true);
+                            }}
+                          >
+                            <LinkIcon className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(wa); setDialogOpen(true); }}>
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteWA.mutate(wa.id)}>
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditing(wa); setDialogOpen(true); }}>
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteWA.mutate(wa.id)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -212,6 +276,13 @@ export default function WorkAreas() {
         open={jiraDialogOpen}
         onOpenChange={setJiraDialogOpen}
         teams={teams}
+      />
+
+      <EpicLinkDialog
+        open={epicDialogOpen}
+        onOpenChange={setEpicDialogOpen}
+        workArea={linkingWorkArea}
+        onLinked={handleEpicLinked}
       />
     </div>
   );
