@@ -11,6 +11,7 @@ import PageHeader from "../components/shared/PageHeader";
 import EmptyState from "../components/shared/EmptyState";
 import UserFormDialog from "../components/users/UserFormDialog";
 import ConfirmDeleteDialog from "../components/shared/ConfirmDeleteDialog";
+import PasswordResetInfo from "../components/auth/PasswordResetInfo";
 import { isAdmin } from "@/lib/permissions";
 import { toast } from "sonner";
 
@@ -92,6 +93,10 @@ export default function UserManagement() {
           <Plus className="w-4 h-4 mr-2" /> Add User
         </Button>
       </PageHeader>
+
+      <div className="mb-6">
+        <PasswordResetInfo />
+      </div>
 
       {isLoading ? (
         <div className="space-y-4">

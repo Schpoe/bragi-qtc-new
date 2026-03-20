@@ -92,6 +92,32 @@ export const AuthProvider = ({ children }) => {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
       const currentUser = await base44.auth.me();
+      
+      // Verify user exists in User entity (access control)
+      try {
+        const users = await base44.entities.User.list();
+        const userExists = users.some(u => u.email === currentUser.email);
+        
+        if (!userExists) {
+          setAuthError({
+            type: 'user_not_authorized',
+            message: 'Your account is not authorized to access this system. Please contact an administrator.'
+          });
+          setIsLoadingAuth(false);
+          setIsAuthenticated(false);
+          return;
+        }
+      } catch (accessError) {
+        console.error('Access verification failed:', accessError);
+        setAuthError({
+          type: 'access_check_failed',
+          message: 'Unable to verify access. Please try again.'
+        });
+        setIsLoadingAuth(false);
+        setIsAuthenticated(false);
+        return;
+      }
+      
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
