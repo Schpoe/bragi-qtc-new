@@ -37,19 +37,38 @@ export function canViewTeam(user, teamId) {
 }
 
 export function canManageTeamMembers(user, teamId) {
+  if (isViewer(user)) return false;
   return canManageTeam(user, teamId);
 }
 
+export function canCreateSprint(user) {
+  if (isViewer(user)) return false;
+  return isAdmin(user) || isTeamManager(user);
+}
+
+export function canCreateWorkArea(user) {
+  if (isViewer(user)) return false;
+  return isAdmin(user) || isTeamManager(user);
+}
+
+export function canManageWorkAreaTypes(user) {
+  if (isViewer(user)) return false;
+  return isAdmin(user);
+}
+
 export function canManageSprints(user, teamId) {
+  if (isViewer(user)) return false;
   return canManageTeam(user, teamId);
 }
 
 export function canManageAllocations(user, teamId) {
+  if (isViewer(user)) return false;
   return canManageTeam(user, teamId);
 }
 
 export function canManageWorkAreas(user, workArea) {
   if (!user) return false;
+  if (isViewer(user)) return false;
   if (isAdmin(user)) return true;
   if (isTeamManager(user)) {
     const teamId = workArea.leading_team_id;
