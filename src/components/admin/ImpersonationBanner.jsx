@@ -11,7 +11,7 @@ export default function ImpersonationBanner() {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-amber-500/10 border-b border-amber-500/30 px-4 py-3 flex items-center justify-between gap-4 z-50">
+    <div className="fixed top-14 left-0 right-0 lg:top-0 lg:left-64 bg-amber-500/10 border-b border-amber-500/30 px-4 py-3 flex items-center justify-between gap-4 z-40">
       <div className="flex items-center gap-3">
         <AlertCircle className="w-5 h-5 text-amber-600" />
         <div>
