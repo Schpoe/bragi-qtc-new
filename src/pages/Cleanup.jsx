@@ -140,12 +140,16 @@ export default function CleanupPage() {
     selectedOrphans.members.size + 
     selectedOrphans.sprints.size + 
     selectedOrphans.allocations.size + 
+    selectedOrphans.quarterlyAllocations.size +
+    selectedOrphans.workAreaSelections.size +
     selectedOrphans.workAreas.size;
 
   const totalOrphans = 
     orphanedData.members.length + 
     orphanedData.sprints.length + 
     orphanedData.allocations.length + 
+    orphanedData.quarterlyAllocations.length +
+    orphanedData.workAreaSelections.length +
     orphanedData.workAreas.length;
 
   const toggleSelection = (category, id) => {
