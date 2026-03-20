@@ -73,6 +73,12 @@ export default function CleanupPage() {
       for (const id of selectedOrphans.allocations) {
         promises.push(base44.entities.Allocation.delete(id));
       }
+      for (const id of selectedOrphans.quarterlyAllocations) {
+        promises.push(base44.entities.QuarterlyAllocation.delete(id));
+      }
+      for (const id of selectedOrphans.workAreaSelections) {
+        promises.push(base44.entities.QuarterlyWorkAreaSelection.delete(id));
+      }
       for (const id of selectedOrphans.workAreas) {
         promises.push(base44.entities.WorkArea.delete(id));
       }
