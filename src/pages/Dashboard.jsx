@@ -126,55 +126,23 @@ export default function Dashboard() {
             </TabsList>
 
             <TabsContent value="quarterly" className="space-y-6 mt-6">
-              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-                <CardHeader className="pb-3 border-b border-primary/10">
-                  <CardTitle className="text-base font-bold text-primary">
-                    Executive Summary — {selectedQuarter}
+              <Card>
+                <CardHeader className="pb-3 border-b">
+                  <CardTitle className="text-base font-bold">
+                    Quarterly Allocation Overview — {selectedQuarter}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <ExecutiveSummary
+                  <QuarterlyAllocationOverview
                     teams={teams}
-                    sprints={sprints}
                     members={members}
-                    allocations={allocations}
                     workAreas={workAreas}
+                    quarterlyAllocations={quarterlyAllocations}
+                    selectedTeamId={selectedTeamId}
                     selectedQuarter={selectedQuarter}
                   />
                 </CardContent>
               </Card>
-              <TeamCapacityChart
-                teams={teams}
-                sprints={sprints}
-                members={members}
-                allocations={allocations}
-                selectedTeamId={selectedTeamId}
-                selectedQuarter={selectedQuarter}
-              />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <DisciplineBreakdown
-                  sprints={quarterSprints}
-                  members={members}
-                  allocations={allocations}
-                  selectedTeamId={selectedTeamId}
-                />
-                <Card>
-                  <CardHeader className="pb-3 border-b">
-                    <CardTitle className="text-base font-bold">
-                      Utilization by Work Item Types
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-6">
-                    <UtilizationByWorkItemType
-                      workAreas={filteredWorkAreas}
-                      allocations={allocations}
-                      members={members}
-                      sprints={quarterSprints}
-                      selectedTeamId={selectedTeamId}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
             </TabsContent>
 
             <TabsContent value="sprint" className="space-y-6 mt-6">
