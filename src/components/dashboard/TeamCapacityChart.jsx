@@ -6,8 +6,10 @@ export default function TeamCapacityChart({ teams, sprints, members, allocations
   const data = useMemo(() => {
     const chartData = [];
 
-    // Filter sprints by quarter
-    const quarterSprints = sprints.filter(s => s.quarter === selectedQuarter && !s.is_cross_team);
+    // Filter sprints by quarter and sort by order ascending
+    const quarterSprints = sprints
+      .filter(s => s.quarter === selectedQuarter && !s.is_cross_team)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
     
     // Filter teams
     const filteredTeams = selectedTeamId && selectedTeamId !== "all"

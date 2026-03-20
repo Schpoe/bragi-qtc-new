@@ -4,8 +4,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 
 export default function CapacityOverviewTable({ sprints, teams, members, allocations, selectedTeamId, workAreas }) {
-  // Filter out template sprints
-  const teamSpecificSprints = sprints.filter(s => !s.is_cross_team);
+  // Filter out template sprints and sort by order ascending
+  const teamSpecificSprints = sprints
+    .filter(s => !s.is_cross_team)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
   const [sortTeamsBy, setSortTeamsBy] = useState("name");
   const [sortMembersBy, setSortMembersBy] = useState("name");
   // If all teams selected, show team-level overview

@@ -36,7 +36,9 @@ function StatusBadge({ pct }) {
 
 export default function ExecutiveSummary({ teams, sprints, members, allocations, workAreas, selectedQuarter }) {
   const data = useMemo(() => {
-    const quarterSprints = sprints.filter(s => s.quarter === selectedQuarter && !s.is_cross_team && s.team_id);
+    const quarterSprints = sprints
+      .filter(s => s.quarter === selectedQuarter && !s.is_cross_team && s.team_id)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
 
     return teams.map(team => {
       const teamMembers = members.filter(m => m.team_id === team.id);
