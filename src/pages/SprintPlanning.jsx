@@ -288,11 +288,37 @@ export default function SprintPlanning() {
          showTeamFilter={true}
        />
 
-      <Tabs defaultValue="sprints" className="mb-6">
+      <Tabs defaultValue="quarterly" className="mb-6">
         <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="quarterly">Quarterly Plan</TabsTrigger>
           <TabsTrigger value="sprints">Sprint Planning</TabsTrigger>
-          <TabsTrigger value="quarterly">Quarterly Overview</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="quarterly">
+         {teamsLoading || sprintsLoading ? (
+           <div className="space-y-4">
+             <Skeleton className="h-64 rounded-xl" />
+           </div>
+         ) : teams.length === 0 ? (
+           <EmptyState icon={CalendarRange} title="No teams yet" description="First create a team under 'Teams'." />
+         ) : (
+           <Card>
+             <CardHeader>
+               <CardTitle className="text-base">Quarterly Plan — {selectedQuarter}</CardTitle>
+             </CardHeader>
+             <CardContent>
+               <QuarterlyAllocationTable
+                 members={members}
+                 workAreas={workAreas}
+                 allocations={quarterlyAllocations}
+                 quarter={selectedQuarter}
+                 onAllocationChange={handleQuarterlyAllocationChange}
+                 selectedTeamId={selectedTeamId}
+               />
+             </CardContent>
+           </Card>
+         )}
+       </TabsContent>
 
         <TabsContent value="sprints">
       {teamsLoading || sprintsLoading ? (
@@ -428,32 +454,6 @@ export default function SprintPlanning() {
           })}
         </div>
       )}
-       </TabsContent>
-
-       <TabsContent value="quarterly">
-         {teamsLoading || sprintsLoading ? (
-           <div className="space-y-4">
-             <Skeleton className="h-64 rounded-xl" />
-           </div>
-         ) : teams.length === 0 ? (
-           <EmptyState icon={CalendarRange} title="No teams yet" description="First create a team under 'Teams'." />
-         ) : (
-           <Card>
-             <CardHeader>
-               <CardTitle className="text-base">Quarterly Allocation — {selectedQuarter}</CardTitle>
-             </CardHeader>
-             <CardContent>
-               <QuarterlyAllocationTable
-                 members={members}
-                 workAreas={workAreas}
-                 allocations={quarterlyAllocations}
-                 quarter={selectedQuarter}
-                 onAllocationChange={handleQuarterlyAllocationChange}
-                 selectedTeamId={selectedTeamId}
-               />
-             </CardContent>
-           </Card>
-         )}
        </TabsContent>
       </Tabs>
 
