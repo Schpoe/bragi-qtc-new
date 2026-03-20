@@ -22,6 +22,7 @@ export default function QuarterlyAllocationTable({
 }) {
   const [selectedWorkAreaIds, setSelectedWorkAreaIds] = useState(() => new Set(initialSelectedWorkAreaIds));
   const [dialogOpen, setDialogOpen] = useState(false);
+  const allocationTimeoutRef = useRef({});
   const { user } = useAuth();
   const relevantTeamId = selectedTeamId === "all" ? members[0]?.team_id : selectedTeamId;
   const canEdit = relevantTeamId && canManageAllocations(user, relevantTeamId);
