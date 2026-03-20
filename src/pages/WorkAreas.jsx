@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, FolderKanban, Pencil, Trash2, Globe, Users, Upload, Filter, Search, X, Link as LinkIcon } from "lucide-react";
+import { Plus, FolderKanban, Pencil, Trash2, Globe, Users, Upload, Filter, Search, X, Link as LinkIcon, History } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import WorkAreaFormDialog from "../components/workareas/WorkAreaFormDialog";
 import JiraImportDialog from "../components/workareas/JiraImportDialog";
 import JiraSyncButton from "../components/workareas/JiraSyncButton";
 import EpicLinkDialog from "../components/workareas/EpicLinkDialog";
+import JiraSyncHistoryTab from "../components/workareas/JiraSyncHistoryTab";
 import { useAuth } from "@/lib/AuthContext";
 import { canManageWorkAreas, canCreateWorkArea, isViewer } from "@/lib/permissions";
 
@@ -43,6 +44,7 @@ export default function WorkAreas() {
   const [filterTeamId, setFilterTeamId] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [roleTab, setRoleTab] = useState("all");
+  const [mainTab, setMainTab] = useState("items");
   const queryClient = useQueryClient();
 
   const { data: workAreas = [], isLoading } = useQuery({
@@ -127,7 +129,21 @@ export default function WorkAreas() {
          )}
       </PageHeader>
 
-      <div className="mb-6 space-y-4">
+      <Tabs value={mainTab} onValueChange={setMainTab} className="mb-6">
+        <TabsList>
+          <TabsTrigger value="items" className="flex items-center gap-2">
+            <FolderKanban className="w-4 h-4" /> Work Items
+          </TabsTrigger>
+          {canCreateWorkArea(user) && (
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="w-4 h-4" /> Sync History
+            </TabsTrigger>
+          )}
+        </TabsList>
+
+        <TabsContent value="items" className="mt-6">
+
+        <div className="mb-6 space-y-4">
         {/* Search and Team Filter */}
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
@@ -181,7 +197,7 @@ export default function WorkAreas() {
         </div>
       </div>
 
-      {isLoading ? (
+        {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}
         </div>
