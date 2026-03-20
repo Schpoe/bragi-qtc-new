@@ -24,7 +24,7 @@ export default function SprintPlanning() {
   const { user } = useAuth();
   const [sprintDialogOpen, setSprintDialogOpen] = useState(false);
   const [editingSprint, setEditingSprint] = useState(null);
-  const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
+  const [selectedQuarter, setSelectedQuarter] = useState(() => getCurrentQuarter());
   const [selectedTeamId, setSelectedTeamId] = useState("all");
   const [teamSelectDialogOpen, setTeamSelectDialogOpen] = useState(false);
   const [teamSelectValue, setTeamSelectValue] = useState("");

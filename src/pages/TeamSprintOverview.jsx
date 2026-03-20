@@ -151,7 +151,7 @@ function TeamCardTitle({ team, memberCount }) {
 }
 
 export default function TeamSprintOverview() {
-  const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
+  const [selectedQuarter, setSelectedQuarter] = useState(() => getCurrentQuarter());
 
   const { data: teams = [], isLoading: teamsLoading } = useQuery({
     queryKey: ["teams"],

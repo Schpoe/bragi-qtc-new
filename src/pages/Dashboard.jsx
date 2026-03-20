@@ -15,7 +15,7 @@ import ExecutiveSummary from "../components/dashboard/ExecutiveSummary";
 import AllocationHeatMap from "../components/dashboard/AllocationHeatMap";
 
 export default function Dashboard() {
-  const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
+  const [selectedQuarter, setSelectedQuarter] = useState(() => getCurrentQuarter());
   const [selectedTeamId, setSelectedTeamId] = useState("all");
 
   const { data: teams = [], isLoading: teamsLoading } = useQuery({
