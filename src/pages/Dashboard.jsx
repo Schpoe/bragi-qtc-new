@@ -121,15 +121,26 @@ export default function Dashboard() {
                   Executive Summary — {selectedQuarter}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6">
-                <ExecutiveSummary
+              <CardContent className="pt-6 space-y-6">
+                <QuarterlyPlanSummary
                   teams={teams}
-                  sprints={sprints}
                   members={members}
                   allocations={allocations}
                   workAreas={workAreas}
                   selectedQuarter={selectedQuarter}
+                  selectedTeamId={selectedTeamId}
                 />
+                <div className="border-t border-primary/10 pt-6">
+                  <h3 className="text-sm font-semibold text-primary mb-4">Sprint Breakdown</h3>
+                  <ExecutiveSummary
+                    teams={teams}
+                    sprints={sprints}
+                    members={members}
+                    allocations={allocations}
+                    workAreas={workAreas}
+                    selectedQuarter={selectedQuarter}
+                  />
+                </div>
               </CardContent>
             </Card>
             <TeamCapacityChart
