@@ -235,7 +235,7 @@ export default function CleanupPage() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="members" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="members">
                     Members <Badge variant="secondary" className="ml-2">{orphanedData.members.length}</Badge>
                   </TabsTrigger>
@@ -244,6 +244,12 @@ export default function CleanupPage() {
                   </TabsTrigger>
                   <TabsTrigger value="allocations">
                     Allocations <Badge variant="secondary" className="ml-2">{orphanedData.allocations.length}</Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="quarterlyAllocations">
+                    Q-Allocations <Badge variant="secondary" className="ml-2">{orphanedData.quarterlyAllocations.length}</Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="workAreaSelections">
+                    Selections <Badge variant="secondary" className="ml-2">{orphanedData.workAreaSelections.length}</Badge>
                   </TabsTrigger>
                   <TabsTrigger value="workAreas">
                     Work Areas <Badge variant="secondary" className="ml-2">{orphanedData.workAreas.length}</Badge>
