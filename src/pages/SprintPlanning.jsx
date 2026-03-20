@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/AuthContext";
+import { canManageSprints, canManageAllocations, getManageableTeams } from "@/lib/permissions";
 import { Plus, CalendarRange, Pencil, Trash2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +23,7 @@ const currentYear = new Date().getFullYear();
 const currentQ = Math.ceil((new Date().getMonth() + 1) / 3);
 
 export default function SprintPlanning() {
+  const { user } = useAuth();
   const [sprintDialogOpen, setSprintDialogOpen] = useState(false);
   const [editingSprint, setEditingSprint] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState(`Q${currentQ} ${currentYear}`);
@@ -132,6 +135,11 @@ export default function SprintPlanning() {
   };
 
   const handleAllocationChange = (memberId, sprintId, workAreaId, value) => {
+    const sprint = sprints.find(s => s.id === sprintId);
+    if (!sprint || !canManageAllocations(user, sprint.team_id)) {
+      return;
+    }
+    
     const existing = allocations.find(
       a => a.team_member_id === memberId && a.sprint_id === sprintId && a.work_area_id === workAreaId
     );
@@ -217,12 +225,11 @@ export default function SprintPlanning() {
     <>
     <div>
       <PageHeader title="Sprint Planning" subtitle="Record capacities per team and sprint">
-        <Button
-          onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}
-          disabled={!effectiveTeamId}
-        >
-          <Plus className="w-4 h-4 mr-2" /> New Sprint
-        </Button>
+        {effectiveTeamId && canManageSprints(user, effectiveTeamId) && (
+          <Button onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}>
+            <Plus className="w-4 h-4 mr-2" /> New Sprint
+          </Button>
+        )}
       </PageHeader>
 
       <FilterBar
@@ -310,22 +317,28 @@ export default function SprintPlanning() {
                       </span>
                     )}
                     {sprint.is_cross_team && (
-                       <Button 
-                         variant="ghost" 
-                         size="icon" 
-                         className="h-7 w-7" 
-                         title="Copy this sprint to team"
-                         onClick={() => handleCopyCrossTeamSprint(sprint)}
-                       >
-                         <Copy className="w-3.5 h-3.5" />
-                       </Button>
+                       {canManageSprints(user, effectiveTeamId) && (
+                         <Button 
+                           variant="ghost" 
+                           size="icon" 
+                           className="h-7 w-7" 
+                           title="Copy this sprint to team"
+                           onClick={() => handleCopyCrossTeamSprint(sprint)}
+                         >
+                           <Copy className="w-3.5 h-3.5" />
+                         </Button>
+                       )}
                      )}
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingSprint(sprint); setSprintDialogOpen(true); }}>
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteSprintId(sprint.id)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    {canManageSprints(user, sprint.team_id || effectiveTeamId) && (
+                      <>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingSprint(sprint); setSprintDialogOpen(true); }}>
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteSprintId(sprint.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </CardHeader>
