@@ -115,6 +115,15 @@ export default function Dashboard() {
           />
 
           <div className="space-y-6">
+           <QuarterlyPlanWidget
+             sprints={sprints}
+             teams={teams}
+             members={members}
+             allocations={allocations}
+             selectedQuarter={selectedQuarter}
+             selectedTeamId={selectedTeamId}
+           />
+
            <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
               <CardHeader className="pb-3 border-b border-primary/10">
                 <CardTitle className="text-base font-bold text-primary">
