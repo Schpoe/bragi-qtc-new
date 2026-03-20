@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }) => {
         if (appError.status === 403 && appError.data?.extra_data?.reason) {
           const reason = appError.data.extra_data.reason;
           if (reason === 'auth_required') {
+            console.log('Auth required - redirecting to login');
             setAuthError({
               type: 'auth_required',
               message: 'Authentication required'
