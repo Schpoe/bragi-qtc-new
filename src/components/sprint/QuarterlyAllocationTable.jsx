@@ -8,6 +8,7 @@ import EmptyState from "@/components/shared/EmptyState";
 import { Users, Settings2 } from "lucide-react";
 import DisciplineBadge from "../shared/DisciplineBadge.jsx";
 import QuarterlyAllocationDialog from "./QuarterlyAllocationDialog";
+import { cn } from "@/lib/utils";
 
 export default function QuarterlyAllocationTable({
   members,
