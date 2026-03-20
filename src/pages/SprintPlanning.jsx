@@ -180,10 +180,13 @@ export default function SprintPlanning() {
       return;
     }
 
-    const existing = quarterlyAllocations.find(
-      a => a.team_member_id === data.team_member_id && a.quarter === data.quarter && a.work_area_id === data.work_area_id
-    );
-    
+    // Use the provided allocationId if available, otherwise search for it
+    const existing = data.allocationId 
+      ? quarterlyAllocations.find(a => a.id === data.allocationId)
+      : quarterlyAllocations.find(
+          a => a.team_member_id === data.team_member_id && a.quarter === data.quarter && a.work_area_id === data.work_area_id
+        );
+
     if (existing) {
       if (data.percent === 0) {
         deleteQuarterlyAllocation.mutate(existing.id);
