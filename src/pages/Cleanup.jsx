@@ -102,7 +102,7 @@ export default function CleanupPage() {
   });
 
   const orphanedData = useMemo(() => {
-    if (!teams.length) return { members: [], sprints: [], allocations: [], workAreas: [] };
+    if (!teams.length) return { members: [], sprints: [], allocations: [], quarterlyAllocations: [], workAreaSelections: [], workAreas: [] };
 
     const teamIds = new Set(teams.map(t => t.id));
     const memberIds = new Set(members.map(m => m.id));
@@ -116,15 +116,25 @@ export default function CleanupPage() {
       !sprintIds.has(a.sprint_id) ||
       !workAreaIds.has(a.work_area_id)
     );
+    const orphanedQuarterlyAllocations = quarterlyAllocations.filter(a =>
+      !memberIds.has(a.team_member_id) ||
+      !workAreaIds.has(a.work_area_id)
+    );
+    const orphanedWorkAreaSelections = workAreaSelections.filter(s =>
+      !teamIds.has(s.team_id) ||
+      (s.work_area_ids && s.work_area_ids.some(waId => !workAreaIds.has(waId)))
+    );
     const orphanedWorkAreas = workAreas.filter(wa => wa.leading_team_id && !teamIds.has(wa.leading_team_id));
 
     return {
       members: orphanedMembers,
       sprints: orphanedSprints,
       allocations: orphanedAllocations,
+      quarterlyAllocations: orphanedQuarterlyAllocations,
+      workAreaSelections: orphanedWorkAreaSelections,
       workAreas: orphanedWorkAreas,
     };
-  }, [teams, members, sprints, allocations, workAreas]);
+  }, [teams, members, sprints, allocations, quarterlyAllocations, workAreaSelections, workAreas]);
 
   const totalSelected = 
     selectedOrphans.members.size + 
