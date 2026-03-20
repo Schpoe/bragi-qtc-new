@@ -13,6 +13,7 @@ import TeamFormDialog from "../components/teams/TeamFormDialog";
 import TeamDetail from "../components/teams/TeamDetail";
 
 export default function Teams() {
+  const { user } = useAuth();
   const [teamDialogOpen, setTeamDialogOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -52,6 +53,8 @@ export default function Teams() {
     setEditingTeam(null);
   };
 
+  const manageableTeams = getManageableTeams(user, teams);
+
   if (selectedTeam) {
     const team = teams.find(t => t.id === selectedTeam);
     if (!team) { setSelectedTeam(null); return null; }
@@ -64,9 +67,11 @@ export default function Teams() {
   return (
     <div>
       <PageHeader title="Teams" subtitle="Manage your teams and members">
-        <Button onClick={() => { setEditingTeam(null); setTeamDialogOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" /> New Team
-        </Button>
+        {manageableTeams.length === teams.length && (
+          <Button onClick={() => { setEditingTeam(null); setTeamDialogOpen(true); }}>
+            <Plus className="w-4 h-4 mr-2" /> New Team
+          </Button>
+        )}
       </PageHeader>
 
       {teamsLoading ? (
@@ -86,8 +91,8 @@ export default function Teams() {
               key={team.id}
               team={team}
               members={members.filter(m => m.team_id === team.id)}
-              onEdit={(t) => { setEditingTeam(t); setTeamDialogOpen(true); }}
-              onDelete={(t) => deleteTeam.mutate(t.id)}
+              onEdit={canManageTeam(user, team.id) ? (t) => { setEditingTeam(t); setTeamDialogOpen(true); } : null}
+              onDelete={canManageTeam(user, team.id) ? (t) => deleteTeam.mutate(t.id) : null}
               onClick={() => setSelectedTeam(team.id)}
             />
           ))}
