@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { canEditAllocations } from "@/lib/permissions";
+import { canManageAllocations } from "@/lib/permissions";
 import { useAuth } from "@/lib/AuthContext";
 import EmptyState from "@/components/shared/EmptyState";
 import { Users } from "lucide-react";
@@ -15,7 +15,8 @@ export default function QuarterlyAllocationTable({
   selectedTeamId
 }) {
   const { user } = useAuth();
-  const canEdit = canEditAllocations(user, selectedTeamId);
+  const relevantTeamId = selectedTeamId === "all" ? members[0]?.team_id : selectedTeamId;
+  const canEdit = relevantTeamId && canManageAllocations(user, relevantTeamId);
 
   const relevantMembers = selectedTeamId === "all"
     ? members
