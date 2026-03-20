@@ -227,33 +227,43 @@ export default function SprintPlanning() {
     }, 300);
   };
 
+  const quarterlyAllocationTimeoutRef = useRef({});
+
   const handleQuarterlyAllocationChange = (data) => {
     const member = members.find(m => m.id === data.team_member_id);
     if (!member || !canManageAllocations(user, member.team_id)) {
       return;
     }
 
-    // Use the provided allocationId if available, otherwise search for it
-    const existing = data.allocationId 
-      ? quarterlyAllocations.find(a => a.id === data.allocationId)
-      : quarterlyAllocations.find(
-          a => a.team_member_id === data.team_member_id && a.quarter === data.quarter && a.work_area_id === data.work_area_id
-        );
-
-    if (existing) {
-      if (data.percent === 0) {
-        deleteQuarterlyAllocation.mutate(existing.id);
-      } else {
-        updateQuarterlyAllocation.mutate({ id: existing.id, data: { percent: data.percent } });
-      }
-    } else if (data.percent > 0) {
-      createQuarterlyAllocation.mutate({
-        team_member_id: data.team_member_id,
-        quarter: data.quarter,
-        work_area_id: data.work_area_id,
-        percent: data.percent
-      });
+    const key = `${data.team_member_id}-${data.quarter}-${data.work_area_id}`;
+    if (quarterlyAllocationTimeoutRef.current[key]) {
+      clearTimeout(quarterlyAllocationTimeoutRef.current[key]);
     }
+
+    quarterlyAllocationTimeoutRef.current[key] = setTimeout(() => {
+      // Use the provided allocationId if available, otherwise search for it
+      const existing = data.allocationId 
+        ? quarterlyAllocations.find(a => a.id === data.allocationId)
+        : quarterlyAllocations.find(
+            a => a.team_member_id === data.team_member_id && a.quarter === data.quarter && a.work_area_id === data.work_area_id
+          );
+
+      if (existing) {
+        if (data.percent === 0) {
+          deleteQuarterlyAllocation.mutate(existing.id);
+        } else {
+          updateQuarterlyAllocation.mutate({ id: existing.id, data: { percent: data.percent } });
+        }
+      } else if (data.percent > 0) {
+        createQuarterlyAllocation.mutate({
+          team_member_id: data.team_member_id,
+          quarter: data.quarter,
+          work_area_id: data.work_area_id,
+          percent: data.percent
+        });
+      }
+      delete quarterlyAllocationTimeoutRef.current[key];
+    }, 300);
   };
 
   const handleCopyCrossTeamSprint = (crossTeamSprint) => {
