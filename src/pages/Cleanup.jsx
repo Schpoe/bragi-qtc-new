@@ -354,6 +354,84 @@ export default function CleanupPage() {
                   )}
                 </TabsContent>
 
+                <TabsContent value="quarterlyAllocations" className="space-y-3 mt-4">
+                  {orphanedData.quarterlyAllocations.length > 0 && (
+                    <div className="flex justify-between items-center mb-3">
+                      <p className="text-sm text-muted-foreground">Quarterly allocations referencing deleted members or work areas</p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => selectAll('quarterlyAllocations')}>Select All</Button>
+                        <Button variant="outline" size="sm" onClick={() => deselectAll('quarterlyAllocations')}>Deselect All</Button>
+                      </div>
+                    </div>
+                  )}
+                  {orphanedData.quarterlyAllocations.map(qa => {
+                    const memberExists = members.some(m => m.id === qa.team_member_id);
+                    const workAreaExists = workAreas.some(wa => wa.id === qa.work_area_id);
+                    
+                    return (
+                      <div key={qa.id} className="flex items-center gap-3 p-3 border rounded-lg bg-background">
+                        <Checkbox
+                          checked={selectedOrphans.quarterlyAllocations.has(qa.id)}
+                          onCheckedChange={() => toggleSelection('quarterlyAllocations', qa.id)}
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium">{qa.percent}% — {qa.quarter}</div>
+                          <div className="text-sm text-muted-foreground space-y-0.5">
+                            {!memberExists && <div className="text-destructive">• Member deleted: {qa.team_member_id.slice(0, 8)}...</div>}
+                            {!workAreaExists && <div className="text-destructive">• Work area deleted: {qa.work_area_id.slice(0, 8)}...</div>}
+                            {memberExists && <div>• Member: {getMemberName(qa.team_member_id)}</div>}
+                            {workAreaExists && <div>• Work Area: {getWorkAreaName(qa.work_area_id)}</div>}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {orphanedData.quarterlyAllocations.length === 0 && (
+                    <div className="text-center py-8 text-sm text-muted-foreground">No orphaned quarterly allocations</div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="workAreaSelections" className="space-y-3 mt-4">
+                  {orphanedData.workAreaSelections.length > 0 && (
+                    <div className="flex justify-between items-center mb-3">
+                      <p className="text-sm text-muted-foreground">Work area selections with deleted teams or work areas</p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => selectAll('workAreaSelections')}>Select All</Button>
+                        <Button variant="outline" size="sm" onClick={() => deselectAll('workAreaSelections')}>Deselect All</Button>
+                      </div>
+                    </div>
+                  )}
+                  {orphanedData.workAreaSelections.map(selection => {
+                    const teamExists = teams.some(t => t.id === selection.team_id);
+                    const missingWorkAreas = selection.work_area_ids?.filter(waId => !workAreas.some(wa => wa.id === waId)) || [];
+                    
+                    return (
+                      <div key={selection.id} className="flex items-center gap-3 p-3 border rounded-lg bg-background">
+                        <Checkbox
+                          checked={selectedOrphans.workAreaSelections.has(selection.id)}
+                          onCheckedChange={() => toggleSelection('workAreaSelections', selection.id)}
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium">{selection.quarter}</div>
+                          <div className="text-sm text-muted-foreground space-y-0.5">
+                            {!teamExists && <div className="text-destructive">• Team deleted: {selection.team_id.slice(0, 8)}...</div>}
+                            {teamExists && <div>• Team: {getTeamName(selection.team_id)}</div>}
+                            {missingWorkAreas.length > 0 && (
+                              <div className="text-destructive">• {missingWorkAreas.length} deleted work area reference{missingWorkAreas.length !== 1 ? "s" : ""}</div>
+                            )}
+                            {selection.work_area_ids && selection.work_area_ids.length > 0 && missingWorkAreas.length === 0 && (
+                              <div>• {selection.work_area_ids.length} work area{selection.work_area_ids.length !== 1 ? "s" : ""}</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {orphanedData.workAreaSelections.length === 0 && (
+                    <div className="text-center py-8 text-sm text-muted-foreground">No orphaned work area selections</div>
+                  )}
+                </TabsContent>
+
                 <TabsContent value="workAreas" className="space-y-3 mt-4">
                   {orphanedData.workAreas.length > 0 && (
                     <div className="flex justify-between items-center mb-3">
