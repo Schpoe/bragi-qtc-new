@@ -59,7 +59,14 @@ const AuthenticatedApp = () => {
     } else if (authError.type === 'auth_required') {
       // Redirect to login automatically
       navigateToLogin();
-      return null;
+      return (
+        <div className="fixed inset-0 flex items-center justify-center bg-background">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Redirecting to login...</p>
+          </div>
+        </div>
+      );
     }
   }
 
