@@ -530,7 +530,7 @@ export default function SprintPlanning() {
         sprint={editingSprint}
         existingSprints={quarterSprints}
         teams={teams}
-        defaultTeamId={effectiveTeamId}
+        defaultTeamId={sprintPlanningTeamId}
         defaultQuarter={selectedQuarter}
         onSave={handleSaveSprint}
       />
