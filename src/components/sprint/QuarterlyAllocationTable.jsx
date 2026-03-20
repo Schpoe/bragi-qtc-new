@@ -251,31 +251,29 @@ export default function QuarterlyAllocationTable({
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
                       {wa.name}
                     </div>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={value}
-                      onChange={(e) => {
-                        const newPercent = parseFloat(e.target.value) || 0;
-                        const key = `${member.id}-${wa.id}`;
-                        if (allocationTimeoutRef.current[key]) {
-                          clearTimeout(allocationTimeoutRef.current[key]);
-                        }
-                        allocationTimeoutRef.current[key] = setTimeout(() => {
-                          onAllocationChange({
-                            team_member_id: member.id,
-                            quarter,
-                            work_area_id: wa.id,
-                            percent: newPercent,
-                            allocationId: alloc?.id
-                          });
-                          delete allocationTimeoutRef.current[key];
-                        }, 300);
-                      }}
-                      disabled={!canEdit}
-                      className="h-8 text-xs text-center font-semibold py-0"
-                    />
+                    {canEdit ? (
+                      <AllocationCell
+                        value={value}
+                        onChange={(newVal) => {
+                          const key = `${member.id}-${wa.id}`;
+                          if (allocationTimeoutRef.current[key]) {
+                            clearTimeout(allocationTimeoutRef.current[key]);
+                          }
+                          allocationTimeoutRef.current[key] = setTimeout(() => {
+                            onAllocationChange({
+                              team_member_id: member.id,
+                              quarter,
+                              work_area_id: wa.id,
+                              percent: newVal,
+                              allocationId: alloc?.id
+                            });
+                            delete allocationTimeoutRef.current[key];
+                          }, 300);
+                        }}
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold tabular-nums">{value}%</span>
+                    )}
                   </div>
                 );
               })}
