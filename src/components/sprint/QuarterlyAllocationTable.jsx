@@ -37,13 +37,10 @@ export default function QuarterlyAllocationTable({
   const quarterAllocations = allocations.filter(a => a.quarter === quarter);
 
   const memberAllocations = useMemo(() => {
-    const selectedWorkAreaIds = new Set(relevantWorkAreas.map(wa => wa.id));
     return relevantMembers.map(member => {
-      const memberAllocs = quarterAllocations.filter(
-        a => a.team_member_id === member.id && selectedWorkAreaIds.has(a.work_area_id)
-      );
+      const memberAllocs = quarterAllocations.filter(a => a.team_member_id === member.id);
       const totalPercent = memberAllocs.reduce((sum, a) => sum + a.percent, 0);
-
+      
       return {
         member,
         allocations: memberAllocs,
@@ -51,7 +48,7 @@ export default function QuarterlyAllocationTable({
         isOverAllocated: totalPercent > 100
       };
     });
-  }, [relevantMembers, quarterAllocations, relevantWorkAreas]);
+  }, [relevantMembers, quarterAllocations]);
 
   const handleWorkAreaSelectionChange = (selected) => {
     setSelectedWorkAreaIds(new Set(selected));
