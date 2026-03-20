@@ -50,6 +50,16 @@ export default function CleanupPage() {
     queryFn: () => base44.entities.WorkArea.list(),
   });
 
+  const { data: quarterlyAllocations = [], isLoading: quarterlyAllocationsLoading } = useQuery({
+    queryKey: ["quarterlyAllocations"],
+    queryFn: () => base44.entities.QuarterlyAllocation.list(),
+  });
+
+  const { data: workAreaSelections = [], isLoading: workAreaSelectionsLoading } = useQuery({
+    queryKey: ["workAreaSelections"],
+    queryFn: () => base44.entities.QuarterlyWorkAreaSelection.list(),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const promises = [];
