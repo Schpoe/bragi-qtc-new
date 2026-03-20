@@ -354,7 +354,7 @@ export default function SprintPlanning() {
     sprints.forEach(s => quarters.add(s.quarter));
     
     // Add next 8 quarters and previous 4 quarters
-    const [currYear, currQ] = currentQuarter.match(/Q(\d) (\d{4})/).slice(1);
+    const [currQ, currYear] = currentQuarter.match(/Q(\d) (\d{4})/).slice(1);
     const currYearNum = parseInt(currYear);
     const currQNum = parseInt(currQ);
     
