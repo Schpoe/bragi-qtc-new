@@ -179,7 +179,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const impersonateUser = async (targetUserEmail) => {
-    if (!actualUser || actualUser.role !== 'admin') {
+    if (user?.role !== 'admin') {
       return false;
     }
     
@@ -191,10 +191,8 @@ export const AuthProvider = ({ children }) => {
         return false;
       }
       
-      // Store the actual admin user if not already stored
-      if (!actualUser) {
-        setActualUser(user);
-      }
+      // Store the actual admin user before switching
+      setActualUser(user);
       
       const mergedUser = {
         ...targetUser,
