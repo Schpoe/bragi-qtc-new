@@ -73,9 +73,14 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="flex items-center justify-between">
-            <Label>Cross-team Sprint</Label>
+            <Label>Sprint Template (no team assignments)</Label>
             <Switch checked={form.is_cross_team} onCheckedChange={(v) => setForm({ ...form, is_cross_team: v })} />
           </div>
+          {form.is_cross_team && (
+            <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md">
+              Templates can be copied to create team-specific sprints but cannot be filled with allocations directly.
+            </p>
+          )}
           {!form.is_cross_team && (
             <div className="space-y-2">
               <Label>Team</Label>

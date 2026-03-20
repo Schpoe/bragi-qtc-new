@@ -256,16 +256,16 @@ export default function SprintPlanning() {
           <EmptyState
             icon={CalendarRange}
             title="No team-specific sprints yet"
-            description="Copy a cross-team sprint or create a new sprint for this team."
+            description="Copy a sprint template or create a new sprint for this team."
           >
             <Button onClick={() => setSprintDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" /> New Sprint
             </Button>
           </EmptyState>
-          
-          {/* Show available cross-team sprints to copy */}
+
+          {/* Show available sprint templates to copy */}
           <div>
-            <h3 className="text-sm font-semibold mb-3">Available Cross-team Sprints</h3>
+            <h3 className="text-sm font-semibold mb-3">Available Sprint Templates</h3>
             <div className="space-y-3">
               {crossTeamSprints.map(sprint => (
                 <Card key={sprint.id} className="border-border/60">
@@ -273,7 +273,7 @@ export default function SprintPlanning() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-semibold">
                         {sprint.name}
-                        <span className="ml-2 text-xs font-normal text-muted-foreground">(Cross-team)</span>
+                        <span className="ml-2 text-xs font-normal text-muted-foreground">(Template)</span>
                       </CardTitle>
                       <Button 
                         variant="outline" 
@@ -301,7 +301,7 @@ export default function SprintPlanning() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-semibold">
                     {sprint.name}
-                    {sprint.is_cross_team && <span className="ml-2 text-xs font-normal text-muted-foreground">(Cross-team)</span>}
+                    {sprint.is_cross_team && <span className="ml-2 text-xs font-normal text-muted-foreground">(Template)</span>}
                   </CardTitle>
                   <div className="flex items-center gap-1">
                     {sprint.start_date && sprint.end_date && (
@@ -330,13 +330,26 @@ export default function SprintPlanning() {
                 </div>
               </CardHeader>
               <CardContent>
-                <SprintAllocationTable
-                  sprint={sprint}
-                  members={teamMembers}
-                  workAreas={sprintWorkAreas}
-                  allocations={allocations}
-                  onAllocationChange={handleAllocationChange}
-                />
+                {sprint.is_cross_team ? (
+                  <div className="text-center py-8 text-sm text-muted-foreground">
+                    <p className="mb-3">This is a sprint template. Copy it to a team to create a team-specific sprint.</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleCopyCrossTeamSprint(sprint)}
+                    >
+                      <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy to Team
+                    </Button>
+                  </div>
+                ) : (
+                  <SprintAllocationTable
+                    sprint={sprint}
+                    members={teamMembers}
+                    workAreas={sprintWorkAreas}
+                    allocations={allocations}
+                    onAllocationChange={handleAllocationChange}
+                  />
+                )}
               </CardContent>
             </Card>
             );
