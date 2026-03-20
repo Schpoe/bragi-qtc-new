@@ -16,9 +16,11 @@ export default function QuarterlyAllocationTable({
   allocations,
   quarter,
   onAllocationChange,
-  selectedTeamId
+  selectedTeamId,
+  onSelectionChange,
+  initialSelectedWorkAreaIds = new Set()
 }) {
-  const [selectedWorkAreaIds, setSelectedWorkAreaIds] = useState(new Set());
+  const [selectedWorkAreaIds, setSelectedWorkAreaIds] = useState(() => new Set(initialSelectedWorkAreaIds));
   const [dialogOpen, setDialogOpen] = useState(false);
   const { user } = useAuth();
   const relevantTeamId = selectedTeamId === "all" ? members[0]?.team_id : selectedTeamId;
@@ -51,7 +53,11 @@ export default function QuarterlyAllocationTable({
   }, [relevantMembers, quarterAllocations]);
 
   const handleWorkAreaSelectionChange = (selected) => {
-    setSelectedWorkAreaIds(new Set(selected));
+    const newIds = new Set(selected);
+    setSelectedWorkAreaIds(newIds);
+    if (onSelectionChange) {
+      onSelectionChange(Array.from(newIds));
+    }
   };
 
   if (relevantMembers.length === 0 || allRelevantWorkAreas.length === 0) {
