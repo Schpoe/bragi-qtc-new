@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import PageHeader from "../components/shared/PageHeader";
 import EmptyState from "../components/shared/EmptyState";
 import { useAuth } from "@/lib/AuthContext";
-import { canManageWorkAreaTypes } from "@/lib/permissions";
+import { canManageWorkAreaTypes, isViewer } from "@/lib/permissions";
 
 export default function WorkAreaTypes() {
   const { user } = useAuth();
@@ -21,15 +21,26 @@ export default function WorkAreaTypes() {
   const [formData, setFormData] = useState({ name: "", description: "" });
   const queryClient = useQueryClient();
 
+  if (isViewer(user)) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
+          <Tag className="w-7 h-7 text-destructive" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground">Access Restricted</h3>
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">Viewers don't have access to Work Item Types.</p>
+      </div>
+    );
+  }
+
   if (!canManageWorkAreaTypes(user)) {
     return (
-      <div>
-        <PageHeader title="Work Item Types" subtitle="Manage categories for work items" />
-        <EmptyState
-          icon={Tag}
-          title="Access Restricted"
-          description="Only administrators can manage work item types."
-        />
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
+          <Tag className="w-7 h-7 text-destructive" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground">Access Restricted</h3>
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">Only administrators can manage work item types.</p>
       </div>
     );
   }
