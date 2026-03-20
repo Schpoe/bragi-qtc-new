@@ -8,11 +8,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const colors = [
   { value: "blue", label: "Blue", class: "bg-blue-500" },
-  { value: "green", label: "Green", class: "bg-emerald-500" },
+  { value: "indigo", label: "Indigo", class: "bg-indigo-500" },
   { value: "purple", label: "Purple", class: "bg-purple-500" },
-  { value: "orange", label: "Orange", class: "bg-orange-500" },
+  { value: "violet", label: "Violet", class: "bg-violet-500" },
+  { value: "fuchsia", label: "Fuchsia", class: "bg-fuchsia-500" },
   { value: "pink", label: "Pink", class: "bg-pink-500" },
+  { value: "rose", label: "Rose", class: "bg-rose-500" },
+  { value: "red", label: "Red", class: "bg-red-500" },
+  { value: "orange", label: "Orange", class: "bg-orange-500" },
+  { value: "amber", label: "Amber", class: "bg-amber-500" },
+  { value: "yellow", label: "Yellow", class: "bg-yellow-500" },
+  { value: "lime", label: "Lime", class: "bg-lime-500" },
+  { value: "green", label: "Green", class: "bg-emerald-500" },
   { value: "teal", label: "Teal", class: "bg-teal-500" },
+  { value: "cyan", label: "Cyan", class: "bg-cyan-500" },
+  { value: "sky", label: "Sky", class: "bg-sky-500" },
+  { value: "slate", label: "Slate", class: "bg-slate-500" },
+  { value: "gray", label: "Gray", class: "bg-gray-500" },
+  { value: "zinc", label: "Zinc", class: "bg-zinc-500" },
+  { value: "stone", label: "Stone", class: "bg-stone-500" },
 ];
 
 export default function TeamFormDialog({ open, onOpenChange, team, onSave }) {
