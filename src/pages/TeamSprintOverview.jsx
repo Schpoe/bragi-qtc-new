@@ -188,11 +188,7 @@ export default function TeamSprintOverview() {
 
   return (
     <div>
-      <PageHeader 
-        title="Team Overview" 
-        subtitle="Sprint utilization of all teams at a glance"
-        quarter={selectedQuarter}
-      />
+      <PageHeader title="Team Overview" subtitle="Sprint utilization of all teams at a glance" />
 
       <FilterBar
         quarter={selectedQuarter}
