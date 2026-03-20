@@ -316,19 +316,17 @@ export default function SprintPlanning() {
                         {sprint.start_date} — {sprint.end_date}
                       </span>
                     )}
-                    {sprint.is_cross_team && (
-                       {canManageSprints(user, effectiveTeamId) && (
-                         <Button 
-                           variant="ghost" 
-                           size="icon" 
-                           className="h-7 w-7" 
-                           title="Copy this sprint to team"
-                           onClick={() => handleCopyCrossTeamSprint(sprint)}
-                         >
-                           <Copy className="w-3.5 h-3.5" />
-                         </Button>
-                       )}
-                     )}
+                    {sprint.is_cross_team && canManageSprints(user, effectiveTeamId) && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7" 
+                        title="Copy this sprint to team"
+                        onClick={() => handleCopyCrossTeamSprint(sprint)}
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
                     {canManageSprints(user, sprint.team_id || effectiveTeamId) && (
                       <>
                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingSprint(sprint); setSprintDialogOpen(true); }}>
