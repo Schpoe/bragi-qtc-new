@@ -90,7 +90,11 @@ export default function Layout({ children, currentPageName }) {
         <div className="p-3 border-t border-border space-y-3">
           <div className="px-3">
             <div className="text-xs text-muted-foreground">Logged in as</div>
-            <div className="text-sm font-medium truncate">{user?.full_name || user?.email}</div>
+            <div className="text-sm font-medium truncate">
+              {user?.first_name && user?.last_name 
+                ? `${user.first_name} ${user.last_name}` 
+                : user?.full_name || user?.email}
+            </div>
             <div className="text-xs text-muted-foreground capitalize">{user?.role?.replace('_', ' ')}</div>
           </div>
           <Button
@@ -151,7 +155,11 @@ export default function Layout({ children, currentPageName }) {
             <div className="p-3 border-t border-border space-y-3">
               <div className="px-3">
                 <div className="text-xs text-muted-foreground">Logged in as</div>
-                <div className="text-sm font-medium truncate">{user?.full_name || user?.email}</div>
+                <div className="text-sm font-medium truncate">
+                  {user?.first_name && user?.last_name 
+                    ? `${user.first_name} ${user.last_name}` 
+                    : user?.full_name || user?.email}
+                </div>
                 <div className="text-xs text-muted-foreground capitalize">{user?.role?.replace('_', ' ')}</div>
               </div>
               <Button
