@@ -260,7 +260,7 @@ export default function SprintPlanning() {
             </Button>
           )}
         </EmptyState>
-      ) : quarterSprints.length === 0 && crossTeamSprints.length > 0 ? (
+      ) : quarterSprints.length === 0 && crossTeamSprints.length > 0 && !effectiveTeamId ? (
         <div className="space-y-6">
           <EmptyState
             icon={CalendarRange}
