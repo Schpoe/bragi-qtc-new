@@ -27,14 +27,20 @@ export default function TeamCard({ team, members, onEdit, onDelete, onClick }) {
             <div className={`w-3 h-3 rounded-full ${teamColors[team.color] || "bg-primary"}`} />
             <h3 className="font-semibold text-foreground">{team.name}</h3>
           </div>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); onEdit(team); }}>
-              <Pencil className="w-3.5 h-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={(e) => { e.stopPropagation(); onDelete(team); }}>
-              <Trash2 className="w-3.5 h-3.5" />
-            </Button>
-          </div>
+          {(onEdit || onDelete) && (
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {onEdit && (
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); onEdit(team); }}>
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+              )}
+              {onDelete && (
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={(e) => { e.stopPropagation(); onDelete(team); }}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent>
