@@ -93,6 +93,21 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
           <DialogTitle>{sprint ? "Edit Sprint" : "New Sprint"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
+          {!sprint && !form.is_cross_team && form.team_id && crossTeamSprints.length > 0 && (
+            <div className="space-y-2">
+              <Label>Use Sprint Template (Optional)</Label>
+              <Select value={selectedTemplate?.id || ""} onValueChange={(templateId) => {
+                const template = crossTeamSprints.find(s => s.id === templateId);
+                if (template) handleApplyTemplate(template);
+              }}>
+                <SelectTrigger><SelectValue placeholder="Select a template to copy..." /></SelectTrigger>
+                <SelectContent>
+                  {crossTeamSprints.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Templates will populate the name and work areas.</p>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <Label>Sprint Template (no team assignments)</Label>
             <Switch checked={form.is_cross_team} onCheckedChange={(v) => setForm({ ...form, is_cross_team: v })} />
