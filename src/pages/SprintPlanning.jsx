@@ -197,24 +197,34 @@ export default function SprintPlanning() {
     setEditingSprint(null);
   };
 
+  const allocationTimeoutRef = useRef({});
+
   const handleAllocationChange = (memberId, sprintId, workAreaId, value) => {
     const sprint = sprints.find(s => s.id === sprintId);
     if (!sprint || !canManageAllocations(user, sprint.team_id)) {
       return;
     }
     
-    const existing = allocations.find(
-      a => a.team_member_id === memberId && a.sprint_id === sprintId && a.work_area_id === workAreaId
-    );
-    if (existing) {
-      if (value === 0) {
-        setDeleteAllocationId(existing.id);
-      } else {
-        updateAllocation.mutate({ id: existing.id, data: { percent: value } });
-      }
-    } else if (value > 0) {
-      createAllocation.mutate({ team_member_id: memberId, sprint_id: sprintId, work_area_id: workAreaId, percent: value });
+    const key = `${memberId}-${sprintId}-${workAreaId}`;
+    if (allocationTimeoutRef.current[key]) {
+      clearTimeout(allocationTimeoutRef.current[key]);
     }
+
+    allocationTimeoutRef.current[key] = setTimeout(() => {
+      const existing = allocations.find(
+        a => a.team_member_id === memberId && a.sprint_id === sprintId && a.work_area_id === workAreaId
+      );
+      if (existing) {
+        if (value === 0) {
+          setDeleteAllocationId(existing.id);
+        } else {
+          updateAllocation.mutate({ id: existing.id, data: { percent: value } });
+        }
+      } else if (value > 0) {
+        createAllocation.mutate({ team_member_id: memberId, sprint_id: sprintId, work_area_id: workAreaId, percent: value });
+      }
+      delete allocationTimeoutRef.current[key];
+    }, 300);
   };
 
   const handleQuarterlyAllocationChange = (data) => {
