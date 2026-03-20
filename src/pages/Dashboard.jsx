@@ -168,6 +168,22 @@ export default function Dashboard() {
             <Card>
               <CardHeader className="pb-3 border-b">
                 <CardTitle className="text-base font-bold">
+                  Quarterly Plan — {selectedQuarter}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <QuarterlyAllocationReport
+                  members={members}
+                  workAreas={filteredWorkAreas}
+                  quarterlyAllocations={quarterlyAllocations}
+                  selectedQuarter={selectedQuarter}
+                  selectedTeamId={selectedTeamId}
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3 border-b">
+                <CardTitle className="text-base font-bold">
                   Capacity Overview — {selectedQuarter}
                 </CardTitle>
               </CardHeader>
