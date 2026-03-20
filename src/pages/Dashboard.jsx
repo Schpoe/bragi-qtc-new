@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCurrentQuarter } from "@/lib/quarter-utils";
 import PageHeader from "../components/shared/PageHeader";
 import FilterBar from "../components/shared/FilterBar";
 import StatsRow from "../components/dashboard/StatsRow";
@@ -13,11 +14,8 @@ import TeamCapacityChart from "../components/dashboard/TeamCapacityChart";
 import ExecutiveSummary from "../components/dashboard/ExecutiveSummary";
 import AllocationHeatMap from "../components/dashboard/AllocationHeatMap";
 
-const currentYear = new Date().getFullYear();
-const currentQ = Math.ceil((new Date().getMonth() + 1) / 3);
-
 export default function Dashboard() {
-  const [selectedQuarter, setSelectedQuarter] = useState(`Q${currentQ} ${currentYear}`);
+  const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
   const [selectedTeamId, setSelectedTeamId] = useState("all");
 
   const { data: teams = [], isLoading: teamsLoading } = useQuery({

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
+import { getCurrentQuarter } from "@/lib/quarter-utils";
 import PageHeader from "../components/shared/PageHeader";
 import EmptyState from "../components/shared/EmptyState";
 import FilterBar from "../components/shared/FilterBar";
@@ -19,14 +20,11 @@ import SprintFormDialog from "../components/sprint/SprintFormDialog";
 import SprintAllocationTable from "../components/sprint/SprintAllocationTable";
 import ConfirmDeleteDialog from "../components/shared/ConfirmDeleteDialog";
 
-const currentYear = new Date().getFullYear();
-const currentQ = Math.ceil((new Date().getMonth() + 1) / 3);
-
 export default function SprintPlanning() {
   const { user } = useAuth();
   const [sprintDialogOpen, setSprintDialogOpen] = useState(false);
   const [editingSprint, setEditingSprint] = useState(null);
-  const [selectedQuarter, setSelectedQuarter] = useState(`Q${currentQ} ${currentYear}`);
+  const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
   const [selectedTeamId, setSelectedTeamId] = useState("all");
   const [teamSelectDialogOpen, setTeamSelectDialogOpen] = useState(false);
   const [teamSelectValue, setTeamSelectValue] = useState("");

@@ -5,14 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getCurrentQuarter } from "@/lib/quarter-utils";
 import PageHeader from "../components/shared/PageHeader";
 import FilterBar from "../components/shared/FilterBar";
 import EmptyState from "../components/shared/EmptyState";
 import { BarChart3, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const currentYear = new Date().getFullYear();
-const currentQ = Math.ceil((new Date().getMonth() + 1) / 3);
 
 const teamColorMap = {
   blue: "bg-blue-500",
@@ -153,7 +151,7 @@ function TeamCardTitle({ team, memberCount }) {
 }
 
 export default function TeamSprintOverview() {
-  const [selectedQuarter, setSelectedQuarter] = useState(`Q${currentQ} ${currentYear}`);
+  const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
 
   const { data: teams = [], isLoading: teamsLoading } = useQuery({
     queryKey: ["teams"],
