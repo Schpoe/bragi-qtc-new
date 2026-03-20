@@ -7,11 +7,16 @@ import EmptyState from "../shared/EmptyState";
 import MemberFormDialog from "./MemberFormDialog";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/AuthContext";
+import { canManageTeamMembers } from "@/lib/permissions";
 
 export default function TeamDetail({ team, members, onBack }) {
+  const { user } = useAuth();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const queryClient = useQueryClient();
+  
+  const canManage = canManageTeamMembers(user, team.id);
 
   const createMember = useMutation({
     mutationFn: (data) => base44.entities.TeamMember.create(data),
@@ -48,9 +53,11 @@ export default function TeamDetail({ team, members, onBack }) {
           <h2 className="text-xl font-bold">{team.name}</h2>
           {team.description && <p className="text-sm text-muted-foreground mt-0.5">{team.description}</p>}
         </div>
-        <Button onClick={() => { setEditingMember(null); setMemberDialogOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" /> Add Member
-        </Button>
+        {canManage && (
+          <Button onClick={() => { setEditingMember(null); setMemberDialogOpen(true); }}>
+            <Plus className="w-4 h-4 mr-2" /> Add Member
+          </Button>
+        )}
       </div>
 
       {members.length === 0 ? (
@@ -74,12 +81,16 @@ export default function TeamDetail({ team, members, onBack }) {
                 </div>
                 <div className="flex items-center gap-3">
                   <DisciplineBadge discipline={member.discipline} />
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingMember(member); setMemberDialogOpen(true); }}>
-                    <Pencil className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteMember.mutate(member.id)}>
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  {canManage && (
+                    <>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setEditingMember(member); setMemberDialogOpen(true); }}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteMember.mutate(member.id)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
