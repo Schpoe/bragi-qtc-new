@@ -388,16 +388,16 @@ export default function SprintPlanning() {
             const sprintWorkAreas = filteredWorkAreas.filter(wa => sprintRelevantIds.has(wa.id));
 
             return (
-            <Card key={sprint.id} className="border-border/60">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-semibold">
+            <Card key={sprint.id} className="border-primary/20 hover:border-primary/40 transition-colors">
+              <CardHeader className="pb-3 border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-base font-bold text-foreground">
                     {sprint.name}
-                    {sprint.is_cross_team && <span className="ml-2 text-xs font-normal text-muted-foreground">(Template)</span>}
+                    {sprint.is_cross_team && <span className="ml-2 text-xs font-normal text-muted-foreground bg-muted px-2 py-1 rounded">(Template)</span>}
                   </CardTitle>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 flex-wrap">
                     {sprint.start_date && sprint.end_date && (
-                      <span className="text-xs text-muted-foreground mr-3">
+                      <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded mr-3">
                         {sprint.start_date} — {sprint.end_date}
                       </span>
                     )}
