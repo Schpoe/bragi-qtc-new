@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { LayoutDashboard, Users, FolderKanban, CalendarRange, BarChart3, Menu, X, Trash2, Shield } from "lucide-react";
+import { LayoutDashboard, Users, FolderKanban, CalendarRange, BarChart3, Menu, X, Trash2, Shield, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/AuthContext";
 import { isAdmin } from "@/lib/permissions";
+import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
 
 const navItems = [
   { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
@@ -24,6 +26,36 @@ export default function Layout({ children, currentPageName }) {
   const filteredNavItems = navItems.filter(item => 
     !item.adminOnly || isAdmin(user)
   );
+
+  // Session timeout - 30 minutes of inactivity
+  useEffect(() => {
+    let timeout;
+    
+    const resetTimeout = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        base44.auth.logout();
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      document.addEventListener(event, resetTimeout);
+    });
+
+    resetTimeout();
+
+    return () => {
+      clearTimeout(timeout);
+      events.forEach(event => {
+        document.removeEventListener(event, resetTimeout);
+      });
+    };
+  }, []);
+
+  const handleLogout = () => {
+    base44.auth.logout();
+  };
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -55,6 +87,16 @@ export default function Layout({ children, currentPageName }) {
             );
           })}
         </nav>
+        <div className="p-3 border-t border-border">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-muted-foreground hover:text-foreground"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-4 h-4 mr-3" />
+            Logout
+          </Button>
+        </div>
       </aside>
 
       {/* Mobile Header */}
@@ -80,7 +122,7 @@ export default function Layout({ children, currentPageName }) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <nav className="p-3 space-y-1">
+            <nav className="flex-1 p-3 space-y-1">
               {filteredNavItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 return (
@@ -101,6 +143,16 @@ export default function Layout({ children, currentPageName }) {
                 );
               })}
             </nav>
+            <div className="p-3 border-t border-border">
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground hover:text-foreground"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4 mr-3" />
+                Logout
+              </Button>
+            </div>
           </aside>
         </div>
       )}
