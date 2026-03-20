@@ -97,27 +97,12 @@ export const AuthProvider = ({ children }) => {
       
       // Verify user exists in User entity (access control) and merge custom fields
       try {
-        const users = await base44.entities.User.list();
-        let userRecord = users.find(u => u.email === currentUser.email);
+        // Use backend function to ensure user record exists (handles RLS)
+        const ensureUserResponse = await base44.functions.invoke('ensureUserExists', {});
+        const userRecord = ensureUserResponse.userRecord;
         
-        // Auto-create User record if it doesn't exist (with default viewer role)
         if (!userRecord) {
-          try {
-            userRecord = await base44.entities.User.create({
-              email: currentUser.email,
-              role: 'viewer',
-              managed_team_ids: []
-            });
-          } catch (createError) {
-            console.error('Failed to auto-create user record:', createError);
-            setAuthError({
-              type: 'access_check_failed',
-              message: 'Unable to initialize user account. Please contact an administrator.'
-            });
-            setIsLoadingAuth(false);
-            setIsAuthenticated(false);
-            return;
-          }
+          throw new Error('Failed to get or create user record');
         }
         
         // Merge custom fields from User entity into the current user object
