@@ -8,6 +8,8 @@ const disciplineStyles = {
   Cloud: "bg-purple-100 text-purple-700 border-purple-200",
   QA: "bg-amber-100 text-amber-700 border-amber-200",
   Embedded: "bg-rose-100 text-rose-700 border-rose-200",
+  Algo: "bg-cyan-100 text-cyan-700 border-cyan-200",
+  "Test Automation": "bg-teal-100 text-teal-700 border-teal-200",
 };
 
 export default function DisciplineBadge({ discipline }) {
