@@ -190,6 +190,51 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
         </Card>
       )}
 
+      {/* Cross-team summary table */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">Quarterly Capacity Summary — All Teams × Disciplines</CardTitle>
+        </CardHeader>
+        <CardContent className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left py-2 pr-4 font-semibold text-muted-foreground min-w-[120px]">Team</th>
+                <th className="text-left py-2 pr-4 font-semibold text-muted-foreground min-w-[100px]">Discipline</th>
+                <th className="text-right py-2 pr-4 font-semibold text-muted-foreground"># Members</th>
+                <th className="text-right py-2 font-semibold text-muted-foreground min-w-[100px]">Q Utilization</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map(({ team, disciplineStats }) =>
+                disciplineStats.map(({ discipline, utilPct, memberCount }, di) => (
+                  <tr key={`${team.id}-${discipline}`} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                    {di === 0 && (
+                      <td className="py-2 pr-4 font-medium align-top" rowSpan={disciplineStats.length}>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: team.color || "#3b82f6" }} />
+                          {team.name}
+                        </div>
+                      </td>
+                    )}
+                    <td className="py-2 pr-4 text-muted-foreground">{discipline}</td>
+                    <td className="py-2 pr-4 text-right text-muted-foreground">{memberCount}</td>
+                    <td className="py-2 text-right">
+                      <span className={cn(
+                        "font-semibold",
+                        utilPct > 100 ? "text-destructive" : utilPct >= 80 ? "text-amber-600" : "text-foreground"
+                      )}>
+                        {utilPct}%
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
       {/* Per-team cards */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {data.map(({ team, teamCapacity, teamMemberCount, quarterlyUtil, sprintStats, disciplineStats, topWorkAreasQuarterly }) => (
@@ -263,51 +308,6 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
           </Card>
         ))}
       </div>
-
-      {/* Cross-team summary table */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">Quarterly Capacity Summary — All Teams × Disciplines</CardTitle>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-2 pr-4 font-semibold text-muted-foreground min-w-[120px]">Team</th>
-                <th className="text-left py-2 pr-4 font-semibold text-muted-foreground min-w-[100px]">Discipline</th>
-                <th className="text-right py-2 pr-4 font-semibold text-muted-foreground"># Members</th>
-                <th className="text-right py-2 font-semibold text-muted-foreground min-w-[100px]">Q Utilization</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(({ team, disciplineStats }) =>
-                disciplineStats.map(({ discipline, utilPct, memberCount }, di) => (
-                  <tr key={`${team.id}-${discipline}`} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                    {di === 0 && (
-                      <td className="py-2 pr-4 font-medium align-top" rowSpan={disciplineStats.length}>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: team.color || "#3b82f6" }} />
-                          {team.name}
-                        </div>
-                      </td>
-                    )}
-                    <td className="py-2 pr-4 text-muted-foreground">{discipline}</td>
-                    <td className="py-2 pr-4 text-right text-muted-foreground">{memberCount}</td>
-                    <td className="py-2 text-right">
-                      <span className={cn(
-                        "font-semibold",
-                        utilPct > 100 ? "text-destructive" : utilPct >= 80 ? "text-amber-600" : "text-foreground"
-                      )}>
-                        {utilPct}%
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
     </div>
   );
 }
