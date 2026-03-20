@@ -221,10 +221,18 @@ export default function SprintPlanning() {
   if (!quarters.includes(selectedQuarter)) quarters.push(selectedQuarter);
   quarters.sort();
 
+  const selectedTeam = effectiveTeamId ? teams.find(t => t.id === effectiveTeamId) : null;
+
   return (
     <>
     <div>
-      <PageHeader title="Sprint Planning" subtitle="Record capacities per team and sprint">
+      <PageHeader 
+        title="Sprint Planning" 
+        subtitle="Record capacities per team and sprint"
+        quarter={selectedQuarter}
+        team={selectedTeam?.name}
+        teamColor={selectedTeam?.color}
+      >
         {effectiveTeamId && canCreateSprint(user) && canManageSprints(user, effectiveTeamId) && (
           <Button onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}>
             <Plus className="w-4 h-4 mr-2" /> New Sprint
