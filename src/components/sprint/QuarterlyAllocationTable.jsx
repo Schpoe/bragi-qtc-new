@@ -166,13 +166,20 @@ export default function QuarterlyAllocationTable({
                         value={value}
                         onChange={(e) => {
                           const newPercent = parseFloat(e.target.value) || 0;
-                          onAllocationChange({
-                            team_member_id: member.id,
-                            quarter,
-                            work_area_id: wa.id,
-                            percent: newPercent,
-                            allocationId: alloc?.id
-                          });
+                          const key = `${member.id}-${wa.id}`;
+                          if (allocationTimeoutRef.current[key]) {
+                            clearTimeout(allocationTimeoutRef.current[key]);
+                          }
+                          allocationTimeoutRef.current[key] = setTimeout(() => {
+                            onAllocationChange({
+                              team_member_id: member.id,
+                              quarter,
+                              work_area_id: wa.id,
+                              percent: newPercent,
+                              allocationId: alloc?.id
+                            });
+                            delete allocationTimeoutRef.current[key];
+                          }, 300);
                         }}
                         disabled={!canEdit}
                         className="h-8 text-xs text-center py-0 font-semibold"
