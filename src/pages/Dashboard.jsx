@@ -21,40 +21,40 @@ export default function Dashboard() {
 
   const { data: teams = [], isLoading: teamsLoading } = useQuery({
     queryKey: ["teams"],
-    queryFn: () => base44.entities.Team.list(),
+    queryFn: () => base44.entities.Team.list()
   });
 
   const { data: members = [] } = useQuery({
     queryKey: ["teamMembers"],
-    queryFn: () => base44.entities.TeamMember.list(),
+    queryFn: () => base44.entities.TeamMember.list()
   });
 
   const { data: workAreas = [] } = useQuery({
     queryKey: ["workAreas"],
-    queryFn: () => base44.entities.WorkArea.list(),
+    queryFn: () => base44.entities.WorkArea.list()
   });
 
   const { data: sprints = [] } = useQuery({
     queryKey: ["sprints"],
-    queryFn: () => base44.entities.Sprint.list(),
+    queryFn: () => base44.entities.Sprint.list()
   });
 
   const { data: allocations = [] } = useQuery({
     queryKey: ["allocations"],
-    queryFn: () => base44.entities.Allocation.list(),
+    queryFn: () => base44.entities.Allocation.list()
   });
 
   const { data: quarterlyAllocations = [] } = useQuery({
     queryKey: ["quarterlyAllocations"],
-    queryFn: () => base44.entities.QuarterlyAllocation.list(),
+    queryFn: () => base44.entities.QuarterlyAllocation.list()
   });
 
   // Cleanup template sprint allocations on mount
   React.useEffect(() => {
     const cleanupTemplateAllocations = async () => {
-      const templateSprintIds = new Set(sprints.filter(s => s.is_cross_team).map(s => s.id));
-      const orphanedAllocations = allocations.filter(a => templateSprintIds.has(a.sprint_id));
-      
+      const templateSprintIds = new Set(sprints.filter((s) => s.is_cross_team).map((s) => s.id));
+      const orphanedAllocations = allocations.filter((a) => templateSprintIds.has(a.sprint_id));
+
       if (orphanedAllocations.length > 0) {
         console.log(`Cleaning up ${orphanedAllocations.length} template sprint allocations...`);
         for (const alloc of orphanedAllocations) {
@@ -62,39 +62,39 @@ export default function Dashboard() {
         }
       }
     };
-    
+
     if (sprints.length > 0 && allocations.length > 0) {
       cleanupTemplateAllocations();
     }
   }, [sprints.length, allocations.length]);
 
-  const quarterSprints = sprints
-    .filter(s => {
-      if (s.quarter !== selectedQuarter) return false;
-      if (s.is_cross_team) return false; // Exclude templates
-      if (selectedTeamId === "all") return true;
-      return s.team_id === selectedTeamId;
-    })
-    .sort((a, b) => (a.order || 0) - (b.order || 0));
+  const quarterSprints = sprints.
+  filter((s) => {
+    if (s.quarter !== selectedQuarter) return false;
+    if (s.is_cross_team) return false; // Exclude templates
+    if (selectedTeamId === "all") return true;
+    return s.team_id === selectedTeamId;
+  }).
+  sort((a, b) => (a.order || 0) - (b.order || 0));
 
   const generateQuarters = () => {
     // Get quarters that have allocations
-    const sprintIdsWithAllocations = new Set(allocations.map(a => a.sprint_id));
+    const sprintIdsWithAllocations = new Set(allocations.map((a) => a.sprint_id));
     const quartersWithAllocations = new Set(
-      sprints
-        .filter(s => sprintIdsWithAllocations.has(s.id))
-        .map(s => s.quarter)
+      sprints.
+      filter((s) => sprintIdsWithAllocations.has(s.id)).
+      map((s) => s.quarter)
     );
-    
+
     return Array.from(quartersWithAllocations);
   };
-  
+
   const quarters = generateQuarters();
   sortQuarters(quarters);
 
-  const filteredWorkAreas = selectedTeamId === "all"
-    ? workAreas
-    : workAreas.filter(wa => wa.is_cross_team || wa.leading_team_id === selectedTeamId || wa.supporting_team_ids.includes(selectedTeamId));
+  const filteredWorkAreas = selectedTeamId === "all" ?
+  workAreas :
+  workAreas.filter((wa) => wa.is_cross_team || wa.leading_team_id === selectedTeamId || wa.supporting_team_ids.includes(selectedTeamId));
 
   const isLoading = teamsLoading;
 
@@ -109,26 +109,26 @@ export default function Dashboard() {
         onTeamChange={setSelectedTeamId}
         teams={teams}
         quarters={quarters}
-        showTeamFilter={true}
-      />
+        showTeamFilter={true} />
+      
 
-      {isLoading ? (
-        <div className="space-y-4">
+      {isLoading ?
+      <div className="space-y-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-20 rounded-xl" />)}
+            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
           </div>
           <Skeleton className="h-64 rounded-xl" />
-        </div>
-      ) : (
-        <>
+        </div> :
+
+      <>
            <StatsRow
-            teams={teams}
-            members={members}
-            workAreas={filteredWorkAreas}
-            sprints={quarterSprints}
-            allocations={allocations}
-            selectedTeamId={selectedTeamId}
-          />
+          teams={teams}
+          members={members}
+          workAreas={filteredWorkAreas}
+          sprints={quarterSprints}
+          allocations={allocations}
+          selectedTeamId={selectedTeamId} />
+        
 
           <div className="space-y-6">
            <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
@@ -139,47 +139,47 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="pt-6">
                 <ExecutiveSummary
-                  teams={teams}
-                  sprints={sprints}
-                  members={members}
-                  allocations={allocations}
-                  workAreas={workAreas}
-                  selectedQuarter={selectedQuarter}
-                />
+                teams={teams}
+                sprints={sprints}
+                members={members}
+                allocations={allocations}
+                workAreas={workAreas}
+                selectedQuarter={selectedQuarter} />
+              
               </CardContent>
             </Card>
             <TeamCapacityChart
-              teams={teams}
-              sprints={sprints}
-              members={members}
-              allocations={allocations}
-              selectedTeamId={selectedTeamId}
-              selectedQuarter={selectedQuarter}
-            />
+            teams={teams}
+            sprints={sprints}
+            members={members}
+            allocations={allocations}
+            selectedTeamId={selectedTeamId}
+            selectedQuarter={selectedQuarter} />
+          
             <AllocationHeatMap
-              teams={teams}
-              members={members}
-              sprints={sprints}
-              allocations={allocations}
-              workAreas={workAreas}
-              selectedQuarter={selectedQuarter}
-              selectedTeamId={selectedTeamId}
-            />
+            teams={teams}
+            members={members}
+            sprints={sprints}
+            allocations={allocations}
+            workAreas={workAreas}
+            selectedQuarter={selectedQuarter}
+            selectedTeamId={selectedTeamId} />
+          
             <Card>
-              <CardHeader className="pb-3 border-b">
-                <CardTitle className="text-base font-bold">
-                  Quarterly Plan — {selectedQuarter}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <QuarterlyAllocationReport
-                  members={members}
-                  workAreas={filteredWorkAreas}
-                  quarterlyAllocations={quarterlyAllocations}
-                  selectedQuarter={selectedQuarter}
-                  selectedTeamId={selectedTeamId}
-                />
-              </CardContent>
+              
+
+
+
+            
+              
+
+
+
+
+
+
+
+            
             </Card>
             <Card>
               <CardHeader className="pb-3 border-b">
@@ -189,22 +189,22 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="pt-6">
                 <CapacityOverviewTable
-                  sprints={quarterSprints}
-                  teams={teams}
-                  members={members}
-                  allocations={allocations}
-                  selectedTeamId={selectedTeamId}
-                  workAreas={filteredWorkAreas}
-                />
+                sprints={quarterSprints}
+                teams={teams}
+                members={members}
+                allocations={allocations}
+                selectedTeamId={selectedTeamId}
+                workAreas={filteredWorkAreas} />
+              
               </CardContent>
             </Card>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DisciplineBreakdown
-                sprints={quarterSprints}
-                members={members}
-                allocations={allocations}
-                selectedTeamId={selectedTeamId}
-              />
+              sprints={quarterSprints}
+              members={members}
+              allocations={allocations}
+              selectedTeamId={selectedTeamId} />
+            
               <Card>
                 <CardHeader className="pb-3 border-b">
                   <CardTitle className="text-base font-bold">
@@ -213,18 +213,18 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="pt-6">
                   <UtilizationByWorkItemType
-                    workAreas={filteredWorkAreas}
-                    allocations={allocations}
-                    members={members}
-                    sprints={quarterSprints}
-                    selectedTeamId={selectedTeamId}
-                  />
+                  workAreas={filteredWorkAreas}
+                  allocations={allocations}
+                  members={members}
+                  sprints={quarterSprints}
+                  selectedTeamId={selectedTeamId} />
+                
                 </CardContent>
               </Card>
             </div>
             </div>
         </>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }
