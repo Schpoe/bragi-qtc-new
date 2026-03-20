@@ -298,14 +298,14 @@ export default function SprintPlanning() {
   };
 
   // Filter sprints: only show team-specific sprints for the selected team
-    const quarterSprints = sprints
-      .filter(s => s.quarter === selectedQuarter && !s.is_cross_team && s.team_id === effectiveTeamId)
-      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  const quarterSprints = sprints
+    .filter(s => s.quarter === selectedQuarter && !s.is_cross_team && s.team_id === sprintPlanningTeamId)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    // Get cross-team sprints for current quarter
-    const crossTeamSprints = sprints.filter(s => s.quarter === selectedQuarter && s.is_cross_team);
+  // Get cross-team sprints for current quarter
+  const crossTeamSprints = sprints.filter(s => s.quarter === selectedQuarter && s.is_cross_team);
 
-   const teamMembers = members.filter(m => m.team_id === effectiveTeamId);
+  const teamMembers = members.filter(m => m.team_id === sprintPlanningTeamId);
 
    // Get work areas relevant to this team (leading/supporting) plus any with allocations or manually selected
    const teamMemberIds = new Set(teamMembers.map(m => m.id));
