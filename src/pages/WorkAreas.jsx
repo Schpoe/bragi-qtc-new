@@ -294,8 +294,8 @@ export default function WorkAreas() {
                 </CardContent>
               </Card>
             );
-          })}
-          </div>
+              })}
+            </div>
           )}
         </TabsContent>
 
