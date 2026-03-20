@@ -514,6 +514,22 @@ export default function CleanupPage() {
                   </div>
                 </div>
               )}
+              {selectedOrphans.quarterlyAllocations.size > 0 && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <div className="font-semibold text-sm mb-2">Quarterly Allocations ({selectedOrphans.quarterlyAllocations.size})</div>
+                  <div className="text-xs text-muted-foreground">
+                    {selectedOrphans.quarterlyAllocations.size} quarterly allocation record{selectedOrphans.quarterlyAllocations.size !== 1 ? "s" : ""} will be deleted
+                  </div>
+                </div>
+              )}
+              {selectedOrphans.workAreaSelections.size > 0 && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <div className="font-semibold text-sm mb-2">Work Area Selections ({selectedOrphans.workAreaSelections.size})</div>
+                  <div className="text-xs text-muted-foreground">
+                    {selectedOrphans.workAreaSelections.size} work area selection record{selectedOrphans.workAreaSelections.size !== 1 ? "s" : ""} will be deleted
+                  </div>
+                </div>
+              )}
               {selectedOrphans.workAreas.size > 0 && (
                 <div className="p-3 bg-muted rounded-lg">
                   <div className="font-semibold text-sm mb-2">Work Areas ({selectedOrphans.workAreas.size})</div>
