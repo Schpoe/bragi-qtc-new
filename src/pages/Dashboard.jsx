@@ -44,11 +44,31 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Allocation.list(),
   });
 
+  // Cleanup template sprint allocations on mount
+  React.useEffect(() => {
+    const cleanupTemplateAllocations = async () => {
+      const templateSprintIds = new Set(sprints.filter(s => s.is_cross_team).map(s => s.id));
+      const orphanedAllocations = allocations.filter(a => templateSprintIds.has(a.sprint_id));
+      
+      if (orphanedAllocations.length > 0) {
+        console.log(`Cleaning up ${orphanedAllocations.length} template sprint allocations...`);
+        for (const alloc of orphanedAllocations) {
+          await base44.entities.Allocation.delete(alloc.id);
+        }
+      }
+    };
+    
+    if (sprints.length > 0 && allocations.length > 0) {
+      cleanupTemplateAllocations();
+    }
+  }, [sprints.length, allocations.length]);
+
   const quarterSprints = sprints
     .filter(s => {
       if (s.quarter !== selectedQuarter) return false;
+      if (s.is_cross_team) return false; // Exclude templates
       if (selectedTeamId === "all") return true;
-      return s.is_cross_team || s.team_id === selectedTeamId;
+      return s.team_id === selectedTeamId;
     })
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 
