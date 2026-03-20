@@ -58,7 +58,7 @@ export default function QuarterlyAllocationTable({
   }, [relevantMembers, quarterAllocations]);
 
   const handleWorkAreaSelectionChange = (selected) => {
-    const newIds = new Set(selected);
+    const newIds = selected instanceof Set ? selected : new Set(selected);
     setSelectedWorkAreaIds(newIds);
     if (onSelectionChange) {
       onSelectionChange(Array.from(newIds));
