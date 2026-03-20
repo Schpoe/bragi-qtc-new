@@ -97,6 +97,7 @@ export default function QuarterlyAllocationTable({
           quarter={quarter}
           teamId={selectedTeamId}
           onConfirm={handleWorkAreaSelectionChange}
+          initialSelectedIds={selectedWorkAreaIds}
         />
       </div>
     );
