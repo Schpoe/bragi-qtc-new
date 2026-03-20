@@ -36,14 +36,30 @@ export default function UserManagement() {
 
   const createUser = useMutation({
     mutationFn: async (data) => {
+      console.log("Creating user with data:", data);
+      
       // Use Base44's invite system to create the user
-      await base44.users.inviteUser(data.email, data.role);
+      try {
+        console.log("Inviting user:", data.email, data.role);
+        await base44.users.inviteUser(data.email, data.role);
+        console.log("User invited successfully");
+      } catch (error) {
+        console.error("Error inviting user:", error);
+        throw error;
+      }
+      
+      // Wait a moment for the user to be created
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Then update the user record with additional fields
+      console.log("Fetching users to find new user");
       const users = await base44.entities.User.list();
       const newUser = users.find(u => u.email === data.email);
       
+      console.log("Found new user:", newUser);
+      
       if (newUser) {
+        console.log("Updating user with additional fields");
         await base44.entities.User.update(newUser.id, {
           first_name: data.first_name,
           last_name: data.last_name,
@@ -51,6 +67,9 @@ export default function UserManagement() {
           role: data.role,
           managed_team_ids: data.managed_team_ids
         });
+        console.log("User updated successfully");
+      } else {
+        throw new Error("User was invited but not found in the database");
       }
     },
     onSuccess: () => {
@@ -60,6 +79,7 @@ export default function UserManagement() {
       toast.success("User invited successfully");
     },
     onError: (error) => {
+      console.error("Create user error:", error);
       toast.error("Failed to create user: " + error.message);
     }
   });
