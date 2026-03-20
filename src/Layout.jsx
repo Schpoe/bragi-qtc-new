@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { LayoutDashboard, Users, FolderKanban, CalendarRange, BarChart3, Menu, X, Trash2, Shield, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, FolderKanban, CalendarRange, BarChart3, Menu, X, Trash2, Shield, LogOut, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/AuthContext";
 import { isAdmin } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
+import ImpersonationBanner from "@/components/admin/ImpersonationBanner";
+import ImpersonateUserDialog from "@/components/admin/ImpersonateUserDialog";
 
 const navItems = [
   { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
@@ -22,6 +24,7 @@ const navItems = [
 
 export default function Layout({ children, currentPageName }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [impersonateDialogOpen, setImpersonateDialogOpen] = useState(false);
   const { user } = useAuth();
   
   const filteredNavItems = navItems.filter(item => 
@@ -60,6 +63,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <ImpersonationBanner />
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card fixed h-full z-30">
         <div className="p-6 border-b border-border">
@@ -98,6 +102,16 @@ export default function Layout({ children, currentPageName }) {
             </div>
             <div className="text-xs text-muted-foreground capitalize">{user?.role?.replace('_', ' ')}</div>
           </div>
+          {isAdmin(user) && !user?._impersonating && (
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
+              onClick={() => setImpersonateDialogOpen(true)}
+            >
+              <Eye className="w-4 h-4 mr-3" />
+              Impersonate User
+            </Button>
+          )}
           <Button
             variant="ghost"
             className="w-full justify-start text-muted-foreground hover:text-foreground"
@@ -177,11 +191,16 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 lg:ml-64 pt-14 lg:pt-0">
+      <main className={cn("flex-1 lg:ml-64 pt-14 lg:pt-0", user?._impersonating && "pt-32 lg:pt-20")}>
         <div className="p-4 md:p-8 max-w-[1400px] mx-auto">
           {children}
         </div>
       </main>
+
+      <ImpersonateUserDialog
+        open={impersonateDialogOpen}
+        onOpenChange={setImpersonateDialogOpen}
+      />
     </div>
   );
 }
