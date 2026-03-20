@@ -311,30 +311,32 @@ export default function SprintPlanning() {
         </TabsList>
 
         <TabsContent value="quarterly">
-         {teamsLoading || sprintsLoading ? (
-           <div className="space-y-4">
-             <Skeleton className="h-64 rounded-xl" />
-           </div>
-         ) : teams.length === 0 ? (
-           <EmptyState icon={CalendarRange} title="No teams yet" description="First create a team under 'Teams'." />
-         ) : (
-           <Card className="border-primary/20">
-             <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent pb-4">
-               <CardTitle className="text-base font-bold text-foreground">Quarterly Plan — {selectedQuarter}</CardTitle>
-             </CardHeader>
-             <CardContent className="pt-6">
-               <QuarterlyAllocationTable
-                 members={members}
-                 workAreas={workAreas}
-                 allocations={quarterlyAllocations}
-                 quarter={selectedQuarter}
-                 onAllocationChange={handleQuarterlyAllocationChange}
-                 selectedTeamId={selectedTeamId}
-               />
-             </CardContent>
-           </Card>
-         )}
-       </TabsContent>
+          {teamsLoading || sprintsLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-64 rounded-xl" />
+            </div>
+          ) : teams.length === 0 ? (
+            <EmptyState icon={CalendarRange} title="No teams yet" description="First create a team under 'Teams'." />
+          ) : !effectiveTeamId ? (
+            <EmptyState icon={CalendarRange} title="Select a team" description="Choose a team from the filter to view the quarterly plan." />
+          ) : (
+            <Card className="border-primary/20">
+              <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent pb-4">
+                <CardTitle className="text-base font-bold text-foreground">Quarterly Plan — {selectedQuarter}</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <QuarterlyAllocationTable
+                  members={teamMembers}
+                  workAreas={filteredWorkAreas}
+                  allocations={quarterlyAllocations}
+                  quarter={selectedQuarter}
+                  onAllocationChange={handleQuarterlyAllocationChange}
+                  selectedTeamId={effectiveTeamId}
+                />
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
         <TabsContent value="sprints">
       {teamsLoading || sprintsLoading ? (
