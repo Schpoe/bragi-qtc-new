@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/AuthContext";
-import { canManageSprints, canManageAllocations, getManageableTeams } from "@/lib/permissions";
+import { canManageSprints, canManageAllocations, getManageableTeams, canCreateSprint, isViewer } from "@/lib/permissions";
 import { Plus, CalendarRange, Pencil, Trash2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -225,7 +225,7 @@ export default function SprintPlanning() {
     <>
     <div>
       <PageHeader title="Sprint Planning" subtitle="Record capacities per team and sprint">
-        {effectiveTeamId && canManageSprints(user, effectiveTeamId) && (
+        {effectiveTeamId && canCreateSprint(user) && canManageSprints(user, effectiveTeamId) && (
           <Button onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}>
             <Plus className="w-4 h-4 mr-2" /> New Sprint
           </Button>
@@ -254,9 +254,11 @@ export default function SprintPlanning() {
           title="No sprints for this team & quarter"
           description="Create sprints for this team to start capacity planning."
         >
-          <Button onClick={() => setSprintDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Create Sprint
-          </Button>
+          {canCreateSprint(user) && (
+            <Button onClick={() => setSprintDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" /> Create Sprint
+            </Button>
+          )}
         </EmptyState>
       ) : quarterSprints.length === 0 && crossTeamSprints.length > 0 ? (
         <div className="space-y-6">
@@ -265,9 +267,11 @@ export default function SprintPlanning() {
             title="No team-specific sprints yet"
             description="Copy a sprint template or create a new sprint for this team."
           >
-            <Button onClick={() => setSprintDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" /> New Sprint
-            </Button>
+            {canCreateSprint(user) && (
+              <Button onClick={() => setSprintDialogOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" /> New Sprint
+              </Button>
+            )}
           </EmptyState>
 
           {/* Show available sprint templates to copy */}
@@ -282,13 +286,15 @@ export default function SprintPlanning() {
                         {sprint.name}
                         <span className="ml-2 text-xs font-normal text-muted-foreground">(Template)</span>
                       </CardTitle>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleCopyCrossTeamSprint(sprint)}
-                      >
-                        <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy to Team
-                      </Button>
+                      {canCreateSprint(user) && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleCopyCrossTeamSprint(sprint)}
+                        >
+                          <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy to Team
+                        </Button>
+                      )}
                     </div>
                   </CardHeader>
                 </Card>
@@ -316,7 +322,7 @@ export default function SprintPlanning() {
                         {sprint.start_date} — {sprint.end_date}
                       </span>
                     )}
-                    {sprint.is_cross_team && canManageSprints(user, effectiveTeamId) && (
+                    {sprint.is_cross_team && canCreateSprint(user) && canManageSprints(user, effectiveTeamId) && (
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -344,13 +350,15 @@ export default function SprintPlanning() {
                 {sprint.is_cross_team ? (
                   <div className="text-center py-8 text-sm text-muted-foreground">
                     <p className="mb-3">This is a sprint template. Copy it to a team to create a team-specific sprint.</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleCopyCrossTeamSprint(sprint)}
-                    >
-                      <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy to Team
-                    </Button>
+                    {canCreateSprint(user) && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleCopyCrossTeamSprint(sprint)}
+                      >
+                        <Copy className="w-3.5 h-3.5 mr-1.5" /> Copy to Team
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   <SprintAllocationTable
