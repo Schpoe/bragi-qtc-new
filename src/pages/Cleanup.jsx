@@ -183,7 +183,7 @@ export default function CleanupPage() {
   const getSprintName = (sprintId) => sprints.find(s => s.id === sprintId)?.name || "Unknown Sprint";
   const getWorkAreaName = (waId) => workAreas.find(wa => wa.id === waId)?.name || "Unknown Work Area";
 
-  const isLoading = teamsLoading || membersLoading || sprintsLoading || allocationsLoading || workAreasLoading;
+  const isLoading = teamsLoading || membersLoading || sprintsLoading || allocationsLoading || quarterlyAllocationsLoading || workAreaSelectionsLoading || workAreasLoading;
 
   if (isLoading) {
     return (
