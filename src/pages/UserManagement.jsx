@@ -153,20 +153,34 @@ export default function UserManagement() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        title="View profile"
+                        title="Edit profile"
                       >
                         <Pencil className="w-4 h-4" />
                       </Button>
                     </Link>
                     {user.id !== currentUser.id && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive"
-                        onClick={() => setDeleteUserId(user.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => {
+                            setEditingUser(user);
+                            setUserDialogOpen(true);
+                          }}
+                          title="Edit role and permissions"
+                        >
+                          <Shield className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          onClick={() => setDeleteUserId(user.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
