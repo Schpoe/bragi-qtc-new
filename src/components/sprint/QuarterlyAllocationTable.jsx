@@ -6,7 +6,7 @@ import { canManageAllocations } from "@/lib/permissions";
 import { useAuth } from "@/lib/AuthContext";
 import EmptyState from "@/components/shared/EmptyState";
 import { Users, Settings2 } from "lucide-react";
-import DisciplineBadge from "../shared/DisciplineBadge";
+import DisciplineBadge from "../shared/DisciplineBadge.jsx";
 import QuarterlyAllocationDialog from "./QuarterlyAllocationDialog";
 
 export default function QuarterlyAllocationTable({
