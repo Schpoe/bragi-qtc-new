@@ -20,11 +20,19 @@ for (let y = currentYear; y <= currentYear + 1; y++) {
 export default function SprintFormDialog({ open, onOpenChange, sprint, existingSprints, teams, defaultTeamId, defaultQuarter, onSave }) {
   const [form, setForm] = useState({ name: "", quarter: quarters[0], team_id: "", is_cross_team: false, start_date: "", end_date: "", order: 1, relevant_work_area_ids: [] });
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const { data: workAreas = [] } = useQuery({
     queryKey: ["workAreas"],
     queryFn: () => base44.entities.WorkArea.list(),
   });
+
+  const { data: sprints = [] } = useQuery({
+    queryKey: ["sprints"],
+    queryFn: () => base44.entities.Sprint.list(),
+  });
+
+  const crossTeamSprints = sprints.filter(s => s.is_cross_team);
 
   useEffect(() => {
     if (!open) return;
