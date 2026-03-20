@@ -334,7 +334,7 @@ export default function SprintPlanning() {
     <>
     <div>
       <PageHeader title="Capacity Planning" subtitle="Manage team capacity allocations">
-        {effectiveTeamId && canCreateSprint(user) && canManageSprints(user, effectiveTeamId) && (
+        {sprintPlanningTeamId && canCreateSprint(user) && canManageSprints(user, sprintPlanningTeamId) && (
           <Button onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}>
             <Plus className="w-4 h-4 mr-2" /> New Sprint
           </Button>
