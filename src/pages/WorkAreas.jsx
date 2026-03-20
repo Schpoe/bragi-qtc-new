@@ -22,6 +22,19 @@ import { canManageWorkAreas, canCreateWorkArea, isViewer } from "@/lib/permissio
 
 export default function WorkAreas() {
   const { user } = useAuth();
+  
+  // Restrict access for viewers
+  if (isViewer(user)) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
+          <FolderKanban className="w-7 h-7 text-destructive" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground">Access Restricted</h3>
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">Viewers don't have access to Work Items.</p>
+      </div>
+    );
+  }
   const [dialogOpen, setDialogOpen] = useState(false);
   const [jiraDialogOpen, setJiraDialogOpen] = useState(false);
   const [epicDialogOpen, setEpicDialogOpen] = useState(false);
