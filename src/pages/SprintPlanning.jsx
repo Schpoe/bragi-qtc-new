@@ -72,9 +72,12 @@ export default function SprintPlanning() {
      queryFn: () => base44.entities.QuarterlyWorkAreaSelection.list(),
    });
 
-  // Only auto-select first team when actually viewing a specific team (not "all")
-  const effectiveTeamId = selectedTeamId && selectedTeamId !== "all" ? selectedTeamId : (teams.length > 0 && (!selectedTeamId || selectedTeamId === "all") ? teams[0].id : "");
+  // For quarterly plan, require explicit team selection - don't auto-select
   const isViewingAllTeams = !selectedTeamId || selectedTeamId === "all";
+  const effectiveTeamId = selectedTeamId && selectedTeamId !== "all" ? selectedTeamId : "";
+  
+  // For sprint planning tabs, use first team for display if "all" is selected
+  const sprintPlanningTeamId = selectedTeamId && selectedTeamId !== "all" ? selectedTeamId : (teams.length > 0 && isViewingAllTeams ? teams[0].id : "");
 
   const createSprint = useMutation({
     mutationFn: (data) => base44.entities.Sprint.create(data),
