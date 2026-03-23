@@ -21,8 +21,6 @@ export default function UserManagement() {
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [deleteUserId, setDeleteUserId] = useState(null);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("viewer");
   const queryClient = useQueryClient();
 
   const { data: users = [], isLoading } = useQuery({
@@ -53,32 +51,19 @@ export default function UserManagement() {
 
   const createUser = useMutation({
     mutationFn: async (data) => {
-      console.log("Creating user with data:", data);
-      // Use backend function to invite user and store pending team assignments
       const response = await base44.functions.invoke('inviteUserWithTeams', {
-        email: data.email,
-        role: data.role,
-        managed_team_ids: data.managed_team_ids || []
-      });
-      
-      console.log("Response from backend:", response.data);
-      
-      // Check if the response contains an error
-      if (response.data?.error) {
         throw new Error(response.data.error);
       }
       
       return response.data;
     },
     onSuccess: (data) => {
-      console.log("Mutation success, showing toast with data:", data);
       queryClient.invalidateQueries({ queryKey: ["users"] });
       setEditingUser(null);
       setUserDialogOpen(false);
       toast.success(data?.message || "Invitation sent successfully!");
     },
     onError: (error) => {
-      console.log("Mutation error:", error);
       toast.error("Failed to send invitation: " + (error.response?.data?.error || error.message));
     }
   });
