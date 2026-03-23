@@ -17,8 +17,9 @@ Deno.serve(async (req) => {
     if (pendingRecords.length > 0) {
       const pending = pendingRecords[0];
       
-      // Apply the team assignments
+      // Apply the role and team assignments
       await base44.asServiceRole.entities.User.update(user.id, {
+        role: pending.role,
         managed_team_ids: pending.managed_team_ids
       });
 
@@ -28,6 +29,7 @@ Deno.serve(async (req) => {
       return Response.json({ 
         success: true, 
         applied: true,
+        role: pending.role,
         managed_team_ids: pending.managed_team_ids
       });
     }
