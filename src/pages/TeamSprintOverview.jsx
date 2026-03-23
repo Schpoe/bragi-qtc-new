@@ -53,7 +53,7 @@ function UtilBar({ value, max }) {
 }
 
 function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
-  const teamSprints = sprints.filter(s => s.is_cross_team || s.team_id === team.id).sort((a, b) => (a.order || 0) - (b.order || 0));
+  const teamSprints = sprints.filter(s => !s.is_cross_team && s.team_id === team.id).sort((a, b) => (a.order || 0) - (b.order || 0));
   const teamMembers = members.filter(m => m.team_id === team.id);
   const teamWorkAreas = workAreas.filter(wa => wa.is_cross_team || wa.team_id === team.id);
   const memberIds = new Set(teamMembers.map(m => m.id));
@@ -95,52 +95,47 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40">
-                <TableHead className="text-xs min-w-[90px]">Area</TableHead>
-                {teamSprints.map(s => (
-                  <TableHead key={s.id} className="text-center text-xs min-w-[70px]">{s.name}</TableHead>
+                <TableHead className="text-xs min-w-[100px]">Sprint</TableHead>
+                {teamWorkAreas.map(wa => (
+                  <TableHead key={wa.id} className="text-center text-xs min-w-[70px]">
+                    <div className="flex items-center justify-center gap-1">
+                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                      <span className="truncate max-w-[80px]">{wa.name}</span>
+                    </div>
+                  </TableHead>
                 ))}
+                <TableHead className="text-center text-xs min-w-[90px]">Utilization</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {teamWorkAreas.map(wa => (
-                <TableRow key={wa.id}>
-                  <TableCell className="py-2">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: wa.color || "#3b82f6" }} />
-                      <span className="text-xs font-medium truncate max-w-[100px]">{wa.name}</span>
-                    </div>
-                  </TableCell>
-                  {teamSprints.map(s => {
-                    const val = getSprintWorkAreaTotal(s.id, wa.id);
-                    return (
-                      <TableCell key={s.id} className="text-center py-2">
-                        <span className={cn("text-xs tabular-nums", val > 0 ? "font-medium" : "text-muted-foreground")}>
-                          {val > 0 ? `${val}%` : "—"}
-                        </span>
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
+              {teamSprints.map(s => {
+                const total = getSprintTotal(s.id);
+                return (
+                  <TableRow key={s.id}>
+                    <TableCell className="py-2 text-xs font-medium">{s.name}</TableCell>
+                    {teamWorkAreas.map(wa => {
+                      const val = getSprintWorkAreaTotal(s.id, wa.id);
+                      return (
+                        <TableCell key={wa.id} className="text-center py-2">
+                          <span className={cn("text-xs tabular-nums", val > 0 ? "font-medium" : "text-muted-foreground")}>
+                            {val > 0 ? `${val}%` : "—"}
+                          </span>
+                        </TableCell>
+                      );
+                    })}
+                    <TableCell className="py-2 min-w-[90px]">
+                      <UtilBar value={total} max={maxCapacity} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
               {teamWorkAreas.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={teamSprints.length + 1} className="text-center text-xs text-muted-foreground py-4">
+                  <TableCell colSpan={teamSprints.length + 2} className="text-center text-xs text-muted-foreground py-4">
                     No work areas assigned.
                   </TableCell>
                 </TableRow>
               )}
-              {/* Total row */}
-              <TableRow className="border-t-2 bg-muted/30">
-                <TableCell className="py-2 text-xs font-semibold">Utilization</TableCell>
-                {teamSprints.map(s => {
-                  const total = getSprintTotal(s.id);
-                  return (
-                    <TableCell key={s.id} className="py-2 min-w-[90px]">
-                      <UtilBar value={total} max={maxCapacity} />
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
             </TableBody>
           </Table>
         </div>
