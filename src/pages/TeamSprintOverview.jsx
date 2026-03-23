@@ -55,8 +55,19 @@ function UtilBar({ value, max }) {
 function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
   const teamSprints = sprints.filter(s => !s.is_cross_team && s.team_id === team.id).sort((a, b) => (a.order || 0) - (b.order || 0));
   const teamMembers = members.filter(m => m.team_id === team.id);
-  const teamWorkAreas = workAreas.filter(wa => wa.is_cross_team || wa.team_id === team.id);
   const memberIds = new Set(teamMembers.map(m => m.id));
+
+  // Only show work areas that are leading or supporting for this team AND have at least one allocation in the quarter
+  const sprintIds = new Set(teamSprints.map(s => s.id));
+  const allocatedWorkAreaIds = new Set(
+    allocations
+      .filter(a => sprintIds.has(a.sprint_id) && memberIds.has(a.team_member_id) && a.percent > 0)
+      .map(a => a.work_area_id)
+  );
+  const teamWorkAreas = workAreas.filter(wa =>
+    (wa.leading_team_id === team.id || wa.supporting_team_ids?.includes(team.id)) &&
+    allocatedWorkAreaIds.has(wa.id)
+  );
 
   const getSprintWorkAreaTotal = (sprintId, workAreaId) => {
     return allocations
@@ -72,11 +83,18 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
 
   const maxCapacity = teamMembers.reduce((sum, m) => sum + (m.availability_percent || 100), 0);
 
+  // Quarterly capacity summary
+  const quarterlyMaxCapacity = maxCapacity * teamSprints.length;
+  const quarterlyTotalAllocated = teamSprints.reduce((sum, s) => sum + allocations
+    .filter(a => a.sprint_id === s.id && memberIds.has(a.team_member_id))
+    .reduce((s2, a) => s2 + (a.percent || 0), 0), 0);
+  const quarterlyPct = quarterlyMaxCapacity > 0 ? Math.round((quarterlyTotalAllocated / quarterlyMaxCapacity) * 100) : 0;
+
   if (teamSprints.length === 0) {
     return (
       <Card className="border-border/60">
         <CardHeader className="pb-3">
-          <TeamCardTitle team={team} memberCount={teamMembers.length} />
+          <TeamCardTitle team={team} memberCount={teamMembers.length} quarterlyPct={null} />
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-6">No sprints in this quarter.</p>
@@ -88,7 +106,7 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-3">
-        <TeamCardTitle team={team} memberCount={teamMembers.length} />
+        <TeamCardTitle team={team} memberCount={teamMembers.length} quarterlyPct={quarterlyPct} />
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -144,17 +162,27 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
   );
 }
 
-function TeamCardTitle({ team, memberCount }) {
+function TeamCardTitle({ team, memberCount, quarterlyPct }) {
+  const capacityLabel = quarterlyPct === null ? null
+    : quarterlyPct > 100 ? { text: `Overcapacity (${quarterlyPct}%)`, cls: "bg-destructive/10 text-destructive border-destructive/20" }
+    : quarterlyPct >= 80 ? { text: `Well utilized (${quarterlyPct}%)`, cls: "bg-amber-50 text-amber-700 border-amber-200" }
+    : { text: `Undercapacity (${quarterlyPct}%)`, cls: "bg-green-50 text-green-700 border-green-200" };
+
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between flex-wrap gap-2">
       <div className="flex items-center gap-2.5">
         <div className={`w-3 h-3 rounded-full ${teamColorMap[team.color] || "bg-primary"}`} />
         <CardTitle className="text-sm font-semibold">{team.name}</CardTitle>
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Users className="w-3.5 h-3.5" />
+          <span>{memberCount}</span>
+        </div>
       </div>
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-        <Users className="w-3.5 h-3.5" />
-        <span>{memberCount}</span>
-      </div>
+      {capacityLabel && (
+        <Badge variant="outline" className={cn("text-xs font-medium", capacityLabel.cls)}>
+          {capacityLabel.text}
+        </Badge>
+      )}
     </div>
   );
 }
