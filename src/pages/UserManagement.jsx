@@ -37,14 +37,18 @@ export default function UserManagement() {
 
   const createUser = useMutation({
     mutationFn: async (data) => {
-      // Send invitation email - this is all we can do from the frontend
-      // The user record will be created when they accept the invitation
-      await base44.users.inviteUser(data.email, data.role);
+      // Use backend function to invite user and store pending team assignments
+      const response = await base44.functions.invoke('inviteUserWithTeams', {
+        email: data.email,
+        role: data.role,
+        managed_team_ids: data.managed_team_ids || []
+      });
+      return response.data;
     },
     onSuccess: () => {
       setEditingUser(null);
       setUserDialogOpen(false);
-      toast.success("Invitation sent! The user will appear here once they accept.");
+      toast.success("Invitation sent! Teams will be assigned when the user accepts.");
     },
     onError: (error) => {
       toast.error("Failed to send invitation: " + error.message);
