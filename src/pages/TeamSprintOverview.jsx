@@ -132,7 +132,7 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
                       );
                     })}
                     <TableCell className="py-2 min-w-[90px]">
-                      <UtilBar value={total} max={maxCapacity} />
+                      <UtilBar value={total} max={maxCapacityPerSprint} />
                     </TableCell>
                   </TableRow>
                 );
