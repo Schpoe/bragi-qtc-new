@@ -35,6 +35,22 @@ export default function UserManagement() {
     queryFn: () => base44.entities.Team.list(),
   });
 
+  // Apply pending team assignments on mount
+  React.useEffect(() => {
+    const applyPendingTeams = async () => {
+      try {
+        const response = await base44.functions.invoke('applyPendingTeams', {});
+        if (response.data?.applied) {
+          queryClient.invalidateQueries({ queryKey: ["users"] });
+          toast.success("Team assignments have been applied to your account");
+        }
+      } catch (error) {
+        console.error("Failed to apply pending teams:", error);
+      }
+    };
+    applyPendingTeams();
+  }, []);
+
   const createUser = useMutation({
     mutationFn: async (data) => {
       // Use backend function to invite user and store pending team assignments
