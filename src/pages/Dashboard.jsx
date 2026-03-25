@@ -94,7 +94,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <PageHeader title="Dashboard" subtitle="Capacity Overview" />
+      <PageHeader title="Overview" subtitle="Capacity Overview" />
 
       <FilterBar
         quarter={selectedQuarter}

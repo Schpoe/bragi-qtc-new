@@ -11,7 +11,7 @@ import ImpersonationBanner from "@/components/admin/ImpersonationBanner";
 import ImpersonateUserDialog from "@/components/admin/ImpersonateUserDialog";
 
 const navItems = [
-  { name: "Dashboard", page: "Dashboard", icon: LayoutDashboard },
+  { name: "Overview", page: "Dashboard", icon: LayoutDashboard },
   { name: "Capacity Planning", page: "SprintPlanning", icon: CalendarRange },
   { name: "Teams", page: "Teams", icon: Users },
   { name: "Work Items", page: "WorkAreas", icon: FolderKanban },
