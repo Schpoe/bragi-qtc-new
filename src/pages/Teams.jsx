@@ -57,7 +57,7 @@ export default function Teams() {
 
   if (selectedTeam) {
     const team = teams.find(t => t.id === selectedTeam);
-    if (!team) { setSelectedTeam(null); return null; }
+    if (!team) return null;
     const teamMembers = members.filter(m => m.team_id === team.id);
     return (
       <TeamDetail team={team} members={teamMembers} onBack={() => setSelectedTeam(null)} />

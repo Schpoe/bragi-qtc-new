@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, teamColorHex } from "@/lib/utils";
 
 export default function CapacityOverviewTable({ sprints, teams, members, allocations, selectedTeamId, workAreas }) {
   // Filter out template sprints and sort by order ascending
@@ -96,7 +96,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, allocat
                   {getSortedTeams().map(team => (
                     <TableHead key={team.id} className="text-center min-w-[100px]">
                       <div className="flex items-center justify-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color || "#3b82f6" }} />
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: teamColorHex[team.color] || "#3b82f6" }} />
                         <span className="text-xs font-medium">{team.name}</span>
                       </div>
                     </TableHead>
@@ -163,7 +163,7 @@ export default function CapacityOverviewTable({ sprints, teams, members, allocat
               return (
                 <div key={team.id}>
                   <div className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: team.color || "#3b82f6" }} />
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: teamColorHex[team.color] || "#3b82f6" }} />
                     {team.name}
                   </div>
                   <div className="overflow-x-auto border rounded-lg bg-muted/30">

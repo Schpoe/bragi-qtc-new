@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, teamColorHex } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 export default function AllocationHeatMap({ teams, members, sprints, allocations, workAreas, selectedQuarter, selectedTeamId }) {
@@ -162,7 +162,7 @@ export default function AllocationHeatMap({ teams, members, sprints, allocations
                   >
                     <div className="px-2">
                       <div className="flex items-center gap-2">
-                        {team && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: team.color || "#3b82f6" }} />}
+                        {team && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: teamColorHex[team.color] || "#3b82f6" }} />}
                         <div className="min-w-0">
                           <div className="text-sm font-medium truncate" title={member.name}>{member.name}</div>
                           <div className="text-xs text-muted-foreground">{member.discipline}</div>

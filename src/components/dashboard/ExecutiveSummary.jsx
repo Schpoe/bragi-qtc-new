@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, TrendingUp, TrendingDown, Minus, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, teamColorHex } from "@/lib/utils";
 import ExportButtons from "./ExportButtons";
 
 function UtilBar({ pct }) {
@@ -213,7 +213,7 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
                             {di === 0 &&
                         <td className="py-2 pr-3 font-medium align-top whitespace-nowrap" rowSpan={disciplineStats.length}>
                                 <div className="flex items-center gap-1.5">
-                                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: team.color || "#3b82f6" }} />
+                                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: teamColorHex[team.color] || "#3b82f6" }} />
                                   <span className="truncate max-w-[70px]">{team.name}</span>
                                 </div>
                               </td>
@@ -247,7 +247,7 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: team.color || "#3b82f6" }} />
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: teamColorHex[team.color] || "#3b82f6" }} />
                   <CardTitle className="text-base truncate">{team.name}</CardTitle>
                   <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
                     <Users className="w-3 h-3" />{teamMemberCount}
