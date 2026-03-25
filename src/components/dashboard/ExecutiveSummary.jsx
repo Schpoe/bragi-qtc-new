@@ -159,9 +159,11 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
   return (
     <div id="executive-summary-content" className="space-y-6">
       {/* Export button */}
-      
+      <div className="flex justify-end">
+        <ExportButtons data={data} selectedQuarter={selectedQuarter} />
+      </div>
 
-      
+
       {/* Alert banner */}
       {alerts.length > 0 &&
       <Card className="border-destructive/40 bg-destructive/5">
