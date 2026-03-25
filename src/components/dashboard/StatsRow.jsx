@@ -14,7 +14,7 @@ export default function StatsRow({ teams, members, workAreas, sprints, allocatio
   const stats = [
     { label: "Teams", value: selectedTeamId === "all" ? teams.length : 1, icon: Users, color: "text-blue-600 bg-blue-50" },
     { label: "Members", value: filteredMembers.length, icon: Users, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Work Areas", value: workAreas.length, icon: FolderKanban, color: "text-purple-600 bg-purple-50" },
+    { label: "Work Items", value: workAreas.length, icon: FolderKanban, color: "text-purple-600 bg-purple-50" },
     { label: "Avg. Utilization", value: `${avgUtil}%`, icon: TrendingUp, color: avgUtil > 100 ? "text-red-600 bg-red-50" : avgUtil > 80 ? "text-amber-600 bg-amber-50" : "text-blue-600 bg-blue-50" },
   ];
 

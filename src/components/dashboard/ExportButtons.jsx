@@ -69,12 +69,12 @@ export default function ExportButtons({ data, selectedQuarter }) {
     const ws3 = XLSX.utils.aoa_to_sheet(disciplineData);
     XLSX.utils.book_append_sheet(workbook, ws3, "Discipline Breakdown");
 
-    // Sheet 4: Top Work Areas
+    // Sheet 4: Top Work Items
     const workAreaData = [
-      [`Top Work Areas - ${selectedQuarter}`],
+      [`Top Work Items - ${selectedQuarter}`],
       [`Exported: ${timestamp}`],
       [],
-      ["Team", "Work Area", "Avg % per Sprint"]
+      ["Team", "Work Item", "Avg % per Sprint"]
     ];
     data.forEach(d => {
       d.topWorkAreasQuarterly.forEach(wa => {
@@ -86,7 +86,7 @@ export default function ExportButtons({ data, selectedQuarter }) {
       });
     });
     const ws4 = XLSX.utils.aoa_to_sheet(workAreaData);
-    XLSX.utils.book_append_sheet(workbook, ws4, "Top Work Areas");
+    XLSX.utils.book_append_sheet(workbook, ws4, "Top Work Items");
 
     XLSX.writeFile(workbook, `Executive_Summary_${selectedQuarter.replace(/ /g, "_")}.xlsx`);
   };
@@ -102,7 +102,7 @@ export default function ExportButtons({ data, selectedQuarter }) {
         ["Summary", d.team.name, "Q Utilization %", d.quarterlyUtil],
         ...d.sprintStats.map(ss => ["Sprint", d.team.name, ss.sprint.name, ss.utilPct]),
         ...d.disciplineStats.map(ds => ["Discipline", d.team.name, ds.discipline, ds.utilPct]),
-        ...d.topWorkAreasQuarterly.map(wa => ["Work Area", d.team.name, wa.name, wa.avgPct])
+        ...d.topWorkAreasQuarterly.map(wa => ["Work Item", d.team.name, wa.name, wa.avgPct])
       ])
     ];
 

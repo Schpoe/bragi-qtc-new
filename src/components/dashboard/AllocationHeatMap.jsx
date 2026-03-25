@@ -21,7 +21,7 @@ export default function AllocationHeatMap({ teams, members, sprints, allocations
       const team = teams.find(t => t.id === member.team_id);
       const memberSprints = quarterSprints.filter(s => s.team_id === member.team_id);
       
-      // Calculate allocation per work area across all sprints
+      // Calculate allocation per work item across all sprints
       const workAreaAllocations = {};
       let totalAllocation = 0;
 
@@ -38,7 +38,7 @@ export default function AllocationHeatMap({ teams, members, sprints, allocations
         });
       });
 
-      // Average allocation per work area
+      // Average allocation per work item
       const sprintCount = memberSprints.length || 1;
       Object.keys(workAreaAllocations).forEach(waId => {
         workAreaAllocations[waId] = Math.round(workAreaAllocations[waId] / sprintCount);
@@ -107,7 +107,7 @@ export default function AllocationHeatMap({ teams, members, sprints, allocations
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Allocation Heat Map — {selectedQuarter}</CardTitle>
         <p className="text-xs text-muted-foreground mt-1">
-          Average allocation per team member across work areas
+          Average allocation per team member across work items
         </p>
       </CardHeader>
       <CardContent>

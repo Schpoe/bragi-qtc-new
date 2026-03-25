@@ -72,13 +72,13 @@ export default function QuarterlyAllocationDialog({ open, onOpenChange, quarter,
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Select Work Areas for {quarter}</DialogTitle>
+          <DialogTitle>Select Work Items for {quarter}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label>Search</Label>
             <Input 
-              placeholder="Search work areas..." 
+              placeholder="Search work items..." 
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 text-sm"
@@ -86,7 +86,7 @@ export default function QuarterlyAllocationDialog({ open, onOpenChange, quarter,
           </div>
 
           {leadingWAs.length === 0 && supportingWAs.length === 0 && otherWAs.length === 0 ? (
-            <p className="text-xs text-muted-foreground border rounded-md p-3">No work areas available</p>
+            <p className="text-xs text-muted-foreground border rounded-md p-3">No work items available</p>
           ) : (
             <Tabs defaultValue={initialTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3">
@@ -96,21 +96,21 @@ export default function QuarterlyAllocationDialog({ open, onOpenChange, quarter,
               </TabsList>
               <TabsContent value="leading" className="border rounded-md p-3 max-h-56 overflow-y-auto">
                 {filteredLeading.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No work areas</p>
+                  <p className="text-xs text-muted-foreground">No work items</p>
                 ) : (
                   <div className="space-y-1">{filteredLeading.map(renderWAItem)}</div>
                 )}
               </TabsContent>
               <TabsContent value="supporting" className="border rounded-md p-3 max-h-56 overflow-y-auto">
                 {filteredSupporting.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No work areas</p>
+                  <p className="text-xs text-muted-foreground">No work items</p>
                 ) : (
                   <div className="space-y-1">{filteredSupporting.map(renderWAItem)}</div>
                 )}
               </TabsContent>
               <TabsContent value="other" className="border rounded-md p-3 max-h-56 overflow-y-auto">
                 {filteredOther.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No work areas</p>
+                  <p className="text-xs text-muted-foreground">No work items</p>
                 ) : (
                   <div className="space-y-1">{filteredOther.map(renderWAItem)}</div>
                 )}

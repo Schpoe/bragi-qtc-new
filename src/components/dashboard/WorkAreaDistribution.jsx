@@ -10,7 +10,7 @@ export default function WorkAreaDistribution({ teams, members, workAreas, alloca
   const teamMembers = members.filter(m => m.team_id === selectedTeamId);
   const memberIds = new Set(teamMembers.map(m => m.id));
 
-  // Categorize work areas
+  // Categorize work items
   const leadingWAs = workAreas.filter(wa => wa.leading_team_id === selectedTeamId);
   const supportingWAs = workAreas.filter(wa => wa.supporting_team_ids?.includes(selectedTeamId));
   const otherWAs = workAreas.filter(wa => 
@@ -65,7 +65,7 @@ export default function WorkAreaDistribution({ teams, members, workAreas, alloca
           <CardContent className="pt-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{leadingWAs.length}</div>
-              <div className="text-xs text-muted-foreground mt-1">Leading Work Areas</div>
+              <div className="text-xs text-muted-foreground mt-1">Leading Work Items</div>
               <div className="text-sm font-semibold mt-2">{Math.round(leadingAllocation)}%</div>
             </div>
           </CardContent>
@@ -74,7 +74,7 @@ export default function WorkAreaDistribution({ teams, members, workAreas, alloca
           <CardContent className="pt-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{supportingWAs.length}</div>
-              <div className="text-xs text-muted-foreground mt-1">Supporting Work Areas</div>
+              <div className="text-xs text-muted-foreground mt-1">Supporting Work Items</div>
               <div className="text-sm font-semibold mt-2">{Math.round(supportingAllocation)}%</div>
             </div>
           </CardContent>
@@ -83,7 +83,7 @@ export default function WorkAreaDistribution({ teams, members, workAreas, alloca
           <CardContent className="pt-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-amber-600">{otherWAs.length}</div>
-              <div className="text-xs text-muted-foreground mt-1">Other Work Areas</div>
+              <div className="text-xs text-muted-foreground mt-1">Other Work Items</div>
               <div className="text-sm font-semibold mt-2">{Math.round(otherAllocation)}%</div>
             </div>
           </CardContent>
@@ -122,11 +122,11 @@ export default function WorkAreaDistribution({ teams, members, workAreas, alloca
           </Card>
         )}
 
-        {/* Work Area Details */}
+        {/* Work Item Details */}
         {workAreaData.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">Work Areas by Allocation</CardTitle>
+              <CardTitle className="text-sm font-semibold">Work Items by Allocation</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">

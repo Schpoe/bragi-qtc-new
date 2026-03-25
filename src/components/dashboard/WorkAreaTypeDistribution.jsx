@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
 
 export default function WorkAreaTypeDistribution({ teams, workAreas, allocations, members, selectedTeamId }) {
-  // Filter work areas based on team selection
+  // Filter work items based on team selection
   const relevantWorkAreas = selectedTeamId === "all"
     ? workAreas
     : workAreas.filter(wa => wa.leading_team_id === selectedTeamId || wa.supporting_team_ids?.includes(selectedTeamId));
@@ -25,7 +25,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
     typeStats[wa.type].count += 1;
     typeStats[wa.type].workAreas.push(wa);
 
-    // Calculate allocation for this work area
+    // Calculate allocation for this work item
     if (selectedTeamId === "all") {
       const waAllocation = allocations
         .filter(a => a.work_area_id === wa.id)
@@ -47,7 +47,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
     return (
       <Card>
         <CardContent className="pt-6">
-          <div className="text-center text-sm text-muted-foreground">No work area types found.</div>
+          <div className="text-center text-sm text-muted-foreground">No work item types found.</div>
         </CardContent>
       </Card>
     );
@@ -90,7 +90,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
         {/* Pie Chart */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Work Areas by Type</CardTitle>
+            <CardTitle className="text-sm font-semibold">Work Items by Type</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -152,7 +152,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
                     <span className="text-sm font-medium">{type.name}</span>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {type.count} work area{type.count !== 1 ? "s" : ""}
+                    {type.count} work item{type.count !== 1 ? "s" : ""}
                   </div>
                 </div>
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">

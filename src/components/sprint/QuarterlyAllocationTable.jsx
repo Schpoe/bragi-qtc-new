@@ -71,7 +71,7 @@ export default function QuarterlyAllocationTable({
       <EmptyState
         icon={Users}
         title="No data available"
-        description="Add team members and work areas to start planning allocations."
+        description="Add team members and work items to start planning allocations."
       />
     );
   }
@@ -80,7 +80,7 @@ export default function QuarterlyAllocationTable({
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-medium">Work Areas</h4>
+          <h4 className="text-sm font-medium">Work Items</h4>
           {canEdit && (
             <Button
               variant="outline"
@@ -88,14 +88,14 @@ export default function QuarterlyAllocationTable({
               onClick={() => setDialogOpen(true)}
             >
               <Settings2 className="w-4 h-4 mr-2" />
-              Select Work Areas
+              Select Work Items
             </Button>
           )}
         </div>
         <EmptyState
           icon={Users}
-          title="No work areas selected"
-          description="Click 'Select Work Areas' to choose which areas to allocate."
+          title="No work items selected"
+          description="Click 'Select Work Items' to choose which areas to allocate."
         />
         <QuarterlyAllocationDialog
           open={dialogOpen}
@@ -112,7 +112,7 @@ export default function QuarterlyAllocationTable({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h4 className="text-sm font-semibold text-foreground">Work Areas Allocation</h4>
+        <h4 className="text-sm font-semibold text-foreground">Work Items Allocation</h4>
         {canEdit && (
           <Button
             variant="outline"
@@ -120,7 +120,7 @@ export default function QuarterlyAllocationTable({
             onClick={() => setDialogOpen(true)}
           >
             <Settings2 className="w-4 h-4 mr-2" />
-            Select Work Areas
+            Select Work Items
           </Button>
         )}
       </div>

@@ -105,7 +105,7 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
                   {crossTeamSprints.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">Templates will populate the name and work areas.</p>
+              <p className="text-xs text-muted-foreground">Templates will populate the name and work items.</p>
             </div>
           )}
           <div className="flex items-center justify-between">
@@ -156,13 +156,13 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
             <Input type="number" min={1} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
           </div>
           <div className="space-y-2">
-            <Label>Relevant Work Areas</Label>
+            <Label>Relevant Work Items</Label>
             {!form.team_id && !form.is_cross_team ? (
-              <p className="text-xs text-muted-foreground border rounded-md p-3">Select a team or enable cross-team to select work areas</p>
+              <p className="text-xs text-muted-foreground border rounded-md p-3">Select a team or enable cross-team to select work items</p>
             ) : (
               <div className="space-y-2">
                 <Input 
-                  placeholder="Search work areas..." 
+                  placeholder="Search work items..." 
                   value={searchQuery} 
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="h-8 text-sm"
@@ -208,7 +208,7 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
                    const filteredOther = filterBySearch(otherWAs);
 
                    if (leadingWAs.length === 0 && supportingWAs.length === 0 && otherWAs.length === 0) {
-                     return <p className="text-xs text-muted-foreground border rounded-md p-3">No work areas available</p>;
+                     return <p className="text-xs text-muted-foreground border rounded-md p-3">No work items available</p>;
                    }
 
                    // Determine initial tab based on form state
@@ -228,21 +228,21 @@ export default function SprintFormDialog({ open, onOpenChange, sprint, existingS
                        </TabsList>
                        <TabsContent value="leading" className="border rounded-md p-3 max-h-56 overflow-y-auto">
                          {filteredLeading.length === 0 ? (
-                           <p className="text-xs text-muted-foreground">No work areas</p>
+                           <p className="text-xs text-muted-foreground">No work items</p>
                          ) : (
                            <div className="space-y-1">{filteredLeading.map(renderWAItem)}</div>
                          )}
                        </TabsContent>
                        <TabsContent value="supporting" className="border rounded-md p-3 max-h-56 overflow-y-auto">
                          {filteredSupporting.length === 0 ? (
-                           <p className="text-xs text-muted-foreground">No work areas</p>
+                           <p className="text-xs text-muted-foreground">No work items</p>
                          ) : (
                            <div className="space-y-1">{filteredSupporting.map(renderWAItem)}</div>
                          )}
                        </TabsContent>
                        <TabsContent value="other" className="border rounded-md p-3 max-h-56 overflow-y-auto">
                          {filteredOther.length === 0 ? (
-                           <p className="text-xs text-muted-foreground">No work areas</p>
+                           <p className="text-xs text-muted-foreground">No work items</p>
                          ) : (
                            <div className="space-y-1">{filteredOther.map(renderWAItem)}</div>
                          )}

@@ -141,10 +141,10 @@ export default function SprintPlanning() {
       const oldIds = new Set(existing?.work_area_ids || []);
       const newIds = new Set(workAreaIds);
       
-      // Find removed work areas
+      // Find removed work items
       const removedIds = Array.from(oldIds).filter(id => !newIds.has(id));
       
-      // Delete allocations for removed work areas
+      // Delete allocations for removed work items
       if (removedIds.length > 0) {
         const allocationsToDelete = quarterlyAllocations.filter(a => 
           a.quarter === quarter && 
@@ -172,14 +172,14 @@ export default function SprintPlanning() {
 
   const handleSaveSprint = async (data) => {
     if (editingSprint) {
-      // When updating a sprint, clean up allocations for removed work areas
+      // When updating a sprint, clean up allocations for removed work items
       const oldWorkAreaIds = new Set(editingSprint.relevant_work_area_ids || []);
       const newWorkAreaIds = new Set(data.relevant_work_area_ids || []);
       
-      // Find work areas that were removed
+      // Find work items that were removed
       for (const waId of oldWorkAreaIds) {
         if (!newWorkAreaIds.has(waId)) {
-          // Delete allocations for this work area in this sprint
+          // Delete allocations for this work item in this sprint
           const allocationsToDelete = allocations.filter(
             a => a.sprint_id === editingSprint.id && a.work_area_id === waId
           );
@@ -326,7 +326,7 @@ export default function SprintPlanning() {
 
   const teamMembers = members.filter(m => m.team_id === sprintPlanningTeamId);
 
-   // Get work areas relevant to this team (leading/supporting) plus any with allocations or manually selected
+   // Get work items relevant to this team (leading/supporting) plus any with allocations or manually selected
    const teamMemberIds = new Set(teamMembers.map(m => m.id));
    const workAreasWithAllocations = new Set(
      quarterlyAllocations

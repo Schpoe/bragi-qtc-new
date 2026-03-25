@@ -181,7 +181,7 @@ export default function CleanupPage() {
   const getTeamName = (teamId) => teams.find(t => t.id === teamId)?.name || "Unknown Team";
   const getMemberName = (memberId) => members.find(m => m.id === memberId)?.name || "Unknown Member";
   const getSprintName = (sprintId) => sprints.find(s => s.id === sprintId)?.name || "Unknown Sprint";
-  const getWorkAreaName = (waId) => workAreas.find(wa => wa.id === waId)?.name || "Unknown Work Area";
+  const getWorkAreaName = (waId) => workAreas.find(wa => wa.id === waId)?.name || "Unknown Work Item";
 
   const isLoading = teamsLoading || membersLoading || sprintsLoading || allocationsLoading || quarterlyAllocationsLoading || workAreaSelectionsLoading || workAreasLoading;
 
@@ -252,7 +252,7 @@ export default function CleanupPage() {
                     Selections <Badge variant="secondary" className="ml-2">{orphanedData.workAreaSelections.length}</Badge>
                   </TabsTrigger>
                   <TabsTrigger value="workAreas">
-                    Work Areas <Badge variant="secondary" className="ml-2">{orphanedData.workAreas.length}</Badge>
+                    Work Items <Badge variant="secondary" className="ml-2">{orphanedData.workAreas.length}</Badge>
                   </TabsTrigger>
                 </TabsList>
 
@@ -317,7 +317,7 @@ export default function CleanupPage() {
                 <TabsContent value="allocations" className="space-y-3 mt-4">
                   {orphanedData.allocations.length > 0 && (
                     <div className="flex justify-between items-center mb-3">
-                      <p className="text-sm text-muted-foreground">Allocations referencing deleted members, sprints, or work areas</p>
+                      <p className="text-sm text-muted-foreground">Allocations referencing deleted members, sprints, or work items</p>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => selectAll('allocations')}>Select All</Button>
                         <Button variant="outline" size="sm" onClick={() => deselectAll('allocations')}>Deselect All</Button>
@@ -343,7 +343,7 @@ export default function CleanupPage() {
                             {!workAreaExists && <div className="text-destructive">• Work area deleted: {alloc.work_area_id.slice(0, 8)}...</div>}
                             {memberExists && <div>• Member: {getMemberName(alloc.team_member_id)}</div>}
                             {sprintExists && <div>• Sprint: {getSprintName(alloc.sprint_id)}</div>}
-                            {workAreaExists && <div>• Work Area: {getWorkAreaName(alloc.work_area_id)}</div>}
+                            {workAreaExists && <div>• Work Item: {getWorkAreaName(alloc.work_area_id)}</div>}
                           </div>
                         </div>
                       </div>
@@ -357,7 +357,7 @@ export default function CleanupPage() {
                 <TabsContent value="quarterlyAllocations" className="space-y-3 mt-4">
                   {orphanedData.quarterlyAllocations.length > 0 && (
                     <div className="flex justify-between items-center mb-3">
-                      <p className="text-sm text-muted-foreground">Quarterly allocations referencing deleted members or work areas</p>
+                      <p className="text-sm text-muted-foreground">Quarterly allocations referencing deleted members or work items</p>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => selectAll('quarterlyAllocations')}>Select All</Button>
                         <Button variant="outline" size="sm" onClick={() => deselectAll('quarterlyAllocations')}>Deselect All</Button>
@@ -380,7 +380,7 @@ export default function CleanupPage() {
                             {!memberExists && <div className="text-destructive">• Member deleted: {qa.team_member_id.slice(0, 8)}...</div>}
                             {!workAreaExists && <div className="text-destructive">• Work area deleted: {qa.work_area_id.slice(0, 8)}...</div>}
                             {memberExists && <div>• Member: {getMemberName(qa.team_member_id)}</div>}
-                            {workAreaExists && <div>• Work Area: {getWorkAreaName(qa.work_area_id)}</div>}
+                            {workAreaExists && <div>• Work Item: {getWorkAreaName(qa.work_area_id)}</div>}
                           </div>
                         </div>
                       </div>
@@ -394,7 +394,7 @@ export default function CleanupPage() {
                 <TabsContent value="workAreaSelections" className="space-y-3 mt-4">
                   {orphanedData.workAreaSelections.length > 0 && (
                     <div className="flex justify-between items-center mb-3">
-                      <p className="text-sm text-muted-foreground">Work area selections with deleted teams or work areas</p>
+                      <p className="text-sm text-muted-foreground">Work area selections with deleted teams or work items</p>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => selectAll('workAreaSelections')}>Select All</Button>
                         <Button variant="outline" size="sm" onClick={() => deselectAll('workAreaSelections')}>Deselect All</Button>
@@ -417,10 +417,10 @@ export default function CleanupPage() {
                             {!teamExists && <div className="text-destructive">• Team deleted: {selection.team_id.slice(0, 8)}...</div>}
                             {teamExists && <div>• Team: {getTeamName(selection.team_id)}</div>}
                             {missingWorkAreas.length > 0 && (
-                              <div className="text-destructive">• {missingWorkAreas.length} deleted work area reference{missingWorkAreas.length !== 1 ? "s" : ""}</div>
+                              <div className="text-destructive">• {missingWorkAreas.length} deleted work item reference{missingWorkAreas.length !== 1 ? "s" : ""}</div>
                             )}
                             {selection.work_area_ids && selection.work_area_ids.length > 0 && missingWorkAreas.length === 0 && (
-                              <div>• {selection.work_area_ids.length} work area{selection.work_area_ids.length !== 1 ? "s" : ""}</div>
+                              <div>• {selection.work_area_ids.length} work item{selection.work_area_ids.length !== 1 ? "s" : ""}</div>
                             )}
                           </div>
                         </div>
@@ -428,7 +428,7 @@ export default function CleanupPage() {
                     );
                   })}
                   {orphanedData.workAreaSelections.length === 0 && (
-                    <div className="text-center py-8 text-sm text-muted-foreground">No orphaned work area selections</div>
+                    <div className="text-center py-8 text-sm text-muted-foreground">No orphaned work item selections</div>
                   )}
                 </TabsContent>
 
@@ -457,7 +457,7 @@ export default function CleanupPage() {
                     </div>
                   ))}
                   {orphanedData.workAreas.length === 0 && (
-                    <div className="text-center py-8 text-sm text-muted-foreground">No orphaned work areas</div>
+                    <div className="text-center py-8 text-sm text-muted-foreground">No orphaned work items</div>
                   )}
                 </TabsContent>
               </Tabs>
@@ -524,15 +524,15 @@ export default function CleanupPage() {
               )}
               {selectedOrphans.workAreaSelections.size > 0 && (
                 <div className="p-3 bg-muted rounded-lg">
-                  <div className="font-semibold text-sm mb-2">Work Area Selections ({selectedOrphans.workAreaSelections.size})</div>
+                  <div className="font-semibold text-sm mb-2">Work Item Selections ({selectedOrphans.workAreaSelections.size})</div>
                   <div className="text-xs text-muted-foreground">
-                    {selectedOrphans.workAreaSelections.size} work area selection record{selectedOrphans.workAreaSelections.size !== 1 ? "s" : ""} will be deleted
+                    {selectedOrphans.workAreaSelections.size} work item selection record{selectedOrphans.workAreaSelections.size !== 1 ? "s" : ""} will be deleted
                   </div>
                 </div>
               )}
               {selectedOrphans.workAreas.size > 0 && (
                 <div className="p-3 bg-muted rounded-lg">
-                  <div className="font-semibold text-sm mb-2">Work Areas ({selectedOrphans.workAreas.size})</div>
+                  <div className="font-semibold text-sm mb-2">Work Items ({selectedOrphans.workAreas.size})</div>
                   <div className="space-y-1">
                     {Array.from(selectedOrphans.workAreas).slice(0, 5).map(id => {
                       const wa = workAreas.find(w => w.id === id);

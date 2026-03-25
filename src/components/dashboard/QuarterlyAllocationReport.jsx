@@ -41,7 +41,7 @@ export default function QuarterlyAllocationReport({
       <EmptyState
         icon={Users}
         title="No data available"
-        description="Add team members and work areas to view quarterly allocations."
+        description="Add team members and work items to view quarterly allocations."
       />
     );
   }

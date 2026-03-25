@@ -54,7 +54,7 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
         const totalAlloc = sprintAllocs.reduce((s, a) => s + (a.percent || 0), 0);
         const utilPct = teamCapacity > 0 ? Math.round(totalAlloc / teamCapacity * 100) : 0;
 
-        // Top work areas by allocation
+        // Top work items by allocation
         const workAreaTotals = {};
         sprintAllocs.forEach((a) => {
           workAreaTotals[a.work_area_id] = (workAreaTotals[a.work_area_id] || 0) + (a.percent || 0);
@@ -295,7 +295,7 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
                 </div>
             }
 
-              {/* Top work areas */}
+              {/* Top work items */}
               {topWorkAreasQuarterly.length > 0 &&
             <div>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Top Work Items (avg/sprint)</p>

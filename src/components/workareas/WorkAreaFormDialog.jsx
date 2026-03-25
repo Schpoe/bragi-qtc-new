@@ -56,7 +56,7 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{workArea ? "Edit Work Area" : "New Work Area"}</DialogTitle>
+          <DialogTitle>{workArea ? "Edit Work Item" : "New Work Item"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
@@ -72,7 +72,7 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
                 </SelectContent>
               </Select>
               {workAreaTypes.length === 0 && (
-                <p className="text-xs text-muted-foreground">No types available. Create types in Work Area Types page.</p>
+                <p className="text-xs text-muted-foreground">No types available. Create types in Work Item Types page.</p>
               )}
           </div>
           <div className="space-y-2">

@@ -57,11 +57,11 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
   const teamMembers = members.filter(m => m.team_id === team.id);
   const memberIds = new Set(teamMembers.map(m => m.id));
 
-  // Collect all unique work area IDs referenced across all team sprints
+  // Collect all unique work item IDs referenced across all team sprints
   const allRelevantWaIds = [...new Set(teamSprints.flatMap(s => s.relevant_work_area_ids || []))];
   const teamWorkAreas = allRelevantWaIds.map(id => workAreas.find(wa => wa.id === id)).filter(Boolean);
 
-  // Per-sprint: sum of all member allocations (each member's percent per work area)
+  // Per-sprint: sum of all member allocations (each member's percent per work item)
   const getSprintWorkAreaTotal = (sprintId, workAreaId) =>
     allocations
       .filter(a => a.sprint_id === sprintId && a.work_area_id === workAreaId && memberIds.has(a.team_member_id))
@@ -140,7 +140,7 @@ function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
               {teamWorkAreas.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={teamSprints.length + 2} className="text-center text-xs text-muted-foreground py-4">
-                    No work areas assigned.
+                    No work items assigned.
                   </TableCell>
                 </TableRow>
               )}

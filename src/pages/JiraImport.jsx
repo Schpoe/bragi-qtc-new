@@ -91,7 +91,7 @@ export default function JiraImport() {
         teams.map(t => [t.name.toLowerCase().trim(), t.id])
       );
 
-      // Create work area type name -> exists lookup and track new types to create
+      // Create work item type name -> exists lookup and track new types to create
       const existingTypeNames = new Set(workAreaTypes.map(t => t.name.toLowerCase().trim()));
       const newTypesToCreate = new Set();
 
@@ -113,13 +113,13 @@ export default function JiraImport() {
           });
           existingTypeNames.add(typeName.toLowerCase());
         } catch (error) {
-          console.error("Failed to create work area type:", typeName, error);
+          console.error("Failed to create work item type:", typeName, error);
         }
       }
 
-      // Second pass: import work areas
+      // Second pass: import work items
       for (const item of items) {
-        // Use "Summary" field for work area name
+        // Use "Summary" field for work item name
         const itemName = item.Summary || item.summary || 
                         item.Name || item.name || item.Title || item.title;
         
@@ -269,7 +269,7 @@ export default function JiraImport() {
               className="w-full"
             >
               <Upload className="w-4 h-4 mr-2" />
-              {uploading ? "Importing..." : "Import to Work Areas"}
+              {uploading ? "Importing..." : "Import to Work Items"}
             </Button>
           </CardContent>
         </Card>

@@ -131,7 +131,7 @@ export default function JiraSync() {
         }
       }
 
-      // Import work area types
+      // Import work item types
       const typeMap = {};
       for (const typeName of syncResult.workAreaTypes) {
         if (!typeName) continue;
@@ -153,14 +153,14 @@ export default function JiraSync() {
         }
       }
 
-      // Import work areas
+      // Import work items
       for (const workArea of syncResult.workAreas) {
         try {
           // Use first team as leading team, or first existing team as fallback
           const leadingTeamId = teamMap[workArea.leadingTeam] || Object.values(teamMap)[0] || existingTeams[0]?.id;
 
           if (!leadingTeamId) {
-            stats.errors.push(`Work Area ${workArea.name}: No team available`);
+            stats.errors.push(`Work Item ${workArea.name}: No team available`);
             continue;
           }
 
@@ -176,7 +176,7 @@ export default function JiraSync() {
             supporting_team_ids: supportingTeamIds
           };
 
-          // Check if work area already exists by prod_id
+          // Check if work item already exists by prod_id
           const existingWA = existingWorkAreas.find(wa => wa.prod_id === workArea.key);
 
           if (existingWA) {
@@ -197,7 +197,7 @@ export default function JiraSync() {
               stats.workAreasSkipped++;
             }
           } else {
-            // Create new work area
+            // Create new work item
             await createWorkArea.mutateAsync({
               ...newData,
               color: colors[stats.workAreasCreated % colors.length]
@@ -205,7 +205,7 @@ export default function JiraSync() {
             stats.workAreasCreated++;
           }
         } catch (err) {
-          stats.errors.push(`Work Area ${workArea.name}: ${err.message}`);
+          stats.errors.push(`Work Item ${workArea.name}: ${err.message}`);
         }
       }
 
@@ -221,7 +221,7 @@ export default function JiraSync() {
     <div className="space-y-6">
       <PageHeader
         title="Jira Sync"
-        subtitle="Import Work Areas, Types, and Teams directly from Jira"
+        subtitle="Import Work Items, Types, and Teams directly from Jira"
       />
 
       <Card>
@@ -291,7 +291,7 @@ export default function JiraSync() {
                   <div className="space-y-2">
                     <p>Found {syncResult.totalIssues} issues, {syncResult.workAreaTypes.length} types, and {syncResult.teams.length} teams</p>
                     <div className="mt-3 pt-3 border-t border-border/50 space-y-1 text-xs">
-                      <p className="font-semibold">Work Area Summary:</p>
+                      <p className="font-semibold">Work Item Summary:</p>
                       <ul className="space-y-1 ml-2">
                         <li>Will be added: <span className="font-medium text-green-600">{stats.toAdd}</span></li>
                         <li>Will be updated: <span className="font-medium text-blue-600">{stats.toUpdate}</span></li>
@@ -312,9 +312,9 @@ export default function JiraSync() {
                   <p>Import completed:</p>
                   <ul className="list-disc list-inside text-sm">
                      <li>Types created: {syncResult.importStats.typesCreated}</li>
-                    <li>Work Areas created: {syncResult.importStats.workAreasCreated}</li>
-                    <li>Work Areas updated: {syncResult.importStats.workAreasUpdated}</li>
-                    <li>Work Areas skipped: {syncResult.importStats.workAreasSkipped}</li>
+                    <li>Work Items created: {syncResult.importStats.workAreasCreated}</li>
+                    <li>Work Items updated: {syncResult.importStats.workAreasUpdated}</li>
+                    <li>Work Items skipped: {syncResult.importStats.workAreasSkipped}</li>
                     {syncResult.importStats.errors.length > 0 && (
                       <li className="text-destructive">Errors: {syncResult.importStats.errors.length}</li>
                     )}

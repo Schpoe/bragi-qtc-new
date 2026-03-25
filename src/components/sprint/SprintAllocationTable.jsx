@@ -27,7 +27,7 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
   if (members.length === 0 || relevantWorkAreas.length === 0) {
     return (
       <div className="text-center py-8 text-sm text-muted-foreground">
-        {members.length === 0 ? "No team members found." : "No work areas defined."}
+        {members.length === 0 ? "No team members found." : "No work items defined."}
       </div>
     );
   }
