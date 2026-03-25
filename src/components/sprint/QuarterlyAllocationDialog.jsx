@@ -37,7 +37,7 @@ export default function QuarterlyAllocationDialog({ open, onOpenChange, quarter,
 
   const leadingWAs = relevantWorkAreas.filter(wa => wa.leading_team_id === teamId);
   const supportingWAs = relevantWorkAreas.filter(wa => wa.supporting_team_ids?.includes(teamId) && wa.leading_team_id !== teamId);
-  const otherWAs = relevantWorkAreas.filter(wa => wa.leading_team_id !== teamId && !wa.supporting_team_ids?.includes(teamId));
+  const otherWAs = workAreas.filter(wa => wa.leading_team_id !== teamId && !wa.supporting_team_ids?.includes(teamId));
 
   const filterBySearch = (items) => items.filter(wa => wa.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
