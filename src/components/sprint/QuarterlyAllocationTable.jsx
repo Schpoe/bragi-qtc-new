@@ -145,7 +145,8 @@ export default function QuarterlyAllocationTable({
           <TableHeader className="bg-primary/5 border-b-2 border-primary/20">
             {hasGroups && (
               <TableRow className="border-b-0">
-                <TableHead className="sticky left-0 z-20 bg-white font-semibold text-primary min-w-[180px]" rowSpan={2}>Team Member</TableHead>
+                <TableHead className="sticky left-0 z-20 bg-white font-semibold text-primary min-w-[180px] border-r" rowSpan={2}>Team Member</TableHead>
+                <TableHead className="text-xs text-center font-semibold text-primary min-w-[90px] sticky left-[180px] z-20 bg-white border-r" rowSpan={2}>Allocated</TableHead>
                 {leadingWAs.length > 0 && (
                   <TableHead colSpan={leadingWAs.length} className="text-center text-xs font-semibold bg-primary/10 text-primary border-l-2 border-primary/30 py-1">
                     Leading
@@ -161,11 +162,11 @@ export default function QuarterlyAllocationTable({
                     Other
                   </TableHead>
                 )}
-                <TableHead className="text-xs text-center font-semibold text-primary min-w-[90px]" rowSpan={2}>Allocated</TableHead>
               </TableRow>
             )}
             <TableRow>
-              {!hasGroups && <TableHead className="sticky left-0 z-20 bg-white font-semibold text-primary min-w-[180px]">Team Member</TableHead>}
+              {!hasGroups && <TableHead className="sticky left-0 z-20 bg-white font-semibold text-primary min-w-[180px] border-r">Team Member</TableHead>}
+              {!hasGroups && <TableHead className="text-xs text-center font-semibold text-primary min-w-[90px] sticky left-[180px] z-20 bg-white border-r">Allocated</TableHead>}
               {groupedWAs.map(wa => (
                 <TableHead key={wa.id} className={cn("text-xs text-center font-semibold text-primary min-w-[130px] max-w-[180px]", getGroupBorder(wa))}>
                   <div className="flex items-start justify-center gap-1.5 px-1">
@@ -174,7 +175,6 @@ export default function QuarterlyAllocationTable({
                   </div>
                 </TableHead>
               ))}
-              {!hasGroups && <TableHead className="text-xs text-center font-semibold text-primary min-w-[90px]">Allocated</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -186,6 +186,25 @@ export default function QuarterlyAllocationTable({
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold">{member.name}</span>
                     <DisciplineBadge discipline={member.discipline} />
+                  </div>
+                </TableCell>
+                <TableCell className={cn("text-center sticky left-[180px] z-10 border-r", isOverAllocated ? "bg-red-50" : totalPercent > 80 ? "bg-amber-50" : "bg-white")}>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className={cn(
+                      "text-sm font-bold tabular-nums",
+                      isOverAllocated ? "text-red-600" : totalPercent > 80 ? "text-amber-600" : "text-green-600"
+                    )}>
+                      {totalPercent}%
+                    </span>
+                    <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className={cn(
+                          "h-full transition-all",
+                          isOverAllocated ? "bg-red-500" : totalPercent > 80 ? "bg-amber-500" : "bg-green-500"
+                        )}
+                        style={{ width: `${Math.min(totalPercent, 100)}%` }}
+                      />
+                    </div>
                   </div>
                 </TableCell>
                 {groupedWAs.map(wa => {
@@ -222,25 +241,6 @@ export default function QuarterlyAllocationTable({
                     </TableCell>
                   );
                 })}
-                <TableCell className="text-center">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className={cn(
-                      "text-sm font-bold tabular-nums",
-                      isOverAllocated ? "text-red-600" : totalPercent > 80 ? "text-amber-600" : "text-green-600"
-                    )}>
-                      {totalPercent}%
-                    </span>
-                    <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className={cn(
-                          "h-full transition-all",
-                          isOverAllocated ? "bg-red-500" : totalPercent > 80 ? "bg-amber-500" : "bg-green-500"
-                        )}
-                        style={{ width: `${Math.min(totalPercent, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -55,7 +55,8 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
           <TableHeader>
             {hasGroups && (
               <TableRow className="bg-primary/5 border-b-0">
-                <TableHead className="min-w-[160px] sticky left-0 bg-white z-10 font-semibold text-primary" rowSpan={2}>Member</TableHead>
+                <TableHead className="min-w-[160px] sticky left-0 bg-white z-10 font-semibold text-primary border-r" rowSpan={2}>Member</TableHead>
+                <TableHead className="text-center min-w-[80px] sticky left-[160px] bg-white z-10 font-semibold text-primary border-r" rowSpan={2}>Total</TableHead>
                 {leadingWAs.length > 0 && (
                   <TableHead colSpan={leadingWAs.length} className="text-center text-xs font-semibold bg-primary/10 text-primary border-l-2 border-primary/30 py-1">
                     Leading
@@ -71,11 +72,11 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
                     Other
                   </TableHead>
                 )}
-                <TableHead className="text-center min-w-[80px] font-semibold text-primary" rowSpan={2}>Total</TableHead>
               </TableRow>
             )}
             <TableRow className="bg-primary/5 border-b-2 border-primary/20">
-              {!hasGroups && <TableHead className="min-w-[160px] sticky left-0 bg-white z-10 font-semibold text-primary">Member</TableHead>}
+              {!hasGroups && <TableHead className="min-w-[160px] sticky left-0 bg-white z-10 font-semibold text-primary border-r">Member</TableHead>}
+              {!hasGroups && <TableHead className="text-center min-w-[80px] sticky left-[160px] bg-white z-10 font-semibold text-primary border-r">Total</TableHead>}
               {groupedWAs.map(wa => (
                 <TableHead key={wa.id} className={cn("text-center min-w-[90px]", getGroupBorder(wa))}>
                   <div className="flex items-center justify-center gap-1.5">
@@ -84,7 +85,6 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
                   </div>
                 </TableHead>
               ))}
-              {!hasGroups && <TableHead className="text-center min-w-[80px] font-semibold text-primary">Total</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -98,10 +98,29 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
                 <TableRow key={member.id} className={cn(
                   isOver ? "bg-red-50/50 hover:bg-red-50" : utilization > 80 ? "bg-amber-50/50 hover:bg-amber-50" : "hover:bg-muted/30"
                 )}>
-                  <TableCell className={cn("sticky left-0 z-10", isOver ? "bg-red-50" : utilization > 80 ? "bg-amber-50" : "bg-white")}>
+                  <TableCell className={cn("sticky left-0 z-10 border-r", isOver ? "bg-red-50" : utilization > 80 ? "bg-amber-50" : "bg-white")}>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold">{member.name}</span>
                       <DisciplineBadge discipline={member.discipline} />
+                    </div>
+                  </TableCell>
+                  <TableCell className={cn("text-center sticky left-[160px] z-10 border-r", isOver ? "bg-red-50" : utilization > 80 ? "bg-amber-50" : "bg-white")}>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className={cn(
+                        "text-sm font-bold tabular-nums",
+                        isOver ? "text-red-600" : utilization > 80 ? "text-amber-600" : "text-green-600"
+                      )}>
+                        {total}%
+                      </span>
+                      <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={cn(
+                            "h-full transition-all",
+                            isOver ? "bg-red-500" : utilization > 80 ? "bg-amber-500" : "bg-green-500"
+                          )}
+                          style={{ width: `${Math.min(utilization, 100)}%` }}
+                        />
+                      </div>
                     </div>
                   </TableCell>
                   {groupedWAs.map(wa => {
@@ -121,25 +140,6 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
                       </TableCell>
                     );
                   })}
-                  <TableCell className="text-center">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className={cn(
-                        "text-sm font-bold tabular-nums",
-                        isOver ? "text-red-600" : utilization > 80 ? "text-amber-600" : "text-green-600"
-                      )}>
-                        {total}%
-                      </span>
-                      <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className={cn(
-                            "h-full transition-all",
-                            isOver ? "bg-red-500" : utilization > 80 ? "bg-amber-500" : "bg-green-500"
-                          )}
-                          style={{ width: `${Math.min(utilization, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </TableCell>
                 </TableRow>
               );
             })}
