@@ -10,9 +10,24 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
   const { user } = useAuth();
   const canEdit = canManageAllocations(user, sprint.team_id);
   
-  const relevantWorkAreas = (sprint?.relevant_work_area_ids?.length ?? 0) > 0 
+  const relevantWorkAreas = (sprint?.relevant_work_area_ids?.length ?? 0) > 0
     ? workAreas.filter(wa => sprint.relevant_work_area_ids.includes(wa.id))
     : [];
+
+  const teamId = sprint.team_id;
+  const leadingWAs = relevantWorkAreas.filter(wa => wa.leading_team_id === teamId);
+  const supportingWAs = relevantWorkAreas.filter(wa => wa.supporting_team_ids?.includes(teamId) && wa.leading_team_id !== teamId);
+  const otherWAs = relevantWorkAreas.filter(wa => wa.leading_team_id !== teamId && !wa.supporting_team_ids?.includes(teamId));
+  const groupedWAs = [...leadingWAs, ...supportingWAs, ...otherWAs];
+  const hasGroups = [leadingWAs, supportingWAs, otherWAs].filter(g => g.length > 0).length > 1;
+
+  const getGroupBorder = (wa) => {
+    if (wa === leadingWAs[0]) return "border-l-2 border-primary/30";
+    if (wa === supportingWAs[0]) return "border-l-2 border-amber-300";
+    if (wa === otherWAs[0]) return "border-l-2 border-slate-300";
+    return "";
+  };
+
   const getAllocation = (memberId, workAreaId) => {
     const alloc = allocations.find(
       a => a.team_member_id === memberId && a.sprint_id === sprint.id && a.work_area_id === workAreaId
@@ -38,17 +53,38 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
       <div className="hidden md:block overflow-x-auto border rounded-lg">
         <Table>
           <TableHeader>
+            {hasGroups && (
+              <TableRow className="bg-primary/5 border-b-0">
+                <TableHead className="min-w-[160px] sticky left-0 bg-primary/5 z-10 font-semibold text-primary" rowSpan={2}>Member</TableHead>
+                {leadingWAs.length > 0 && (
+                  <TableHead colSpan={leadingWAs.length} className="text-center text-xs font-semibold bg-primary/10 text-primary border-l-2 border-primary/30 py-1">
+                    Leading
+                  </TableHead>
+                )}
+                {supportingWAs.length > 0 && (
+                  <TableHead colSpan={supportingWAs.length} className="text-center text-xs font-semibold bg-amber-50 text-amber-700 border-l-2 border-amber-300 py-1">
+                    Supporting
+                  </TableHead>
+                )}
+                {otherWAs.length > 0 && (
+                  <TableHead colSpan={otherWAs.length} className="text-center text-xs font-semibold bg-muted/60 text-muted-foreground border-l-2 border-slate-300 py-1">
+                    Other
+                  </TableHead>
+                )}
+                <TableHead className="text-center min-w-[80px] font-semibold text-primary" rowSpan={2}>Total</TableHead>
+              </TableRow>
+            )}
             <TableRow className="bg-primary/5 border-b-2 border-primary/20">
-              <TableHead className="min-w-[160px] sticky left-0 bg-primary/5 z-10 font-semibold text-primary">Member</TableHead>
-              {relevantWorkAreas.map(wa => (
-                <TableHead key={wa.id} className="text-center min-w-[90px]">
+              {!hasGroups && <TableHead className="min-w-[160px] sticky left-0 bg-primary/5 z-10 font-semibold text-primary">Member</TableHead>}
+              {groupedWAs.map(wa => (
+                <TableHead key={wa.id} className={cn("text-center min-w-[90px]", getGroupBorder(wa))}>
                   <div className="flex items-center justify-center gap-1.5">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
                     <span className="text-xs font-semibold">{wa.name}</span>
                   </div>
                 </TableHead>
               ))}
-              <TableHead className="text-center min-w-[80px] font-semibold text-primary">Total</TableHead>
+              {!hasGroups && <TableHead className="text-center min-w-[80px] font-semibold text-primary">Total</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -68,10 +104,10 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
                       <DisciplineBadge discipline={member.discipline} />
                     </div>
                   </TableCell>
-                  {relevantWorkAreas.map(wa => {
-                     const val = getAllocation(member.id, wa.id);
+                  {groupedWAs.map(wa => {
+                    const val = getAllocation(member.id, wa.id);
                     return (
-                      <TableCell key={wa.id} className="text-center p-2">
+                      <TableCell key={wa.id} className={cn("text-center p-2", getGroupBorder(wa))}>
                         {canEdit ? (
                           <AllocationCell
                             value={val}
@@ -145,21 +181,32 @@ export default function SprintAllocationTable({ sprint, members, workAreas, allo
                   style={{ width: `${Math.min(utilization, 100)}%` }}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {relevantWorkAreas.map(wa => (
-                  <div key={wa.id} className="text-xs">
-                    <div className="font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
-                      {wa.name}
+              <div className="space-y-2">
+                {[
+                  { label: "Leading", items: leadingWAs, color: "text-primary" },
+                  { label: "Supporting", items: supportingWAs, color: "text-amber-700" },
+                  { label: "Other", items: otherWAs, color: "text-muted-foreground" },
+                ].filter(g => g.items.length > 0).map(group => (
+                  <div key={group.label}>
+                    {hasGroups && <p className={cn("text-[10px] font-semibold uppercase tracking-wider mb-1", group.color)}>{group.label}</p>}
+                    <div className="grid grid-cols-2 gap-2">
+                      {group.items.map(wa => (
+                        <div key={wa.id} className="text-xs">
+                          <div className="font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                            {wa.name}
+                          </div>
+                          {canEdit ? (
+                            <AllocationCell
+                              value={getAllocation(member.id, wa.id)}
+                              onChange={(val) => onAllocationChange(member.id, sprint.id, wa.id, val)}
+                            />
+                          ) : (
+                            <span className="font-semibold">{getAllocation(member.id, wa.id)}%</span>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                    {canEdit ? (
-                      <AllocationCell
-                        value={getAllocation(member.id, wa.id)}
-                        onChange={(val) => onAllocationChange(member.id, sprint.id, wa.id, val)}
-                      />
-                    ) : (
-                      <span className="font-semibold">{getAllocation(member.id, wa.id)}%</span>
-                    )}
                   </div>
                 ))}
               </div>
