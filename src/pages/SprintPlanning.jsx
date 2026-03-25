@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/AuthContext";
-import { canManageSprints, canManageAllocations, canCreateSprint } from "@/lib/permissions";
+import { canManageSprints, canManageAllocations, canCreateSprint, isTeamManager } from "@/lib/permissions";
 import { Plus, CalendarRange, Pencil, Trash2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +26,11 @@ export default function SprintPlanning() {
   const [sprintDialogOpen, setSprintDialogOpen] = useState(false);
   const [editingSprint, setEditingSprint] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState(() => getCurrentQuarter());
-  const [selectedTeamId, setSelectedTeamId] = useState("all");
+  const [selectedTeamId, setSelectedTeamId] = useState(() =>
+    isTeamManager(user) && user?.managed_team_ids?.length > 0
+      ? user.managed_team_ids[0]
+      : "all"
+  );
   const [teamSelectDialogOpen, setTeamSelectDialogOpen] = useState(false);
   const [teamSelectValue, setTeamSelectValue] = useState("");
   const [sprintToCopy, setSprintToCopy] = useState(null);
