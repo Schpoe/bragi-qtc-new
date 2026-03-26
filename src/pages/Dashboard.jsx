@@ -18,6 +18,7 @@ import TeamCapacityChart from "../components/dashboard/TeamCapacityChart";
 import ExecutiveSummary from "../components/dashboard/ExecutiveSummary";
 import AllocationHeatMap from "../components/dashboard/AllocationHeatMap";
 import QuarterlyAllocationReport from "../components/dashboard/QuarterlyAllocationReport";
+import QuarterlyTeamsSummary from "../components/dashboard/QuarterlyTeamsSummary";
 
 export default function Dashboard() {
   const [selectedQuarter, setSelectedQuarter] = useState(() => getCurrentQuarter());
@@ -156,10 +157,13 @@ export default function Dashboard() {
             {/* ── Quarterly Plan tab ──────────────────────────────────────── */}
             <TabsContent value="quarterly">
               {selectedTeamId === "all" ? (
-                <EmptyState
-                  icon={CalendarRange}
-                  title="Select a team"
-                  description="Choose a team from the filter to view the quarterly plan overview."
+                <QuarterlyTeamsSummary
+                  teams={teams}
+                  members={members}
+                  workAreas={workAreas}
+                  quarterlyAllocations={quarterlyAllocations}
+                  workAreaSelections={workAreaSelections}
+                  selectedQuarter={selectedQuarter}
                 />
               ) : (
                 <Card className="border-primary/20">
