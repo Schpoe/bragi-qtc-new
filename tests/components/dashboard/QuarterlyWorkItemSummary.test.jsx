@@ -76,12 +76,12 @@ describe('QuarterlyWorkItemSummary', () => {
         selectedQuarter={quarter}
       />
     );
-    // Feature A: 50 + 30 = 80% — appears in both work-item list and type breakdown
-    expect(screen.getAllByText('80%').length).toBeGreaterThan(0);
-    // Bug Fix B: 20%
-    expect(screen.getAllByText('20%').length).toBeGreaterThan(0);
-    // Epic C: 40%
+    // Feature A: (50+30) / 2 members = 40% — appears in work-item list and type breakdown
     expect(screen.getAllByText('40%').length).toBeGreaterThan(0);
+    // Bug Fix B: 20 / 2 = 10%
+    expect(screen.getAllByText('10%').length).toBeGreaterThan(0);
+    // Epic C: 40 / 2 = 20%
+    expect(screen.getAllByText('20%').length).toBeGreaterThan(0);
   });
 
   it('ignores allocations for a different quarter', () => {
@@ -94,7 +94,8 @@ describe('QuarterlyWorkItemSummary', () => {
       />
     );
     // Q1 2025 allocation of 99% for wa1 must not appear
-    expect(screen.queryByText('179%')).toBeNull(); // 80 + 99 would be 179
+    // Without Q1 data: Feature A = (50+30)/2 = 40%. With Q1: (50+99+30)/2 = 89%
+    expect(screen.queryByText('89%')).toBeNull();
   });
 
   it('ignores allocations from members not in the members prop', () => {
