@@ -78,7 +78,7 @@ export default function QuarterlyWorkItemSummary({
   const maxType = typeBreakdown[0]?.total ?? 1;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Top 15 Work Items */}
       {top15.length > 0 && (
         <Card>

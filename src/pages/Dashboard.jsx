@@ -21,6 +21,7 @@ import QuarterlyAllocationReport from "../components/dashboard/QuarterlyAllocati
 import QuarterlyTeamsSummary from "../components/dashboard/QuarterlyTeamsSummary";
 import QuarterlyExportButtons from "../components/dashboard/QuarterlyExportButtons";
 import QuarterlyWorkItemSummary from "../components/dashboard/QuarterlyWorkItemSummary";
+import QuarterlyDisciplineSummary from "../components/dashboard/QuarterlyDisciplineSummary";
 
 export default function Dashboard() {
   const [selectedQuarter, setSelectedQuarter] = useState(() => getCurrentQuarter());
@@ -168,7 +169,15 @@ export default function Dashboard() {
                   selectedTeamId={selectedTeamId}
                 />
               </div>
-              <div id="quarterly-plan-content">
+              <div id="quarterly-plan-content" className="space-y-6">
+                {/* Top 15 Work Items + Allocation by Type — always at the top */}
+                <QuarterlyWorkItemSummary
+                  members={selectedTeamId === "all" ? members : quarterlyTabMembers}
+                  workAreas={workAreas}
+                  quarterlyAllocations={quarterlyAllocations}
+                  selectedQuarter={selectedQuarter}
+                />
+
                 {selectedTeamId === "all" ? (
                   <QuarterlyTeamsSummary
                     teams={teams}
@@ -179,29 +188,33 @@ export default function Dashboard() {
                     selectedQuarter={selectedQuarter}
                   />
                 ) : (
-                  <Card className="border-primary/20">
-                    <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent pb-4">
-                      <CardTitle className="text-base font-bold text-foreground">
-                        Quarterly Plan — {selectedQuarter}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <QuarterlyAllocationReport
-                        members={quarterlyTabMembers}
-                        workAreas={quarterlyTabWorkAreas}
-                        quarterlyAllocations={quarterlyAllocations}
-                        selectedQuarter={selectedQuarter}
-                        selectedTeamId={selectedTeamId}
-                      />
-                    </CardContent>
-                  </Card>
+                  <>
+                    {/* Discipline allocation for the selected team */}
+                    <QuarterlyDisciplineSummary
+                      members={quarterlyTabMembers}
+                      quarterlyAllocations={quarterlyAllocations}
+                      selectedQuarter={selectedQuarter}
+                    />
+
+                    {/* Member × work area allocation table */}
+                    <Card className="border-primary/20">
+                      <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent pb-4">
+                        <CardTitle className="text-base font-bold text-foreground">
+                          Quarterly Plan — {selectedQuarter}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-6">
+                        <QuarterlyAllocationReport
+                          members={quarterlyTabMembers}
+                          workAreas={quarterlyTabWorkAreas}
+                          quarterlyAllocations={quarterlyAllocations}
+                          selectedQuarter={selectedQuarter}
+                          selectedTeamId={selectedTeamId}
+                        />
+                      </CardContent>
+                    </Card>
+                  </>
                 )}
-                <QuarterlyWorkItemSummary
-                  members={selectedTeamId === "all" ? members : quarterlyTabMembers}
-                  workAreas={workAreas}
-                  quarterlyAllocations={quarterlyAllocations}
-                  selectedQuarter={selectedQuarter}
-                />
               </div>
             </TabsContent>
 
