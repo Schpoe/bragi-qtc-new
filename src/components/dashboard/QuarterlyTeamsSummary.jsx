@@ -73,29 +73,22 @@ export default function QuarterlyTeamsSummary({
       );
 
       // Total capacity = sum of each member's availability_percent
-      const totalCapacity = teamMembers.reduce(
-        (sum, m) => sum + (m.availability_percent ?? 100),
-        0
-      );
-
       const totalAllocated = teamAllocs.reduce((sum, a) => sum + a.percent, 0);
+      // Capacity = count * 100: quarterly percent is relative to 100% per member,
+      // matching how QuarterlyAllocationReport displays totals
       const overallUtil =
-        totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
+        teamMembers.length > 0 ? Math.round(totalAllocated / teamMembers.length) : 0;
 
       // By discipline
       const disciplines = [...new Set(teamMembers.map((m) => m.discipline).filter(Boolean))];
       const disciplineBreakdown = disciplines.map((disc) => {
         const discMembers = teamMembers.filter((m) => m.discipline === disc);
         const discMemberIds = new Set(discMembers.map((m) => m.id));
-        const discCapacity = discMembers.reduce(
-          (sum, m) => sum + (m.availability_percent ?? 100),
-          0
-        );
         const discAllocated = teamAllocs
           .filter((a) => discMemberIds.has(a.team_member_id))
           .reduce((sum, a) => sum + a.percent, 0);
         const util =
-          discCapacity > 0 ? Math.round((discAllocated / discCapacity) * 100) : 0;
+          discMembers.length > 0 ? Math.round(discAllocated / discMembers.length) : 0;
         return { discipline: disc, util };
       }).sort((a, b) => b.util - a.util);
 
@@ -130,15 +123,11 @@ export default function QuarterlyTeamsSummary({
     return disciplines.map((disc) => {
       const discMembers = members.filter((m) => m.discipline === disc);
       const discMemberIds = new Set(discMembers.map((m) => m.id));
-      const discCapacity = discMembers.reduce(
-        (sum, m) => sum + (m.availability_percent ?? 100),
-        0
-      );
       const discAllocated = quarterAllocations
         .filter((a) => discMemberIds.has(a.team_member_id))
         .reduce((sum, a) => sum + a.percent, 0);
       const util =
-        discCapacity > 0 ? Math.round((discAllocated / discCapacity) * 100) : 0;
+        discMembers.length > 0 ? Math.round(discAllocated / discMembers.length) : 0;
       const count = discMembers.length;
       return { discipline: disc, util, count };
     }).sort((a, b) => b.util - a.util);
