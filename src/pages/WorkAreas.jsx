@@ -69,40 +69,33 @@ export default function WorkAreas() {
 
   const teamMap = Object.fromEntries(teams.map(t => [t.id, t.name]));
 
-  // Filter by team — include cross-team items so the "Other" tab has data
-  let filteredByTeam = filterTeamId === "all"
-    ? workAreas
-    : workAreas.filter(wa =>
-        wa.leading_team_id === filterTeamId ||
-        (wa.supporting_team_ids || []).includes(filterTeamId) ||
-        wa.is_cross_team
-      );
+  // When a team is selected, show all work areas so the role tabs can partition them.
+  // "Other" = work areas where the selected team has no formal role (neither leading
+  // nor supporting). is_cross_team is only set on Sprint records, not WorkArea records,
+  // so we cannot rely on it here.
+  const filteredByTeam = filterTeamId === "all" ? workAreas : workAreas;
 
-  // Tab counts (pre-search, so the badges always show the full category size)
+  const isLeading    = (wa) => wa.leading_team_id === filterTeamId;
+  const isSupporting = (wa) => (wa.supporting_team_ids || []).includes(filterTeamId);
+  const isOther      = (wa) => !isLeading(wa) && !isSupporting(wa);
+
+  // Tab counts (pre-search, so badges reflect the full partition)
   const tabCounts = filterTeamId === "all" ? null : {
-    all: filteredByTeam.length,
-    leading: filteredByTeam.filter(wa => wa.leading_team_id === filterTeamId).length,
-    supporting: filteredByTeam.filter(wa => (wa.supporting_team_ids || []).includes(filterTeamId)).length,
-    other: filteredByTeam.filter(wa =>
-      wa.is_cross_team &&
-      wa.leading_team_id !== filterTeamId &&
-      !(wa.supporting_team_ids || []).includes(filterTeamId)
-    ).length,
+    all: workAreas.length,
+    leading: workAreas.filter(isLeading).length,
+    supporting: workAreas.filter(isSupporting).length,
+    other: workAreas.filter(isOther).length,
   };
 
   // Filter by role (All, Leading, Supporting, Other)
   let filteredByRole = filteredByTeam;
   if (filterTeamId !== "all") {
     if (roleTab === "leading") {
-      filteredByRole = filteredByTeam.filter(wa => wa.leading_team_id === filterTeamId);
+      filteredByRole = workAreas.filter(isLeading);
     } else if (roleTab === "supporting") {
-      filteredByRole = filteredByTeam.filter(wa => (wa.supporting_team_ids || []).includes(filterTeamId));
+      filteredByRole = workAreas.filter(isSupporting);
     } else if (roleTab === "other") {
-      filteredByRole = filteredByTeam.filter(wa =>
-        wa.is_cross_team &&
-        wa.leading_team_id !== filterTeamId &&
-        !(wa.supporting_team_ids || []).includes(filterTeamId)
-      );
+      filteredByRole = workAreas.filter(isOther);
     }
   }
 
