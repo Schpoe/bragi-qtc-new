@@ -458,8 +458,11 @@ export default function SprintPlanning() {
               <QuarterlyPlanHistoryPanel
                 quarter={selectedQuarter}
                 teamId={effectiveTeamId}
+                teamName={teams.find(t => t.id === effectiveTeamId)?.name ?? ""}
+                user={user}
                 members={teamMembers}
                 workAreas={filteredWorkAreas}
+                quarterlyAllocations={quarterlyAllocations}
               />
             </>
           )}

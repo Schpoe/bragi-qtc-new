@@ -268,4 +268,82 @@ router.post('/linkJiraEpic', requireAuth, async (req, res) => {
   }
 });
 
+// Revert quarterly plan allocations to a saved snapshot
+router.post('/revertQuarterlyPlanSnapshot', requireAuth, async (req, res) => {
+  try {
+    const { snapshotId } = req.body;
+    if (!snapshotId) return res.status(400).json({ error: 'snapshotId is required' });
+
+    const snapshot = await prisma.quarterlyPlanSnapshot.findUnique({ where: { id: snapshotId } });
+    if (!snapshot) return res.status(404).json({ error: 'Snapshot not found' });
+
+    const user = req.user;
+    const isAdmin = user.role === 'admin';
+    const isManager = user.role === 'team_manager' && (user.managed_team_ids || []).includes(snapshot.team_id);
+    if (!isAdmin && !isManager) {
+      return res.status(403).json({ error: 'Not authorized to revert this team\'s plan' });
+    }
+
+    const snapshotAllocations = Array.isArray(snapshot.allocations) ? snapshot.allocations : [];
+
+    // Get all team member IDs for this team to scope the delete
+    const teamMembers = await prisma.teamMember.findMany({
+      where: { team_id: snapshot.team_id },
+      select: { id: true },
+    });
+    const memberIds = teamMembers.map(m => m.id);
+
+    await prisma.$transaction(async (tx) => {
+      // Delete all current allocations for this team/quarter
+      await tx.quarterlyAllocation.deleteMany({
+        where: { quarter: snapshot.quarter, team_member_id: { in: memberIds } },
+      });
+
+      // Recreate from snapshot
+      for (const alloc of snapshotAllocations) {
+        if (alloc.percent > 0) {
+          await tx.quarterlyAllocation.create({
+            data: {
+              quarter: snapshot.quarter,
+              team_member_id: alloc.team_member_id,
+              work_area_id: alloc.work_area_id,
+              percent: alloc.percent,
+            },
+          });
+        }
+      }
+
+      // Log revert action in history
+      const now = new Date();
+      for (const alloc of snapshotAllocations) {
+        if (alloc.percent > 0) {
+          await tx.quarterlyPlanHistory.create({
+            data: {
+              quarter: snapshot.quarter,
+              team_id: snapshot.team_id,
+              team_name: snapshot.team_name,
+              team_member_id: alloc.team_member_id,
+              member_name: alloc.member_name || null,
+              member_discipline: alloc.member_discipline || null,
+              work_area_id: alloc.work_area_id,
+              work_area_name: alloc.work_area_name || null,
+              work_area_type: alloc.work_area_type || null,
+              action: 'reverted',
+              old_percent: null,
+              new_percent: alloc.percent,
+              changed_at: now,
+            },
+          });
+        }
+      }
+    });
+
+    const restoredCount = snapshotAllocations.filter(a => a.percent > 0).length;
+    res.json({ data: { success: true, restored: restoredCount, label: snapshot.label } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -69,6 +69,7 @@ export const bragiQTC = {
     QuarterlyAllocation:        makeEntityClient('/api/quarterly-allocations'),
     QuarterlyWorkAreaSelection: makeEntityClient('/api/quarterly-work-area-selections'),
     QuarterlyPlanHistory:       makeEntityClient('/api/quarterly-plan-history'),
+    QuarterlyPlanSnapshot:      makeEntityClient('/api/quarterly-plan-snapshots'),
     JiraSyncHistory:            makeEntityClient('/api/jira-sync-history'),
   },
 

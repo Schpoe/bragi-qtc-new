@@ -21,6 +21,7 @@ const allocationRoutes = require('./routes/allocations');
 const quarterlyAllocationRoutes = require('./routes/quarterly-allocations');
 const quarterlyWorkAreaSelectionRoutes = require('./routes/quarterly-work-area-selections');
 const quarterlyPlanHistoryRoutes = require('./routes/quarterly-plan-history');
+const quarterlyPlanSnapshotRoutes = require('./routes/quarterly-plan-snapshots');
 const jiraSyncHistoryRoutes = require('./routes/jira-sync-history');
 const functionsRoutes = require('./routes/functions');
 
@@ -40,6 +41,7 @@ app.use('/api/allocations', allocationRoutes);
 app.use('/api/quarterly-allocations', quarterlyAllocationRoutes);
 app.use('/api/quarterly-work-area-selections', quarterlyWorkAreaSelectionRoutes);
 app.use('/api/quarterly-plan-history', quarterlyPlanHistoryRoutes);
+app.use('/api/quarterly-plan-snapshots', quarterlyPlanSnapshotRoutes);
 app.use('/api/jira-sync-history', jiraSyncHistoryRoutes);
 app.use('/api/functions', functionsRoutes);
 

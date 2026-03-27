@@ -126,6 +126,18 @@ model QuarterlyPlanHistory {
   created_at        DateTime  @default(now())
 }
 
+model QuarterlyPlanSnapshot {
+  id               String   @id @default(uuid())
+  quarter          String
+  team_id          String
+  team_name        String?
+  label            String
+  note             String?
+  created_by_email String?
+  created_at       DateTime @default(now())
+  allocations      Json
+}
+
 model JiraSyncHistory {
   id             String   @id @default(uuid())
   timestamp      DateTime @default(now())
