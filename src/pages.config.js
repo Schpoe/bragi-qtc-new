@@ -51,7 +51,6 @@ import Dashboard from './pages/Dashboard';
 import JiraImport from './pages/JiraImport';
 import JiraSync from './pages/JiraSync';
 import SprintPlanning from './pages/SprintPlanning';
-import TeamSprintOverview from './pages/TeamSprintOverview';
 import Teams from './pages/Teams';
 import WorkAreaTypes from './pages/WorkAreaTypes';
 import WorkAreas from './pages/WorkAreas';
@@ -63,7 +62,6 @@ export const PAGES = {
     "JiraImport": JiraImport,
     "JiraSync": JiraSync,
     "SprintPlanning": SprintPlanning,
-    "TeamSprintOverview": TeamSprintOverview,
     "Teams": Teams,
     "WorkAreaTypes": WorkAreaTypes,
     "WorkAreas": WorkAreas,
