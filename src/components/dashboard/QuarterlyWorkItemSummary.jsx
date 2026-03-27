@@ -40,10 +40,8 @@ export default function QuarterlyWorkItemSummary({
 
   const memberCount = members.length;
 
-  // Sum quarterly allocation percents per work area, scoped to relevant members.
-  // Normalise by memberCount so the result is "% of total team capacity", matching
-  // how discipline utilisation is calculated (sum / count → avg per member).
-  const workItemTotals = useMemo(() => {
+  // Raw sums per work area (un-normalised), scoped to relevant members + quarter.
+  const rawSums = useMemo(() => {
     if (memberCount === 0) return {};
     const map = {};
     quarterAllocs
@@ -51,36 +49,38 @@ export default function QuarterlyWorkItemSummary({
       .forEach((a) => {
         map[a.work_area_id] = (map[a.work_area_id] || 0) + a.percent;
       });
-    // Normalise: raw sum / memberCount = average % of capacity per member
-    const normalised = {};
-    Object.entries(map).forEach(([waId, sum]) => {
-      normalised[waId] = Math.round(sum / memberCount);
-    });
-    return normalised;
+    return map;
   }, [quarterAllocs, memberIds, memberCount]);
 
-  // Top 15 work items
+  // Normalise per work area: raw sum / memberCount = avg % of capacity per member.
+  // Top 15 by normalised value.
   const top15 = useMemo(() => {
-    return Object.entries(workItemTotals)
-      .map(([waId, pct]) => {
+    return Object.entries(rawSums)
+      .map(([waId, sum]) => {
         const wa = workAreas.find((w) => w.id === waId);
-        return { name: wa?.name ?? "Unknown", color: wa?.color, type: wa?.type, pct };
+        return {
+          name: wa?.name ?? "Unknown",
+          color: wa?.color,
+          pct: Math.round(sum / memberCount),
+        };
       })
       .sort((a, b) => b.pct - a.pct)
       .slice(0, 15);
-  }, [workItemTotals, workAreas]);
+  }, [rawSums, workAreas, memberCount]);
 
-  // All work item types
+  // Type breakdown: aggregate RAW sums per type first, then normalise once.
+  // Summing already-normalised per-WA values would inflate results when a type
+  // has many work areas (e.g. 8 Features × 15% each = 120%, which is wrong).
   const typeBreakdown = useMemo(() => {
-    const map = {};
-    Object.entries(workItemTotals).forEach(([waId, pct]) => {
+    const rawByType = {};
+    Object.entries(rawSums).forEach(([waId, sum]) => {
       const type = workAreas.find((w) => w.id === waId)?.type ?? "Other";
-      map[type] = (map[type] || 0) + pct;
+      rawByType[type] = (rawByType[type] || 0) + sum;
     });
-    return Object.entries(map)
-      .map(([type, pct]) => ({ type, pct }))
+    return Object.entries(rawByType)
+      .map(([type, sum]) => ({ type, pct: Math.round(sum / memberCount) }))
       .sort((a, b) => b.pct - a.pct);
-  }, [workItemTotals, workAreas]);
+  }, [rawSums, workAreas, memberCount]);
 
   if (top15.length === 0 && typeBreakdown.length === 0) return null;
 
