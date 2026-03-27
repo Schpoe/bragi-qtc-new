@@ -361,13 +361,7 @@ export default function SprintPlanning() {
   return (
     <>
     <div>
-      <PageHeader title="Capacity Planning" subtitle="Manage team capacity allocations">
-        {sprintPlanningTeamId && canCreateSprint(user) && canManageSprints(user, sprintPlanningTeamId) && (
-          <Button onClick={() => { setEditingSprint(null); setSprintDialogOpen(true); }}>
-            <Plus className="w-4 h-4 mr-2" /> New Sprint
-          </Button>
-        )}
-      </PageHeader>
+      <PageHeader title="Capacity Planning" subtitle="Manage team capacity allocations" />
 
       <FilterBar
          quarter={selectedQuarter}
