@@ -1,0 +1,8 @@
+"name	color	description	id	created_date	updated_date	created_by_id	created_by	is_sample",color,description,id,created_date,updated_date,created_by_id,created_by,is_sample
+Enabler,blue,,69b119dae2f92006c4346e61,2026-03-11T07:29:30.883000,2026-03-11T09:16:06.892000,69aff1e4245700ed2a34287c,benjamin.spiss@gmail.com,FALSE
+Growth,lime,,69b119d6b705fe95e0c67bcf,2026-03-11T07:29:26.996000,2026-03-20T13:28:52.571000,69aff1e4245700ed2a34287c,benjamin.spiss@gmail.com,FALSE
+CSAT,pink,,69b119cecb30e08ae1f2238d,2026-03-11T07:29:18.378000,2026-03-20T13:21:24.622000,69aff1e4245700ed2a34287c,benjamin.spiss@gmail.com,FALSE
+App & Cloud,indigo,"Bragi AI, Cloud and Store",69aff3c2522f033339b5d0d6,2026-03-10T10:34:42.842000,2026-03-20T13:28:59.587000,69aff1e4245700ed2a34287c,benjamin.spiss@gmail.com,FALSE
+AA2,orange,Audio Apps and Capabilities,69aff2f04b4fb2a08f82c193,2026-03-10T10:31:12.199000,2026-03-10T12:57:31.693000,69aff1e4245700ed2a34287c,benjamin.spiss@gmail.com,FALSE
+Connect,teal,mSDK - Connect middleware,69aff2f04b4fb2a08f82c191,2026-03-10T10:31:12.199000,2026-03-10T12:58:02.490000,69aff1e4245700ed2a34287c,benjamin.spiss@gmail.com,FALSE
+AA1,purple,Cloud & Backend Services,69aff2f04b4fb2a08f82c192,2026-03-10T10:31:12.199000,2026-03-10T12:57:13.174000,69aff1e4245700ed2a34287c,benjamin.spiss@gmail.com,FALSE
