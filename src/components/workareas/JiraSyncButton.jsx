@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 export default function JiraSyncButton() {
   const [syncing, setSyncing] = useState(false);

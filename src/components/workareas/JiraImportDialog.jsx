@@ -100,7 +100,7 @@ export default function JiraImportDialog({ open, onOpenChange, teams: existingTe
     setError(null);
 
     try {
-      const colors = ['blue', 'green', 'purple', 'orange', 'pink', 'teal'];
+      const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#f97316', '#ec4899', '#14b8a6'];
       let stats = {
         typesCreated: 0,
         workAreasCreated: 0,
@@ -130,7 +130,6 @@ export default function JiraImportDialog({ open, onOpenChange, teams: existingTe
           try {
             await createWorkAreaType.mutateAsync({
               name: typeName,
-              order: stats.typesCreated
             });
             stats.typesCreated++;
             typeMap[typeName] = typeName;

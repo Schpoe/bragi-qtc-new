@@ -66,16 +66,17 @@ model WorkArea {
 }
 
 model Sprint {
-  id            String    @id @default(uuid())
-  team_id       String?
-  name          String
-  quarter       String
-  start_date    DateTime?
-  end_date      DateTime?
-  is_cross_team Boolean   @default(false)
-  is_template   Boolean   @default(false)
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
+  id                     String    @id @default(uuid())
+  team_id                String?
+  name                   String
+  quarter                String
+  start_date             DateTime?
+  end_date               DateTime?
+  is_cross_team          Boolean   @default(false)
+  is_template            Boolean   @default(false)
+  relevant_work_area_ids String[]
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @updatedAt
 }
 
 model Allocation {
@@ -83,7 +84,7 @@ model Allocation {
   sprint_id      String
   team_member_id String
   work_area_id   String
-  percentage     Int
+  percent        Int
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 }
@@ -93,7 +94,7 @@ model QuarterlyAllocation {
   quarter        String
   team_member_id String
   work_area_id   String
-  percentage     Int
+  percent        Int
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 }
@@ -108,17 +109,21 @@ model QuarterlyWorkAreaSelection {
 }
 
 model QuarterlyPlanHistory {
-  id             String   @id @default(uuid())
-  quarter        String
-  timestamp      DateTime @default(now())
-  user_id        String?
-  action         String?
-  team_id        String?
-  team_member_id String?
-  work_area_id   String?
-  old_value      String?
-  new_value      String?
-  created_at     DateTime @default(now())
+  id                String    @id @default(uuid())
+  quarter           String
+  team_id           String?
+  team_name         String?
+  team_member_id    String?
+  member_name       String?
+  member_discipline String?
+  work_area_id      String?
+  work_area_name    String?
+  work_area_type    String?
+  action            String?
+  old_percent       Int?
+  new_percent       Int?
+  changed_at        DateTime?
+  created_at        DateTime  @default(now())
 }
 
 model JiraSyncHistory {

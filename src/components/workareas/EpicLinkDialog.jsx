@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { X, Link as LinkIcon } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 export default function EpicLinkDialog({ open, onOpenChange, workArea, onLinked }) {
   const [epicKey, setEpicKey] = useState("");
