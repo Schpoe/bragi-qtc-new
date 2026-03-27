@@ -11,7 +11,7 @@ import EmptyState from "../shared/EmptyState";
 export default function JiraSyncHistoryTab() {
   const { data: history = [], isLoading } = useQuery({
     queryKey: ["jiraSyncHistory"],
-    queryFn: () => base44.entities.JiraSyncHistory.list("-created_date", 50),
+    queryFn: () => base44.entities.JiraSyncHistory.list(),
   });
 
   const getStatusIcon = (status) => {

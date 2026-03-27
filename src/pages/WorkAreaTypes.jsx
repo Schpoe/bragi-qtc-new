@@ -23,7 +23,7 @@ export default function WorkAreaTypes() {
 
   const { data: types = [], isLoading } = useQuery({
     queryKey: ["workAreaTypes"],
-    queryFn: () => base44.entities.WorkAreaType.list("order"),
+    queryFn: () => base44.entities.WorkAreaType.list(),
   });
 
   const createType = useMutation({

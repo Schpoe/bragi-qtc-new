@@ -18,7 +18,7 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
 
   const { data: workAreaTypes = [] } = useQuery({
     queryKey: ["workAreaTypes"],
-    queryFn: () => base44.entities.WorkAreaType.list("order"),
+    queryFn: () => base44.entities.WorkAreaType.list(),
   });
 
   useEffect(() => {
