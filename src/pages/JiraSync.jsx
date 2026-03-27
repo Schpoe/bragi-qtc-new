@@ -112,7 +112,7 @@ export default function JiraSync() {
     setError(null);
 
     try {
-      const colors = ['blue', 'green', 'purple', 'orange', 'pink', 'teal'];
+      const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#f97316', '#ec4899', '#14b8a6'];
       let stats = {
        teamsCreated: 0,
        typesCreated: 0,

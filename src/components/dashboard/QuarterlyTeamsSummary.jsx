@@ -1,14 +1,6 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, getTeamColor } from "@/lib/utils";
-
-const disciplineColors = {
-  iOS: "#3b82f6",
-  Android: "#10b981",
-  Cloud: "#8b5cf6",
-  QA: "#f59e0b",
-  Embedded: "#ef4444",
-};
+import { cn, getTeamColor, getDisciplineColor } from "@/lib/utils";
 
 function UtilBar({ value, color }) {
   const capped = Math.min(value, 100);
@@ -131,7 +123,7 @@ export default function QuarterlyTeamsSummary({
                     <div className="flex items-center gap-2">
                       <div
                         className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: disciplineColors[discipline] || "#6b7280" }}
+                        style={{ backgroundColor: getDisciplineColor(discipline) }}
                       />
                       <span className="text-sm font-medium">{discipline}</span>
                       <span className="text-xs text-muted-foreground">({count})</span>
@@ -145,7 +137,7 @@ export default function QuarterlyTeamsSummary({
                       {util}%
                     </span>
                   </div>
-                  <UtilBar value={util} color={disciplineColors[discipline]} />
+                  <UtilBar value={util} color={getDisciplineColor(discipline)} />
                 </div>
               ))}
             </div>
@@ -193,7 +185,7 @@ export default function QuarterlyTeamsSummary({
                             <div className="flex items-center gap-1.5">
                               <div
                                 className="w-2 h-2 rounded-full flex-shrink-0"
-                                style={{ backgroundColor: disciplineColors[discipline] || "#6b7280" }}
+                                style={{ backgroundColor: getDisciplineColor(discipline) }}
                               />
                               <span className="text-xs font-medium">{discipline}</span>
                             </div>
@@ -201,7 +193,7 @@ export default function QuarterlyTeamsSummary({
                               {util}%
                             </span>
                           </div>
-                          <UtilBar value={util} color={disciplineColors[discipline]} />
+                          <UtilBar value={util} color={getDisciplineColor(discipline)} />
                         </div>
                       ))}
                     </div>

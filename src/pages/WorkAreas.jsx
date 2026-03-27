@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getWorkAreaColor } from "@/lib/utils";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, FolderKanban, Pencil, Trash2, Users, Upload, Search, X, Link as LinkIcon, History } from "lucide-react";
@@ -227,7 +228,7 @@ export default function WorkAreas() {
                 <CardContent className="py-4 px-5">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: getWorkAreaColor(wa) }} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-medium text-sm">{wa.name}</p>

@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-
-const disciplineColors = {
-  iOS: "#3b82f6",
-  Android: "#10b981",
-  Cloud: "#8b5cf6",
-  QA: "#f59e0b",
-  Embedded: "#ef4444",
-};
+import { cn, getDisciplineColor } from "@/lib/utils";
 
 export default function DisciplineBreakdown({ sprints, members, allocations, selectedTeamId }) {
   const [sortBy, setSortBy] = useState("name");
@@ -64,7 +56,7 @@ export default function DisciplineBreakdown({ sprints, members, allocations, sel
               <div key={disc}>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: disciplineColors[disc] }} />
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: getDisciplineColor(disc) }} />
                     <span className="text-sm font-medium">{disc}</span>
                     <span className="text-xs text-muted-foreground">({count})</span>
                   </div>
@@ -80,7 +72,7 @@ export default function DisciplineBreakdown({ sprints, members, allocations, sel
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${Math.min(util, 100)}%`,
-                      backgroundColor: disciplineColors[disc],
+                      backgroundColor: getDisciplineColor(disc),
                     }}
                   />
                 </div>

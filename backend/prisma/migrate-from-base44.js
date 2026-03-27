@@ -123,6 +123,7 @@ async function importWorkAreas() {
       create: {
         id: row[idx(h, 'id')],
         name: row[idx(h, 'name')],
+        color: row[idx(h, 'color')] || null,
         type: row[idx(h, 'type')] || null,
         leading_team_id: row[idx(h, 'leading_team_id')] || null,
         supporting_team_ids: parseArr(row[idx(h, 'supporting_team_ids')]),

@@ -37,4 +37,46 @@ export function getTeamColor(team) {
   return teamColorHex[team.color] ?? "#6b7280";
 }
 
+// Discipline colors — complete map covering all known disciplines.
+export const disciplineColorHex = {
+  iOS: "#3b82f6",
+  Android: "#10b981",
+  Cloud: "#8b5cf6",
+  QA: "#f59e0b",
+  Embedded: "#ef4444",
+  Algo: "#06b6d4",
+  "Test Automation": "#14b8a6",
+  UX: "#d946ef",
+  Frontend: "#f97316",
+  Backend: "#6366f1",
+};
+
+export function getDisciplineColor(discipline) {
+  return disciplineColorHex[discipline] ?? "#6b7280";
+}
+
+// Work Area Type colors — hash-based so any type name always gets the
+// same color consistently across every component.
+const TYPE_COLOR_PALETTE = [
+  "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444",
+  "#06b6d4", "#ec4899", "#6366f1", "#84cc16", "#f97316",
+  "#14b8a6", "#a855f7",
+];
+
+export function getWorkAreaTypeColor(typeName) {
+  if (!typeName) return "#6b7280";
+  let hash = 0;
+  for (let i = 0; i < typeName.length; i++) {
+    hash = (hash * 31 + typeName.charCodeAt(i)) & 0xffff;
+  }
+  return TYPE_COLOR_PALETTE[hash % TYPE_COLOR_PALETTE.length];
+}
+
+// Returns the display color for a work area: uses its stored color if set,
+// otherwise falls back to its type color.
+export function getWorkAreaColor(wa) {
+  if (wa?.color) return wa.color;
+  return getWorkAreaTypeColor(wa?.type);
+}
+
 export const isIframe = window.self !== window.top;

@@ -8,7 +8,7 @@ import { Users, Settings2 } from "lucide-react";
 import DisciplineBadge from "../shared/DisciplineBadge.jsx";
 import AllocationCell from "./AllocationCell";
 import QuarterlyAllocationDialog from "./QuarterlyAllocationDialog";
-import { cn } from "@/lib/utils";
+import { cn, getWorkAreaColor } from "@/lib/utils";
 
 export default function QuarterlyAllocationTable({
   members,
@@ -170,7 +170,7 @@ export default function QuarterlyAllocationTable({
               {groupedWAs.map(wa => (
                 <TableHead key={wa.id} className={cn("text-xs text-center font-semibold text-primary min-w-[130px] max-w-[180px]", getGroupBorder(wa))}>
                   <div className="flex items-start justify-center gap-1.5 px-1">
-                    <div className="w-2.5 h-2.5 rounded-full shrink-0 mt-0.5" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0 mt-0.5" style={{ backgroundColor: getWorkAreaColor(wa) }} />
                     <span className="line-clamp-2 text-left leading-tight" title={wa.name}>{wa.name}</span>
                   </div>
                 </TableHead>
@@ -290,7 +290,7 @@ export default function QuarterlyAllocationTable({
                       return (
                         <div key={wa.id}>
                           <div className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getWorkAreaColor(wa) }} />
                             {wa.name}
                           </div>
                           {canEdit ? (

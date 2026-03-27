@@ -51,6 +51,7 @@ model WorkAreaType {
 model WorkArea {
   id                  String    @id @default(uuid())
   name                String
+  color               String?
   type                String?
   leading_team_id     String?
   supporting_team_ids String[]

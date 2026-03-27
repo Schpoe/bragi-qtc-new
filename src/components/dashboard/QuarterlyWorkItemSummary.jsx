@@ -1,13 +1,6 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const typeColors = {
-  Feature: "hsl(var(--chart-1))",
-  Bug: "hsl(var(--chart-2))",
-  Epic: "hsl(var(--chart-3))",
-  Task: "hsl(var(--chart-4))",
-  Improvement: "hsl(var(--chart-5))",
-};
+import { getWorkAreaColor, getWorkAreaTypeColor } from "@/lib/utils";
 
 function HBar({ value, max, color }) {
   const width = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -59,7 +52,7 @@ export default function QuarterlyWorkItemSummary({
         const wa = workAreas.find((w) => w.id === waId);
         return {
           name: wa?.name ?? "Unknown",
-          color: wa?.color,
+          color: getWorkAreaColor(wa),
           pct: Math.round(sum / memberCount),
         };
       })
@@ -127,7 +120,7 @@ export default function QuarterlyWorkItemSummary({
           <CardContent className="pt-4">
             <div className="space-y-3">
               {typeBreakdown.map(({ type, pct }) => {
-                const color = typeColors[type] || "hsl(var(--chart-1))";
+                const color = getWorkAreaTypeColor(type);
                 return (
                   <div key={type}>
                     <div className="flex items-center justify-between mb-1">

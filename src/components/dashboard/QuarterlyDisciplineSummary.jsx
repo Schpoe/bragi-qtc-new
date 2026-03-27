@@ -1,14 +1,6 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-
-const disciplineColors = {
-  iOS: "#3b82f6",
-  Android: "#10b981",
-  Cloud: "#8b5cf6",
-  QA: "#f59e0b",
-  Embedded: "#ef4444",
-};
+import { cn, getDisciplineColor } from "@/lib/utils";
 
 export default function QuarterlyDisciplineSummary({
   members,
@@ -53,7 +45,7 @@ export default function QuarterlyDisciplineSummary({
       <CardContent className="pt-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
           {breakdown.map(({ discipline, util, count }) => {
-            const color = disciplineColors[discipline] || "#6b7280";
+            const color = getDisciplineColor(discipline);
             return (
               <div key={discipline}>
                 <div className="flex items-center justify-between mb-1">

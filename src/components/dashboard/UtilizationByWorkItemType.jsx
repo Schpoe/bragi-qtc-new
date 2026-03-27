@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-
-const typeColors = {
-  Feature: "hsl(var(--chart-1))",
-  Bug: "hsl(var(--chart-2))",
-  Epic: "hsl(var(--chart-3))",
-  Task: "hsl(var(--chart-4))",
-  Improvement: "hsl(var(--chart-5))",
-};
+import { cn, getWorkAreaTypeColor } from "@/lib/utils";
 
 export default function UtilizationByWorkItemType({ workAreas, allocations, members, sprints, selectedTeamId }) {
   const [sortBy, setSortBy] = useState("name");
@@ -67,7 +59,7 @@ export default function UtilizationByWorkItemType({ workAreas, allocations, memb
           {sortedTypes.map(type => {
             const util = getUtilization(type);
             const count = workAreas.filter(wa => wa.type === type).length;
-            const color = typeColors[type] || "hsl(var(--chart-1))";
+            const color = getWorkAreaTypeColor(type);
             return (
               <div key={type}>
                 <div className="flex items-center justify-between mb-1.5">

@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+import { getWorkAreaTypeColor } from "@/lib/utils";
 
 export default function WorkAreaTypeDistribution({ teams, workAreas, allocations, members, selectedTeamId }) {
   // Filter work items based on team selection
@@ -74,7 +74,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
           <Card key={idx}>
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-2xl font-bold" style={{ color: COLORS[idx % COLORS.length] }}>
+                <div className="text-2xl font-bold" style={{ color: getWorkAreaTypeColor(type.name) }}>
                   {type.count}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 truncate">{type.name}</div>
@@ -106,7 +106,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
                   dataKey="value"
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={getWorkAreaTypeColor(entry.name)} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -147,7 +147,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
                   <div className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+                      style={{ backgroundColor: getWorkAreaTypeColor(type.name) }}
                     />
                     <span className="text-sm font-medium">{type.name}</span>
                   </div>
@@ -159,7 +159,7 @@ export default function WorkAreaTypeDistribution({ teams, workAreas, allocations
                   <div
                     className="h-full rounded-full"
                     style={{
-                      backgroundColor: COLORS[idx % COLORS.length],
+                      backgroundColor: getWorkAreaTypeColor(type.name),
                       width: `${Math.min(type.allocation, 100)}%`,
                     }}
                   />
