@@ -29,7 +29,7 @@ export default function UserProfile() {
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['userProfile', userId],
-    queryFn: () => base44.entities.User.filter({ id: userId }).then(users => users[0]),
+    queryFn: () => base44.entities.User.get(userId),
     enabled: !!userId,
     // Team Managers lack direct read access to the User entity via RLS.
     // When viewing their own profile, seed from the auth context user (already fetched via service role at login).
