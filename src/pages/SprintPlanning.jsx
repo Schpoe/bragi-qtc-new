@@ -140,9 +140,13 @@ export default function SprintPlanning() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["quarterlyAllocations"] }),
   });
 
-  // Fire-and-forget history log — failures are silent so they never block the user
+  // Fire-and-forget history log — silently no-ops if the entity doesn't exist yet
   const logQuarterlyHistory = (entry) => {
-    base44.entities.QuarterlyPlanHistory.create(entry).catch(() => {});
+    try {
+      base44.entities.QuarterlyPlanHistory?.create(entry)?.catch(() => {});
+    } catch {
+      // Entity not yet created in base44 — ignore
+    }
   };
 
   const updateWorkAreaSelection = useMutation({
