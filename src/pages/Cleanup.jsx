@@ -107,6 +107,7 @@ function CategorySection({ title, description, items, selectedIds, onSelectAll, 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 const EMPTY_SELECTION = {
+  emptyTeams: new Set(),
   members: new Set(),
   sprints: new Set(),
   allocations: new Set(),
@@ -243,7 +244,12 @@ export default function CleanupPage() {
       (s.relevant_work_area_ids || []).some(waId => !workAreaIds.has(waId))
     );
 
+    // 15. Teams with no members — appear in Team Overview but have no capacity
+    const memberTeamIds = new Set(members.map(m => m.team_id));
+    const emptyTeams = teams.filter(t => !memberTeamIds.has(t.id));
+
     return {
+      emptyTeams,
       members: orphanMembers,
       sprints: orphanSprints,
       allocations: orphanAllocations,
@@ -274,6 +280,7 @@ export default function CleanupPage() {
   const deselectAll = (category) => setSelected(prev => ({ ...prev, [category]: new Set() }));
 
   const selectAllOrphans = () => setSelected({
+    emptyTeams:           new Set(orphans.emptyTeams.map(i => i.id)),
     members:              new Set(orphans.members.map(i => i.id)),
     sprints:              new Set(orphans.sprints.map(i => i.id)),
     allocations:          new Set(orphans.allocations.map(i => i.id)),
@@ -289,6 +296,7 @@ export default function CleanupPage() {
   });
 
   const totalSelected =
+    selected.emptyTeams.size +
     selected.members.size + selected.sprints.size + selected.allocations.size +
     selected.templateAllocations.size + selected.zeroAllocations.size +
     selected.quarterlyAllocations.size + selected.zeroQA.size +
@@ -296,6 +304,7 @@ export default function CleanupPage() {
     selected.workAreas.size + selected.unassignedAllocations.size + selected.detachedAllocations.size;
 
   const totalOrphans =
+    orphans.emptyTeams.length +
     orphans.members.length + orphans.sprints.length + orphans.allocations.length +
     orphans.templateAllocations.length + orphans.zeroAllocations.length +
     orphans.quarterlyAllocations.length + orphans.zeroQA.length +
@@ -353,6 +362,7 @@ export default function CleanupPage() {
 
   const handleDelete = async () => {
     const ops = [
+      ...[...selected.emptyTeams].map(id           => () => bragiQTC.entities.Team.delete(id)),
       ...[...selected.members].map(id              => () => bragiQTC.entities.TeamMember.delete(id)),
       ...[...selected.sprints].map(id              => () => bragiQTC.entities.Sprint.delete(id)),
       ...[...selected.allocations].map(id          => () => bragiQTC.entities.Allocation.delete(id)),
@@ -377,7 +387,7 @@ export default function CleanupPage() {
       setDeleteProgress({ done, total: ops.length });
     }
 
-    ["teamMembers", "sprints", "allocations", "quarterlyAllocations", "workAreaSelections", "workAreas"]
+    ["teams", "teamMembers", "sprints", "allocations", "quarterlyAllocations", "workAreaSelections", "workAreas"]
       .forEach(k => queryClient.invalidateQueries({ queryKey: [k] }));
 
     setSelected(EMPTY_SELECTION);
@@ -400,6 +410,18 @@ export default function CleanupPage() {
   const waName     = id => workAreas.find(w => w.id === id)?.name ?? `[deleted ${id?.slice(0, 6)}…]`;
 
   // ── Render helpers ─────────────────────────────────────────────────────────
+
+  const emptyTeamItem = (t) => {
+    const sprintCount = sprints.filter(s => !s.is_cross_team && s.team_id === t.id).length;
+    return (
+      <OrphanItem key={t.id} checked={selected.emptyTeams.has(t.id)} onToggle={() => toggle("emptyTeams", t.id)}
+        title={t.name}
+        reasons={[
+          { label: "No members", danger: true },
+          sprintCount > 0 && { label: `${sprintCount} sprint${sprintCount !== 1 ? "s" : ""} will become orphaned on next scan`, danger: false },
+        ].filter(Boolean)} />
+    );
+  };
 
   const memberItem = (m) => (
     <OrphanItem key={m.id} checked={selected.members.has(m.id)} onToggle={() => toggle("members", m.id)}
@@ -643,6 +665,12 @@ export default function CleanupPage() {
           )}
 
           {/* ── Deletable categories ──────────────────────────────────────── */}
+          <CategorySection title="Teams Without Members"
+            description="Teams with no members — shown in Team Overview but have no capacity; their sprints will surface as orphans after deletion"
+            items={orphans.emptyTeams} selectedIds={selected.emptyTeams}
+            onSelectAll={() => selectAll("emptyTeams")} onDeselectAll={() => deselectAll("emptyTeams")}
+            renderItem={emptyTeamItem} defaultOpen={orphans.emptyTeams.length > 0} />
+
           <CategorySection title="Team Members" description="Members whose team has been deleted"
             items={orphans.members} selectedIds={selected.members}
             onSelectAll={() => selectAll("members")} onDeselectAll={() => deselectAll("members")}
@@ -764,6 +792,7 @@ export default function CleanupPage() {
 
           <div className="space-y-2 py-2 max-h-52 overflow-y-auto">
             {[
+              { key: "emptyTeams",           label: "Teams (no members)",             nameFn: t => t.name,                             src: teams },
               { key: "members",              label: "Team Members",                   nameFn: m => `${m.name} (${m.discipline})`,      src: members },
               { key: "sprints",              label: "Sprints",                        nameFn: s => `${s.name} — ${s.quarter}`,         src: sprints },
               { key: "allocations",          label: "Sprint Allocations",             nameFn: null,                                    src: allocations },
