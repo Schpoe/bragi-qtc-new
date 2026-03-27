@@ -3,7 +3,6 @@ import { bragiQTC } from "@/api/bragiQTCClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarRange, AlertTriangle } from "lucide-react";
 import { getCurrentQuarter } from "@/lib/quarter-utils";
 import { useQuarters } from "@/lib/useQuarters";
@@ -180,14 +179,7 @@ export default function Dashboard() {
             selectedTeamId={selectedTeamId}
           />
 
-          <Tabs defaultValue="quarterly" className="mb-6">
-            <TabsList className="grid w-full grid-cols-2 max-w-md mb-6">
-              <TabsTrigger value="quarterly">Quarterly Plan</TabsTrigger>
-              <TabsTrigger value="sprint">Sprint Plan</TabsTrigger>
-            </TabsList>
-
-            {/* ── Quarterly Plan tab ──────────────────────────────────────── */}
-            <TabsContent value="quarterly">
+          <div className="mb-6">
               <div className="flex justify-end mb-4">
                 <QuarterlyExportButtons
                   teams={teams}
@@ -280,10 +272,10 @@ export default function Dashboard() {
                   </>
                 )}
               </div>
-            </TabsContent>
+            </div>
 
-            {/* ── Sprint Planning tab ─────────────────────────────────────── */}
-            <TabsContent value="sprint">
+            {/* Sprint Plan tab hidden — kept for future use */}
+            {false && <div>
               {quarterSprints.length === 0 ? (
                 <EmptyState
                   icon={CalendarRange}
@@ -365,8 +357,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
+            </div>}
         </>
       )}
     </div>

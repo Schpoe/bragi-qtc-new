@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { getCurrentQuarter } from "@/lib/quarter-utils";
@@ -416,13 +415,7 @@ export default function SprintPlanning() {
          showTeamFilter={true}
        />
 
-      <Tabs defaultValue="quarterly" className="mb-6">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="quarterly">Quarterly Plan</TabsTrigger>
-          <TabsTrigger value="sprints">Sprint Plan</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="quarterly">
+      <div className="mb-6">
           {!effectiveTeamId ? (
             <EmptyState icon={CalendarRange} title="Select a team" description="Choose a team from the filter to view the quarterly plan." />
           ) : teamsLoading || sprintsLoading ? (
@@ -461,9 +454,10 @@ export default function SprintPlanning() {
               />
             </>
           )}
-        </TabsContent>
+        </div>
 
-        <TabsContent value="sprints">
+        {/* Sprint Plan tab hidden — kept for future use */}
+        {false && <div>
       {teamsLoading || sprintsLoading ? (
         <div className="space-y-4">
           {[1, 2].map(i => <Skeleton key={i} className="h-48 rounded-xl" />)}
@@ -601,8 +595,7 @@ export default function SprintPlanning() {
           })}
         </div>
       )}
-       </TabsContent>
-      </Tabs>
+       </div>}
 
       <SprintFormDialog
         open={sprintDialogOpen}
