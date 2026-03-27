@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  password_hash    String
+  full_name        String?
+  role             String   @default("viewer")
+  managed_team_ids String[]
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  lead_id     String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model TeamMember {
+  id                   String   @id @default(uuid())
+  team_id              String
+  name                 String
+  discipline           String
+  availability_percent Int      @default(100)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+}
+
+model WorkAreaType {
+  id         String   @id @default(uuid())
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model WorkArea {
+  id                  String    @id @default(uuid())
+  name                String
+  type                String?
+  leading_team_id     String?
+  supporting_team_ids String[]
+  prod_id             String?
+  jira_key            String?
+  jira_status         String?
+  jira_progress       Int?
+  last_synced         DateTime?
+  linked_epic_keys    String[]
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+}
+
+model Sprint {
+  id            String    @id @default(uuid())
+  team_id       String?
+  name          String
+  quarter       String
+  start_date    DateTime?
+  end_date      DateTime?
+  is_cross_team Boolean   @default(false)
+  is_template   Boolean   @default(false)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+}
+
+model Allocation {
+  id             String   @id @default(uuid())
+  sprint_id      String
+  team_member_id String
+  work_area_id   String
+  percentage     Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model QuarterlyAllocation {
+  id             String   @id @default(uuid())
+  quarter        String
+  team_member_id String
+  work_area_id   String
+  percentage     Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model QuarterlyWorkAreaSelection {
+  id            String   @id @default(uuid())
+  quarter       String
+  team_id       String
+  work_area_ids String[]
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
+
+model QuarterlyPlanHistory {
+  id             String   @id @default(uuid())
+  quarter        String
+  timestamp      DateTime @default(now())
+  user_id        String?
+  action         String?
+  team_id        String?
+  team_member_id String?
+  work_area_id   String?
+  old_value      String?
+  new_value      String?
+  created_at     DateTime @default(now())
+}
+
+model JiraSyncHistory {
+  id             String   @id @default(uuid())
+  timestamp      DateTime @default(now())
+  jql            String?
+  result_summary Json?
+  created_at     DateTime @default(now())
+}

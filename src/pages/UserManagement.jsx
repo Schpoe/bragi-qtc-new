@@ -33,28 +33,13 @@ export default function UserManagement() {
     queryFn: () => base44.entities.Team.list(),
   });
 
-  // Apply pending team assignments on mount
-  React.useEffect(() => {
-    const applyPendingTeams = async () => {
-      try {
-        const response = await base44.functions.invoke('applyPendingTeams', {});
-        if (response.data?.applied) {
-          queryClient.invalidateQueries({ queryKey: ["users"] });
-          toast.success("Team assignments have been applied to your account");
-        }
-      } catch (error) {
-        console.error("Failed to apply pending teams:", error);
-      }
-    };
-    applyPendingTeams();
-  }, []);
-
   const createUser = useMutation({
     mutationFn: async (data) => {
       const response = await base44.functions.invoke('inviteUserWithTeams', {
         email: data.email,
         role: data.role,
-        managed_team_ids: data.managed_team_ids || []
+        managed_team_ids: data.managed_team_ids || [],
+        initial_password: data.initial_password,
       });
       if (response.data?.error) {
         throw new Error(response.data.error);
@@ -65,10 +50,10 @@ export default function UserManagement() {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       setEditingUser(null);
       setUserDialogOpen(false);
-      toast.success(data?.message || "Invitation sent successfully!");
+      toast.success("User created successfully!");
     },
     onError: (error) => {
-      toast.error("Failed to send invitation: " + (error.response?.data?.error || error.message));
+      toast.error("Failed to create user: " + error.message);
     }
   });
 

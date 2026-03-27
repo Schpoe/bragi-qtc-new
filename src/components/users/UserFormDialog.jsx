@@ -14,6 +14,7 @@ export default function UserFormDialog({ open, onOpenChange, user, teams, onSave
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [position, setPosition] = useState("");
+  const [initialPassword, setInitialPassword] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -30,6 +31,7 @@ export default function UserFormDialog({ open, onOpenChange, user, teams, onSave
       setFirstName("");
       setLastName("");
       setPosition("");
+      setInitialPassword("");
     }
   }, [user, open]);
 
@@ -49,9 +51,10 @@ export default function UserFormDialog({ open, onOpenChange, user, teams, onSave
         managed_team_ids: role === "team_manager" ? managedTeamIds : []
       });
     } else {
-      // Inviting new user - email, role, and managed teams
+      // Creating new user - email, password, role, and managed teams
       onSave({
         email,
+        initial_password: initialPassword,
         role,
         managed_team_ids: role === "team_manager" ? managedTeamIds : []
       });
@@ -72,10 +75,10 @@ export default function UserFormDialog({ open, onOpenChange, user, teams, onSave
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{user ? "Edit User" : "Invite User"}</DialogTitle>
+          <DialogTitle>{user ? "Edit User" : "Create User"}</DialogTitle>
           {isCreatingNew && (
             <p className="text-sm text-muted-foreground mt-2">
-              An invitation email will be sent. Additional details can be added after the user accepts.
+              Set an initial password the user can change after first login.
             </p>
           )}
         </DialogHeader>
@@ -89,17 +92,30 @@ export default function UserFormDialog({ open, onOpenChange, user, teams, onSave
               </div>
             </div>
           ) : (
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address *</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="user@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="user@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="initial_password">Initial Password *</Label>
+                <Input
+                  id="initial_password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={initialPassword}
+                  onChange={(e) => setInitialPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </>
           )}
 
           <div className="space-y-2">
@@ -157,7 +173,7 @@ export default function UserFormDialog({ open, onOpenChange, user, teams, onSave
               type="submit" 
               disabled={isLoading || (role === "team_manager" && managedTeamIds.length === 0)}
             >
-              {isLoading ? "Sending..." : user ? "Update User" : "Send Invitation"}
+              {isLoading ? "Saving..." : user ? "Update User" : "Create User"}
             </Button>
           </DialogFooter>
         </form>
