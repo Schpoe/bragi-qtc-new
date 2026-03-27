@@ -134,6 +134,18 @@ export default function Dashboard() {
       .sort((a, b) => b.total - a.total);
   }, [members, quarterlyTabMembers, quarterlyAllocations, selectedQuarter, selectedTeamId, teams]);
 
+  // Group quarterly alerts by team → discipline for display
+  const quarterlyAlertsByTeam = useMemo(() => {
+    const byTeam = {};
+    quarterlyAlerts.forEach(({ member, total, teamName }) => {
+      if (!byTeam[teamName]) byTeam[teamName] = {};
+      const disc = member.discipline || "Other";
+      if (!byTeam[teamName][disc]) byTeam[teamName][disc] = [];
+      byTeam[teamName][disc].push({ name: member.name, total });
+    });
+    return byTeam;
+  }, [quarterlyAlerts]);
+
   const isLoading = teamsLoading;
 
   return (
@@ -186,7 +198,7 @@ export default function Dashboard() {
                   selectedTeamId={selectedTeamId}
                 />
               </div>
-              {/* Over-allocation alerts */}
+              {/* Over-allocation alerts — grouped by team → discipline */}
               {quarterlyAlerts.length > 0 && (
                 <Card className="border-destructive/40 bg-destructive/5 mb-4">
                   <CardHeader className="pb-2 pt-4">
@@ -195,22 +207,28 @@ export default function Dashboard() {
                       Over-allocation Alerts — {quarterlyAlerts.length} member{quarterlyAlerts.length !== 1 ? "s" : ""} exceed 100%
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pb-4">
-                    <div className="flex flex-wrap gap-2">
-                      {quarterlyAlerts.map(({ member, total, teamName }) => (
-                        <div key={member.id} className="flex items-center gap-1.5 bg-background border border-destructive/30 rounded-md px-2 py-1 text-xs">
-                          <span className="font-semibold text-destructive">{total}%</span>
-                          <span className="text-muted-foreground">—</span>
-                          {selectedTeamId === "all" && (
-                            <>
-                              <span className="font-medium">{teamName}</span>
-                              <span className="text-muted-foreground">/</span>
-                            </>
-                          )}
-                          <span>{member.name}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <CardContent className="pb-4 space-y-3">
+                    {Object.entries(quarterlyAlertsByTeam).map(([teamName, byDisc]) => (
+                      <div key={teamName}>
+                        {selectedTeamId === "all" && (
+                          <p className="text-xs font-semibold text-muted-foreground mb-1.5">{teamName}</p>
+                        )}
+                        {Object.entries(byDisc).map(([disc, members]) => (
+                          <div key={disc} className="mb-1.5">
+                            <p className="text-xs text-muted-foreground mb-1">{disc}</p>
+                            <div className="flex flex-wrap gap-2">
+                              {members.map(({ name, total }) => (
+                                <div key={name} className="flex items-center gap-1.5 bg-background border border-destructive/30 rounded-md px-2 py-1 text-xs">
+                                  <span className="font-semibold text-destructive">{total}%</span>
+                                  <span className="text-muted-foreground">—</span>
+                                  <span>{name}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
               )}
@@ -274,24 +292,15 @@ export default function Dashboard() {
                 />
               ) : (
                 <div className="space-y-6">
-                  <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-                    <CardHeader className="pb-3 border-b border-primary/10">
-                      <CardTitle className="text-base font-bold text-primary">
-                        Executive Summary — {selectedQuarter}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <ExecutiveSummary
-                        teams={teams}
-                        sprints={sprints}
-                        members={members}
-                        allocations={allocations}
-                        workAreas={workAreas}
-                        selectedQuarter={selectedQuarter}
-                        selectedTeamId={selectedTeamId}
-                      />
-                    </CardContent>
-                  </Card>
+                  <ExecutiveSummary
+                    teams={teams}
+                    sprints={sprints}
+                    members={members}
+                    allocations={allocations}
+                    workAreas={workAreas}
+                    selectedQuarter={selectedQuarter}
+                    selectedTeamId={selectedTeamId}
+                  />
 
                   <TeamCapacityChart
                     teams={teams}

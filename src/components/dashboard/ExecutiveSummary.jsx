@@ -128,18 +128,28 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
     }).filter((t) => t.teamMemberCount > 0);
   }, [teams, sprints, members, allocations, workAreas, selectedQuarter]);
 
-  // Alert items: over-allocated sprints
-  const alerts = useMemo(() => {
-    const items = [];
+  // Alert items grouped by team → discipline
+  const alertsByTeam = useMemo(() => {
+    const result = {};
     data.forEach(({ team, sprintStats }) => {
-      sprintStats.forEach(({ sprint, utilPct, overAllocated }) => {
-        if (utilPct > 100) {
-          items.push({ team: team.name, sprint: sprint.name, utilPct, overAllocated: overAllocated.length });
-        }
-      });
+      const overSprints = sprintStats
+        .filter(({ utilPct }) => utilPct > 100)
+        .map(({ sprint, utilPct, overAllocated }) => {
+          // Count over-allocated members per discipline
+          const byDisc = {};
+          overAllocated.forEach((m) => {
+            const disc = m.discipline || "Other";
+            byDisc[disc] = (byDisc[disc] || 0) + 1;
+          });
+          return { sprintName: sprint.name, utilPct, byDisc };
+        })
+        .sort((a, b) => b.utilPct - a.utilPct);
+      if (overSprints.length > 0) result[team.name] = overSprints;
     });
-    return items.sort((a, b) => b.utilPct - a.utilPct);
+    return result;
   }, [data]);
+
+  const totalAlertSprints = Object.values(alertsByTeam).reduce((s, arr) => s + arr.length, 0);
 
   if (data.length === 0) {
     return (
@@ -157,33 +167,38 @@ export default function ExecutiveSummary({ teams, sprints, members, allocations,
       </div>
 
 
-      {/* Alert banner */}
-      {alerts.length > 0 &&
-      <Card className="border-destructive/40 bg-destructive/5">
+      {/* Alert banner — grouped by team → discipline */}
+      {totalAlertSprints > 0 && (
+        <Card className="border-destructive/40 bg-destructive/5">
           <CardHeader className="pb-2 pt-4">
             <CardTitle className="text-sm flex items-center gap-2 text-destructive">
               <AlertTriangle className="w-4 h-4" />
-              Over-allocation Alerts ({alerts.length} sprint{alerts.length !== 1 ? "s" : ""})
+              Over-allocation Alerts ({totalAlertSprints} sprint{totalAlertSprints !== 1 ? "s" : ""})
             </CardTitle>
           </CardHeader>
-          <CardContent className="pb-4">
-            <div className="flex flex-wrap gap-2">
-              {alerts.map((a, i) =>
-            <div key={i} className="flex items-center gap-1.5 bg-background border border-destructive/30 rounded-md px-2 py-1 text-xs">
-                  <span className="font-semibold text-destructive">{a.utilPct}%</span>
-                  <span className="text-muted-foreground">—</span>
-                  <span className="font-medium">{a.team}</span>
-                  <span className="text-muted-foreground">/</span>
-                  <span>{a.sprint}</span>
-                  {a.overAllocated > 0 &&
-              <span className="ml-1 text-destructive/70">({a.overAllocated} member{a.overAllocated !== 1 ? "s" : ""})</span>
-              }
+          <CardContent className="pb-4 space-y-3">
+            {Object.entries(alertsByTeam).map(([teamName, sprints]) => (
+              <div key={teamName}>
+                <p className="text-xs font-semibold text-muted-foreground mb-1.5">{teamName}</p>
+                <div className="flex flex-wrap gap-2">
+                  {sprints.map(({ sprintName, utilPct, byDisc }) => (
+                    <div key={sprintName} className="flex items-center gap-1.5 bg-background border border-destructive/30 rounded-md px-2 py-1 text-xs">
+                      <span className="font-semibold text-destructive">{utilPct}%</span>
+                      <span className="text-muted-foreground">—</span>
+                      <span className="font-medium">{sprintName}</span>
+                      {Object.keys(byDisc).length > 0 && (
+                        <span className="text-destructive/70 ml-1">
+                          ({Object.entries(byDisc).map(([d, n]) => `${d}: ${n}`).join(", ")})
+                        </span>
+                      )}
+                    </div>
+                  ))}
                 </div>
-            )}
-            </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
-      }
+      )}
 
       {/* Cross-team summary tables - 2 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
