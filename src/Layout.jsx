@@ -25,7 +25,7 @@ const navItems = [
 export default function Layout({ children, currentPageName }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [impersonateDialogOpen, setImpersonateDialogOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   const filteredNavItems = navItems.filter(item => 
     !item.adminOnly || isAdmin(user)
@@ -38,7 +38,7 @@ export default function Layout({ children, currentPageName }) {
     const resetTimeout = () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        base44.auth.logout();
+        logout();
       }, 30 * 60 * 1000); // 30 minutes
     };
 
@@ -58,7 +58,7 @@ export default function Layout({ children, currentPageName }) {
   }, []);
 
   const handleLogout = () => {
-    base44.auth.logout();
+    logout();
   };
 
   return (
