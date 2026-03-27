@@ -34,6 +34,8 @@ export const teamColorHex = {
 // local color maps so all pages stay in sync.
 export function getTeamColor(team) {
   if (!team?.color) return "#6b7280";
+  // Support both new hex values (#rrggbb) and legacy named Tailwind colors
+  if (team.color.startsWith("#")) return team.color;
   return teamColorHex[team.color] ?? "#6b7280";
 }
 

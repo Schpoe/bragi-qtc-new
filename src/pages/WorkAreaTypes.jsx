@@ -14,61 +14,7 @@ import EmptyState from "../components/shared/EmptyState";
 import { useAuth } from "@/lib/AuthContext";
 import { canManageWorkAreaTypes, isViewer } from "@/lib/permissions";
 import { getWorkAreaTypeColor } from "@/lib/utils";
-
-const PRESET_COLORS = [
-  "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444",
-  "#06b6d4", "#ec4899", "#6366f1", "#84cc16", "#f97316",
-  "#14b8a6", "#a855f7", "#f43f5e", "#0ea5e9", "#64748b",
-];
-
-function ColorPicker({ value, onChange }) {
-  const activeColor = value || "";
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {PRESET_COLORS.map(c => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => onChange(c)}
-            className="w-7 h-7 rounded-full border-2 transition-all"
-            style={{
-              backgroundColor: c,
-              borderColor: activeColor === c ? "#000" : "transparent",
-              boxShadow: activeColor === c ? "0 0 0 1px #fff inset" : "none",
-            }}
-            title={c}
-          />
-        ))}
-        {/* Custom color via native picker */}
-        <label className="w-7 h-7 rounded-full border-2 border-dashed border-muted-foreground/40 flex items-center justify-center cursor-pointer hover:border-muted-foreground transition-colors overflow-hidden relative" title="Custom color">
-          <span className="text-xs text-muted-foreground leading-none select-none">+</span>
-          <input
-            type="color"
-            value={activeColor || "#6b7280"}
-            onChange={e => onChange(e.target.value)}
-            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-          />
-        </label>
-        {activeColor && (
-          <button
-            type="button"
-            onClick={() => onChange("")}
-            className="text-xs text-muted-foreground hover:text-foreground px-2 h-7 rounded border border-dashed border-muted-foreground/40"
-          >
-            Auto
-          </button>
-        )}
-      </div>
-      {activeColor && (
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: activeColor }} />
-          {activeColor}
-        </div>
-      )}
-    </div>
-  );
-}
+import ColorPicker from "@/components/shared/ColorPicker";
 
 export default function WorkAreaTypes() {
   const { user } = useAuth();
@@ -227,6 +173,7 @@ export default function WorkAreaTypes() {
               <ColorPicker
                 value={formData.color}
                 onChange={(c) => setFormData({ ...formData, color: c })}
+                showAuto
               />
               <p className="text-xs text-muted-foreground">
                 Leave on Auto to use the default assigned color.

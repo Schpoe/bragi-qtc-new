@@ -6,14 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const areaColors = [
-  "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#6366f1"
-];
+import ColorPicker from "@/components/shared/ColorPicker";
 
 export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams, onSave }) {
   const [form, setForm] = useState({
-    name: "", type: "", leading_team_id: "", supporting_team_ids: [], color: areaColors[0]
+    name: "", type: "", leading_team_id: "", supporting_team_ids: [], color: "#3b82f6"
   });
 
   const { data: workAreaTypes = [] } = useQuery({
@@ -30,10 +27,10 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
         type: workArea.type,
         leading_team_id: workArea.leading_team_id || "",
         supporting_team_ids: workArea.supporting_team_ids || [],
-        color: workArea.color || areaColors[0],
+        color: workArea.color || "#3b82f6",
       });
     } else if (workAreaTypes.length > 0) {
-      setForm({ name: "", type: workAreaTypes[0].name, leading_team_id: "", supporting_team_ids: [], color: areaColors[Math.floor(Math.random() * areaColors.length)] });
+      setForm({ name: "", type: workAreaTypes[0].name, leading_team_id: "", supporting_team_ids: [], color: "#3b82f6" });
     }
   }, [workArea, open, workAreaTypes]);
 
@@ -106,16 +103,10 @@ export default function WorkAreaFormDialog({ open, onOpenChange, workArea, teams
           </div>
           <div className="space-y-2">
             <Label>Color</Label>
-            <div className="flex gap-2">
-              {areaColors.map(c => (
-                <button
-                  key={c}
-                  onClick={() => setForm({ ...form, color: c })}
-                  className={`w-7 h-7 rounded-full transition-all ${form.color === c ? "ring-2 ring-offset-2 ring-primary" : "opacity-60 hover:opacity-100"}`}
-                  style={{ backgroundColor: c }}
-                />
-              ))}
-            </div>
+            <ColorPicker
+              value={form.color}
+              onChange={(c) => setForm({ ...form, color: c || "#3b82f6" })}
+            />
           </div>
         </div>
         <DialogFooter>

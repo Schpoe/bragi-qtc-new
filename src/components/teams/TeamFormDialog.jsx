@@ -4,38 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import ColorPicker from "@/components/shared/ColorPicker";
+import { teamColorHex } from "@/lib/utils";
 
-const colors = [
-  { value: "blue", label: "Blue", class: "bg-blue-500" },
-  { value: "indigo", label: "Indigo", class: "bg-indigo-500" },
-  { value: "purple", label: "Purple", class: "bg-purple-500" },
-  { value: "violet", label: "Violet", class: "bg-violet-500" },
-  { value: "fuchsia", label: "Fuchsia", class: "bg-fuchsia-500" },
-  { value: "pink", label: "Pink", class: "bg-pink-500" },
-  { value: "rose", label: "Rose", class: "bg-rose-500" },
-  { value: "red", label: "Red", class: "bg-red-500" },
-  { value: "orange", label: "Orange", class: "bg-orange-500" },
-  { value: "amber", label: "Amber", class: "bg-amber-500" },
-  { value: "yellow", label: "Yellow", class: "bg-yellow-500" },
-  { value: "lime", label: "Lime", class: "bg-lime-500" },
-  { value: "green", label: "Green", class: "bg-emerald-500" },
-  { value: "teal", label: "Teal", class: "bg-teal-500" },
-  { value: "cyan", label: "Cyan", class: "bg-cyan-500" },
-  { value: "sky", label: "Sky", class: "bg-sky-500" },
-  { value: "slate", label: "Slate", class: "bg-slate-500" },
-  { value: "gray", label: "Gray", class: "bg-gray-500" },
-  { value: "zinc", label: "Zinc", class: "bg-zinc-500" },
-  { value: "stone", label: "Stone", class: "bg-stone-500" },
-];
+// Convert a stored color value (named or hex) to a hex string for the picker
+function toHex(color) {
+  if (!color) return "#3b82f6";
+  if (color.startsWith("#")) return color;
+  return teamColorHex[color] ?? "#3b82f6";
+}
 
 export default function TeamFormDialog({ open, onOpenChange, team, onSave }) {
-  const [form, setForm] = useState({ name: "", description: "", color: "blue" });
+  const [form, setForm] = useState({ name: "", description: "", color: "#3b82f6" });
 
   useEffect(() => {
     if (team) {
-      setForm({ name: team.name, description: team.description || "", color: team.color || "blue" });
+      setForm({ name: team.name, description: team.description || "", color: toHex(team.color) });
     } else {
-      setForm({ name: "", description: "", color: "blue" });
+      setForm({ name: "", description: "", color: "#3b82f6" });
     }
   }, [team, open]);
 
@@ -62,16 +48,10 @@ export default function TeamFormDialog({ open, onOpenChange, team, onSave }) {
           </div>
           <div className="space-y-2">
             <Label>Color</Label>
-            <div className="grid grid-cols-10 gap-2">
-              {colors.map(c => (
-                <button
-                  key={c.value}
-                  onClick={() => setForm({ ...form, color: c.value })}
-                  className={`w-8 h-8 rounded-full ${c.class} transition-all ${form.color === c.value ? "ring-2 ring-offset-2 ring-primary" : "opacity-60 hover:opacity-100"}`}
-                  title={c.label}
-                />
-              ))}
-            </div>
+            <ColorPicker
+              value={form.color}
+              onChange={(c) => setForm({ ...form, color: c || "#3b82f6" })}
+            />
           </div>
         </div>
         <DialogFooter>
