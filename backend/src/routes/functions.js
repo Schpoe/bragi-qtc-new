@@ -103,21 +103,41 @@ router.post('/cleanupAllOrphans', requireAdmin, async (_req, res) => {
   }
 });
 
+// Test Jira connectivity (credentials + reachability)
+router.post('/testJiraConnection', requireAdmin, async (_req, res) => {
+  if (!jira.isConfigured()) {
+    return res.json({ data: { ok: false, error: 'Jira credentials not configured (JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN)' } });
+  }
+  try {
+    const fieldMap = await jira.fetchFieldMap();
+    const fieldCount = Object.keys(fieldMap).length;
+    return res.json({ data: { ok: true, fieldCount, baseUrl: process.env.JIRA_BASE_URL } });
+  } catch (err) {
+    return res.json({ data: { ok: false, error: err.message } });
+  }
+});
+
 // Jira preview import
 router.post('/jiraSync', requireAdmin, async (req, res) => {
   try {
     if (!jira.isConfigured()) {
-      return res.status(500).json({ error: 'Jira credentials not configured' });
+      return res.status(400).json({ error: 'Jira credentials not configured (set JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN in .env)' });
     }
     const { jql } = req.body;
     if (!jql) return res.status(400).json({ error: 'jql is required' });
+
+    const logs = [];
 
     const fieldMap = await jira.fetchFieldMap();
     const leadingTeamField = fieldMap['Leading Team'];
     const contributingTeamsField = fieldMap['Contributing Teams'];
     const typeField = fieldMap['Type'];
 
+    logs.push(`Connected to ${process.env.JIRA_BASE_URL} — fetched ${Object.keys(fieldMap).length} fields`);
+    logs.push(`Field mapping: Leading Team → ${leadingTeamField || '(not found)'}, Contributing Teams → ${contributingTeamsField || '(not found)'}, Type → ${typeField || '(not found)'}`);
+
     const issues = await jira.searchJql(jql);
+    logs.push(`JQL returned ${issues.length} issue(s)`);
 
     const workAreaTypes = new Set();
     const teams = new Set();
@@ -165,9 +185,13 @@ router.post('/jiraSync', requireAdmin, async (req, res) => {
       });
     }
 
+    if (teams.size > 0) logs.push(`Teams found in issues: ${[...teams].join(', ')}`);
+    else logs.push('Warning: no leading/contributing team values found in issues (check field mapping)');
+
     res.json({
       data: {
         success: true,
+        logs,
         workAreaTypes: [...workAreaTypes],
         teams: [...teams],
         workAreas,
