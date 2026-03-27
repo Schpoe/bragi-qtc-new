@@ -51,10 +51,11 @@ async function importTeams() {
     if (!row[3]) continue;
     await prisma.team.upsert({
       where: { id: row[3] },
-      update: {},
+      update: { name: row[0], color: row[1] || null, description: row[2] || null },
       create: {
         id: row[3],
         name: row[0],
+        color: row[1] || null,
         description: row[2] || null,
         created_at: parseDate(row[4]) || new Date(),
         updated_at: parseDate(row[5]) || new Date(),
