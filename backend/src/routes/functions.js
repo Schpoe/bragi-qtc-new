@@ -25,7 +25,7 @@ router.post('/inviteUserWithTeams', requireAdmin, async (req, res) => {
 });
 
 // Delete allocations referencing missing members/sprints/work areas
-router.post('/cleanupOrphanedAllocations', requireAdmin, async (req, res) => {
+router.post('/cleanupOrphanedAllocations', requireAdmin, async (_req, res) => {
   try {
     const [allocations, members, workAreas] = await Promise.all([
       prisma.allocation.findMany(),
@@ -49,7 +49,7 @@ router.post('/cleanupOrphanedAllocations', requireAdmin, async (req, res) => {
 });
 
 // Comprehensive orphan cleanup
-router.post('/cleanupAllOrphans', requireAdmin, async (req, res) => {
+router.post('/cleanupAllOrphans', requireAdmin, async (_req, res) => {
   try {
     const [teams, teamMembers, sprints, allocations, workAreas] = await Promise.all([
       prisma.team.findMany({ select: { id: true } }),
@@ -104,7 +104,7 @@ router.post('/cleanupAllOrphans', requireAdmin, async (req, res) => {
 });
 
 // Jira preview import
-router.post('/jiraSync', requireAuth, async (req, res) => {
+router.post('/jiraSync', requireAdmin, async (req, res) => {
   try {
     if (!jira.isConfigured()) {
       return res.status(500).json({ error: 'Jira credentials not configured' });
@@ -181,7 +181,7 @@ router.post('/jiraSync', requireAuth, async (req, res) => {
 });
 
 // Sync Jira status to all work areas that have a jira_key
-router.post('/syncJiraIssues', requireAdmin, async (req, res) => {
+router.post('/syncJiraIssues', requireAdmin, async (_req, res) => {
   try {
     if (!jira.isConfigured()) {
       return res.status(500).json({ error: 'Jira credentials not configured' });

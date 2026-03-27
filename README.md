@@ -1,39 +1,55 @@
-**Welcome to your Base44 project** 
+# Bragi QTC
 
-**About**
+Sprint capacity planning tool for Bragi. Self-hosted via Docker.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+## Prerequisites
 
-This project contains everything you need to run your app locally.
+- Docker and Docker Compose
 
-**Edit the code in your local development environment**
+## Setup
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+1. Clone the repository
+2. Create a `.env` file from the example:
+   ```bash
+   cp .env.example .env
+   ```
+3. Edit `.env` and set:
+   - `DB_PASSWORD` — a strong random password for PostgreSQL
+   - `JWT_SECRET` — a random string of at least 32 characters
+   - `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` — initial admin credentials
+   - Optionally configure Jira integration fields
 
-**Prerequisites:** 
+## Running
 
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
-
+```bash
+docker compose up --build
 ```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
 
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+The app will be available at [http://localhost](http://localhost) (or the port set via `PORT` in `.env`).
+
+On first boot the database schema is applied automatically and the admin user is seeded.
+
+## Data Migration (from Base44)
+
+If you have CSV exports from Base44, place them in the `import/` folder and run:
+
+```bash
+docker compose exec backend node prisma/migrate-from-base44.js
 ```
 
-Run the app: `npm run dev`
+## Development
 
-**Publish your changes**
+Frontend (Vite dev server):
+```bash
+npm install
+npm run dev
+```
 
-Open [Base44.com](http://Base44.com) and click on Publish.
+Backend:
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-**Docs & Support**
-
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
-
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+The backend requires a running PostgreSQL instance. Set `DATABASE_URL` in `backend/.env`.
