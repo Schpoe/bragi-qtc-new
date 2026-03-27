@@ -117,6 +117,8 @@ const EMPTY_SELECTION = {
   workAreaSelections: new Set(),
   unassignedWorkAreas: new Set(),
   workAreas: new Set(),
+  unassignedAllocations: new Set(),
+  detachedAllocations: new Set(),
 };
 
 export default function CleanupPage() {
@@ -127,20 +129,22 @@ export default function CleanupPage() {
   const [repairing, setRepairing] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: teams = [], isLoading: teamsLoading, refetch: refetchTeams } = useQuery({ queryKey: ["teams"], queryFn: () => bragiQTC.entities.Team.list() });
-  const { data: members = [], isLoading: membersLoading, refetch: refetchMembers } = useQuery({ queryKey: ["teamMembers"], queryFn: () => bragiQTC.entities.TeamMember.list() });
-  const { data: sprints = [], isLoading: sprintsLoading, refetch: refetchSprints } = useQuery({ queryKey: ["sprints"], queryFn: () => bragiQTC.entities.Sprint.list() });
-  const { data: allocations = [], isLoading: allocationsLoading, refetch: refetchAllocations } = useQuery({ queryKey: ["allocations"], queryFn: () => bragiQTC.entities.Allocation.list() });
-  const { data: workAreas = [], isLoading: workAreasLoading, refetch: refetchWorkAreas } = useQuery({ queryKey: ["workAreas"], queryFn: () => bragiQTC.entities.WorkArea.list() });
-  const { data: quarterlyAllocations = [], isLoading: qaLoading, refetch: refetchQA } = useQuery({ queryKey: ["quarterlyAllocations"], queryFn: () => bragiQTC.entities.QuarterlyAllocation.list() });
-  const { data: workAreaSelections = [], isLoading: wasLoading, refetch: refetchWAS } = useQuery({ queryKey: ["workAreaSelections"], queryFn: () => bragiQTC.entities.QuarterlyWorkAreaSelection.list() });
+  const { data: teams = [], isLoading: teamsLoading, isFetching: teamsFetching } = useQuery({ queryKey: ["teams"], queryFn: () => bragiQTC.entities.Team.list() });
+  const { data: members = [], isLoading: membersLoading, isFetching: membersFetching } = useQuery({ queryKey: ["teamMembers"], queryFn: () => bragiQTC.entities.TeamMember.list() });
+  const { data: sprints = [], isLoading: sprintsLoading, isFetching: sprintsFetching } = useQuery({ queryKey: ["sprints"], queryFn: () => bragiQTC.entities.Sprint.list() });
+  const { data: allocations = [], isLoading: allocationsLoading, isFetching: allocationsFetching } = useQuery({ queryKey: ["allocations"], queryFn: () => bragiQTC.entities.Allocation.list() });
+  const { data: workAreas = [], isLoading: workAreasLoading, isFetching: workAreasFetching } = useQuery({ queryKey: ["workAreas"], queryFn: () => bragiQTC.entities.WorkArea.list() });
+  const { data: quarterlyAllocations = [], isLoading: qaLoading, isFetching: qaFetching } = useQuery({ queryKey: ["quarterlyAllocations"], queryFn: () => bragiQTC.entities.QuarterlyAllocation.list() });
+  const { data: workAreaSelections = [], isLoading: wasLoading, isFetching: wasFetching } = useQuery({ queryKey: ["workAreaSelections"], queryFn: () => bragiQTC.entities.QuarterlyWorkAreaSelection.list() });
 
   const isLoading = teamsLoading || membersLoading || sprintsLoading || allocationsLoading || workAreasLoading || qaLoading || wasLoading;
+  const isScanning = teamsFetching || membersFetching || sprintsFetching || allocationsFetching || workAreasFetching || qaFetching || wasFetching;
+
+  const SCAN_KEYS = ["teams", "teamMembers", "sprints", "allocations", "workAreas", "quarterlyAllocations", "workAreaSelections"];
 
   const rescan = () => {
     setSelected(EMPTY_SELECTION);
-    refetchTeams(); refetchMembers(); refetchSprints(); refetchAllocations();
-    refetchWorkAreas(); refetchQA(); refetchWAS();
+    SCAN_KEYS.forEach(k => queryClient.invalidateQueries({ queryKey: [k] }));
   };
 
   // ── Orphan detection ───────────────────────────────────────────────────────
@@ -210,6 +214,35 @@ export default function CleanupPage() {
       (wa.supporting_team_ids || []).some(tid => !teamIds.has(tid))
     );
 
+    // 13. Sprint allocations with no work_area_id (unassigned) — member and sprint
+    //     exist but no work item is referenced; invisible in Sprint Plan UI
+    const unassignedAllocations = allocations.filter(a =>
+      !orphanAllocationIds.has(a.id) &&
+      !a.work_area_id &&
+      !templateSprintIds.has(a.sprint_id)
+    );
+
+    // 14. Detached sprint allocations — sprint + member + work area all exist,
+    //     but the work area is not in the sprint's relevant_work_area_ids list.
+    //     These are invisible in Sprint Plan UI but still show up in the Overview.
+    const sprintMap = Object.fromEntries(sprints.map(s => [s.id, s]));
+    const detachedAllocations = allocations.filter(a => {
+      if (orphanAllocationIds.has(a.id)) return false;
+      if (!a.work_area_id) return false;
+      const sprint = sprintMap[a.sprint_id];
+      if (!sprint || sprint.is_cross_team) return false;
+      // If sprint has no work items assigned, ALL its allocations are detached.
+      // If it has work items, only those not in the list are detached.
+      const relevantIds = sprint.relevant_work_area_ids || [];
+      return !relevantIds.includes(a.work_area_id);
+    });
+
+    // 14. Sprints with stale relevant_work_area_ids (repair-worthy — remove deleted IDs)
+    const staleSprints = sprints.filter(s =>
+      !s.is_cross_team &&
+      (s.relevant_work_area_ids || []).some(waId => !workAreaIds.has(waId))
+    );
+
     return {
       members: orphanMembers,
       sprints: orphanSprints,
@@ -219,10 +252,13 @@ export default function CleanupPage() {
       quarterlyAllocations: orphanQA,
       zeroQA,
       workAreaSelections: orphanWAS,
-      staleWAS,        // repair only
+      staleWAS,           // repair only
       workAreas: orphanWorkAreas,
       unassignedWorkAreas,
-      staleWorkAreas,  // repair only
+      staleWorkAreas,     // repair only
+      unassignedAllocations,
+      detachedAllocations,
+      staleSprints,       // repair only
     };
   }, [teams, members, sprints, allocations, quarterlyAllocations, workAreaSelections, workAreas]);
 
@@ -246,8 +282,10 @@ export default function CleanupPage() {
     quarterlyAllocations: new Set(orphans.quarterlyAllocations.map(i => i.id)),
     zeroQA:               new Set(orphans.zeroQA.map(i => i.id)),
     workAreaSelections:   new Set(orphans.workAreaSelections.map(i => i.id)),
-    unassignedWorkAreas:  new Set(orphans.unassignedWorkAreas.map(i => i.id)),
-    workAreas:            new Set(orphans.workAreas.map(i => i.id)),
+    unassignedWorkAreas:    new Set(orphans.unassignedWorkAreas.map(i => i.id)),
+    workAreas:              new Set(orphans.workAreas.map(i => i.id)),
+    unassignedAllocations:  new Set(orphans.unassignedAllocations.map(i => i.id)),
+    detachedAllocations:    new Set(orphans.detachedAllocations.map(i => i.id)),
   });
 
   const totalSelected =
@@ -255,16 +293,16 @@ export default function CleanupPage() {
     selected.templateAllocations.size + selected.zeroAllocations.size +
     selected.quarterlyAllocations.size + selected.zeroQA.size +
     selected.workAreaSelections.size + selected.unassignedWorkAreas.size +
-    selected.workAreas.size;
+    selected.workAreas.size + selected.unassignedAllocations.size + selected.detachedAllocations.size;
 
   const totalOrphans =
     orphans.members.length + orphans.sprints.length + orphans.allocations.length +
     orphans.templateAllocations.length + orphans.zeroAllocations.length +
     orphans.quarterlyAllocations.length + orphans.zeroQA.length +
     orphans.workAreaSelections.length + orphans.unassignedWorkAreas.length +
-    orphans.workAreas.length;
+    orphans.workAreas.length + orphans.unassignedAllocations.length + orphans.detachedAllocations.length;
 
-  const totalRepairable = orphans.staleWAS.length + orphans.staleWorkAreas.length;
+  const totalRepairable = orphans.staleWAS.length + orphans.staleWorkAreas.length + orphans.staleSprints.length;
 
   // ── Repair operations ──────────────────────────────────────────────────────
 
@@ -291,8 +329,17 @@ export default function CleanupPage() {
       } catch (e) { errors.push(e.message); }
     }
 
+    for (const s of orphans.staleSprints) {
+      try {
+        const cleanIds = (s.relevant_work_area_ids || []).filter(id => workAreaIds.has(id));
+        await bragiQTC.entities.Sprint.update(s.id, { relevant_work_area_ids: cleanIds });
+        repaired++;
+      } catch (e) { errors.push(e.message); }
+    }
+
     queryClient.invalidateQueries({ queryKey: ["workAreaSelections"] });
     queryClient.invalidateQueries({ queryKey: ["workAreas"] });
+    queryClient.invalidateQueries({ queryKey: ["sprints"] });
     setRepairing(false);
 
     if (errors.length > 0) {
@@ -315,7 +362,9 @@ export default function CleanupPage() {
       ...[...selected.zeroQA].map(id               => () => bragiQTC.entities.QuarterlyAllocation.delete(id)),
       ...[...selected.workAreaSelections].map(id   => () => bragiQTC.entities.QuarterlyWorkAreaSelection.delete(id)),
       ...[...selected.unassignedWorkAreas].map(id  => () => bragiQTC.entities.WorkArea.delete(id)),
-      ...[...selected.workAreas].map(id            => () => bragiQTC.entities.WorkArea.delete(id)),
+      ...[...selected.workAreas].map(id               => () => bragiQTC.entities.WorkArea.delete(id)),
+      ...[...selected.unassignedAllocations].map(id   => () => bragiQTC.entities.Allocation.delete(id)),
+      ...[...selected.detachedAllocations].map(id     => () => bragiQTC.entities.Allocation.delete(id)),
     ];
 
     setDeleteProgress({ done: 0, total: ops.length });
@@ -475,6 +524,48 @@ export default function CleanupPage() {
     );
   };
 
+  const unassignedAllocItem = (a) => {
+    const sprint = sprints.find(s => s.id === a.sprint_id);
+    return (
+      <OrphanItem key={a.id} checked={selected.unassignedAllocations.has(a.id)} onToggle={() => toggle("unassignedAllocations", a.id)}
+        title={`${a.percent}% allocation`}
+        subtitle={`Member: ${memberName(a.team_member_id)}`}
+        reasons={[
+          { label: `Sprint: ${sprint?.name ?? sprintName(a.sprint_id)}`, danger: false },
+          { label: "No work item assigned", danger: true },
+        ]} />
+    );
+  };
+
+  const detachedAllocItem = (a) => {
+    const sprint = sprints.find(s => s.id === a.sprint_id);
+    return (
+      <OrphanItem key={a.id} checked={selected.detachedAllocations.has(a.id)} onToggle={() => toggle("detachedAllocations", a.id)}
+        title={`${a.percent}% allocation`}
+        subtitle={`Member: ${memberName(a.team_member_id)}`}
+        reasons={[
+          { label: `Sprint: ${sprint?.name ?? sprintName(a.sprint_id)}`, danger: false },
+          { label: `Work item: ${waName(a.work_area_id)}`, danger: false },
+          { label: "Not in sprint's work items", danger: true },
+        ]} />
+    );
+  };
+
+  const staleSprintItem = (s) => {
+    const staleIds = (s.relevant_work_area_ids || []).filter(id => !workAreas.some(w => w.id === id));
+    return (
+      <div key={s.id} className="flex items-start gap-3 p-3 border rounded-lg bg-background">
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-sm">{s.name} — {s.quarter}</div>
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            <ReasonTag danger>{staleIds.length} deleted work item ref{staleIds.length !== 1 ? "s" : ""} in sprint list</ReasonTag>
+            <ReasonTag>{(s.relevant_work_area_ids || []).length - staleIds.length} valid refs kept</ReasonTag>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // ── Loading ────────────────────────────────────────────────────────────────
 
   if (isLoading) {
@@ -499,8 +590,8 @@ export default function CleanupPage() {
               {repairing ? "Repairing…" : `Repair Stale Refs (${totalRepairable})`}
             </Button>
           )}
-          <Button variant="outline" onClick={rescan}>
-            <RefreshCw className="w-4 h-4 mr-2" /> Re-scan
+          <Button variant="outline" onClick={rescan} disabled={isScanning}>
+            <RefreshCw className={cn("w-4 h-4 mr-2", isScanning && "animate-spin")} /> {isScanning ? "Scanning…" : "Re-scan"}
           </Button>
           {isDeletable && (
             <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
@@ -602,7 +693,33 @@ export default function CleanupPage() {
             onSelectAll={() => selectAll("workAreas")} onDeselectAll={() => deselectAll("workAreas")}
             renderItem={waItem} defaultOpen={orphans.workAreas.length > 0} />
 
+          <CategorySection title="Sprint Allocations Without Work Item"
+            description="Allocations with no work item assigned — invisible in the Sprint Plan table and excluded from utilization totals"
+            items={orphans.unassignedAllocations} selectedIds={selected.unassignedAllocations}
+            onSelectAll={() => selectAll("unassignedAllocations")} onDeselectAll={() => deselectAll("unassignedAllocations")}
+            renderItem={unassignedAllocItem} defaultOpen={orphans.unassignedAllocations.length > 0} />
+
+          <CategorySection title="Detached Sprint Allocations"
+            description="Allocations whose work item is no longer in the sprint's work item list — invisible in Sprint Plan UI but counted in the Overview"
+            items={orphans.detachedAllocations} selectedIds={selected.detachedAllocations}
+            onSelectAll={() => selectAll("detachedAllocations")} onDeselectAll={() => deselectAll("detachedAllocations")}
+            renderItem={detachedAllocItem} defaultOpen={orphans.detachedAllocations.length > 0} />
+
           {/* ── Repair-only categories ────────────────────────────────────── */}
+          <CategorySection
+            title="Sprints — Stale Work Item References"
+            description="Sprints whose relevant work item list contains deleted work item IDs. 'Repair All' removes only the stale IDs."
+            items={orphans.staleSprints}
+            selectedIds={null}
+            renderItem={staleSprintItem}
+            defaultOpen={orphans.staleSprints.length > 0}
+            actionSlot={orphans.staleSprints.length > 0 && (
+              <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={repairAll} disabled={repairing}>
+                <Wrench className="w-3 h-3" /> Repair All
+              </Button>
+            )}
+          />
+
           <CategorySection
             title="Work Item Selections — Stale References"
             description="Team is still valid, but some selected work items were deleted. 'Repair All' removes only the stale IDs."
@@ -657,6 +774,8 @@ export default function CleanupPage() {
               { key: "workAreaSelections",   label: "Work Item Selections",           nameFn: null,                                    src: workAreaSelections },
               { key: "unassignedWorkAreas",  label: "Unassigned Work Items",          nameFn: w => w.name,                             src: workAreas },
               { key: "workAreas",            label: "Work Items (deleted team)",      nameFn: w => w.name,                             src: workAreas },
+              { key: "unassignedAllocations", label: "Allocations Without Work Item",  nameFn: null,                                    src: allocations },
+              { key: "detachedAllocations",  label: "Detached Sprint Allocations",    nameFn: null,                                    src: allocations },
             ].map(({ key, label, nameFn, src }) => {
               const ids = selected[key];
               if (!ids || ids.size === 0) return null;

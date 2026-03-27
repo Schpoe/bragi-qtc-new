@@ -378,7 +378,9 @@ export default function SprintPlanning() {
 
   const teamMembers = members.filter(m => m.team_id === sprintPlanningTeamId);
 
-   // Get work items relevant to this team (leading/supporting) plus any with allocations or manually selected
+   // Work items for Quarterly Plan tab — based solely on team assignment,
+   // quarterly allocations, and manual quarterly selection. Sprint work items
+   // do NOT bleed into this pool.
    const teamMemberIds = new Set(teamMembers.map(m => m.id));
    const workAreasWithAllocations = new Set(
      quarterlyAllocations
@@ -389,19 +391,12 @@ export default function SprintPlanning() {
    const currentSelection = workAreaSelections.find(s => s.team_id === effectiveTeamId && s.quarter === selectedQuarter);
    const manuallySelectedIds = new Set(currentSelection?.work_area_ids || []);
 
-   const sprintRelevantIds = new Set(
-     sprints
-       .filter(s => s.team_id === effectiveTeamId)
-       .flatMap(s => s.relevant_work_area_ids || [])
-   );
-
-   const filteredWorkAreas = effectiveTeamId ? workAreas.filter(wa =>
+   const quarterlyWorkAreas = effectiveTeamId ? workAreas.filter(wa =>
      wa.is_cross_team ||
      wa.leading_team_id === effectiveTeamId ||
-     wa.supporting_team_ids.includes(effectiveTeamId) ||
+     (wa.supporting_team_ids || []).includes(effectiveTeamId) ||
      workAreasWithAllocations.has(wa.id) ||
-     manuallySelectedIds.has(wa.id) ||
-     sprintRelevantIds.has(wa.id)
+     manuallySelectedIds.has(wa.id)
    ) : [];
 
   const quarters = useQuarters(sprints, { includeRange: true }).filter(q => !q.includes('2025'));
@@ -445,7 +440,7 @@ export default function SprintPlanning() {
                 <CardContent className="pt-6">
                   <QuarterlyAllocationTable
                     members={teamMembers}
-                    workAreas={filteredWorkAreas}
+                    workAreas={quarterlyWorkAreas}
                     allocations={quarterlyAllocations}
                     quarter={selectedQuarter}
                     onAllocationChange={handleQuarterlyAllocationChange}
@@ -461,7 +456,7 @@ export default function SprintPlanning() {
                 teamName={teams.find(t => t.id === effectiveTeamId)?.name ?? ""}
                 user={user}
                 members={teamMembers}
-                workAreas={filteredWorkAreas}
+                workAreas={quarterlyWorkAreas}
                 quarterlyAllocations={quarterlyAllocations}
               />
             </>
@@ -532,8 +527,11 @@ export default function SprintPlanning() {
       ) : (
         <div className="space-y-6">
           {quarterSprints.map(sprint => {
-            const sprintRelevantIds = new Set(sprint.relevant_work_area_ids || []);
-            const sprintWorkAreas = filteredWorkAreas.filter(wa => sprintRelevantIds.has(wa.id));
+            // Sprint work areas are resolved purely from the sprint's own relevant_work_area_ids,
+            // with no dependency on the quarterly plan's work area pool.
+            const sprintWorkAreas = (sprint.relevant_work_area_ids || [])
+              .map(id => workAreas.find(wa => wa.id === id))
+              .filter(Boolean);
 
             return (
             <Card key={sprint.id} className="border-primary/20 hover:border-primary/40 transition-colors">

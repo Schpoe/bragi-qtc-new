@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { bragiQTC } from "@/api/bragiQTCClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getCurrentQuarter } from "@/lib/quarter-utils";
@@ -53,128 +52,234 @@ function UtilBar({ value, max }) {
   );
 }
 
-function TeamOverviewCard({ team, sprints, members, workAreas, allocations }) {
+function SprintPlanSection({ team, sprints, members, workAreas, allocations }) {
   const teamSprints = sprints.filter(s => !s.is_cross_team && s.team_id === team.id).sort((a, b) => (a.order || 0) - (b.order || 0));
   const teamMembers = members.filter(m => m.team_id === team.id);
   const memberIds = new Set(teamMembers.map(m => m.id));
 
-  // Collect all unique work item IDs referenced across all team sprints
+  // Unique work areas across all sprints for column headers
   const allRelevantWaIds = [...new Set(teamSprints.flatMap(s => s.relevant_work_area_ids || []))];
   const teamWorkAreas = allRelevantWaIds.map(id => workAreas.find(wa => wa.id === id)).filter(Boolean);
 
-  // Per-sprint: sum of all member allocations (each member's percent per work item)
   const getSprintWorkAreaTotal = (sprintId, workAreaId) =>
     allocations
       .filter(a => a.sprint_id === sprintId && a.work_area_id === workAreaId && memberIds.has(a.team_member_id))
       .reduce((sum, a) => sum + (a.percent || 0), 0);
 
-  const getSprintTotal = (sprintId) =>
-    allocations
-      .filter(a => a.sprint_id === sprintId && memberIds.has(a.team_member_id))
+  const getSprintTotal = (sprintId) => {
+    const sprint = teamSprints.find(s => s.id === sprintId);
+    const relevantIds = sprint?.relevant_work_area_ids;
+    // If the sprint has no work items assigned, no allocations should count.
+    if (!relevantIds || relevantIds.length === 0) return 0;
+    return allocations
+      .filter(a =>
+        a.sprint_id === sprintId &&
+        memberIds.has(a.team_member_id) &&
+        a.work_area_id &&
+        relevantIds.includes(a.work_area_id)
+      )
       .reduce((sum, a) => sum + (a.percent || 0), 0);
+  };
 
-  // Max capacity per sprint = sum of each member's availability_percent
   const maxCapacityPerSprint = teamMembers.reduce((sum, m) => sum + (m.availability_percent || 100), 0);
-
-  // Quarterly capacity summary
-  const quarterlyMaxCapacity = maxCapacityPerSprint * teamSprints.length;
-  const quarterlyTotalAllocated = teamSprints.reduce((sum, s) => sum + getSprintTotal(s.id), 0);
-  const quarterlyPct = quarterlyMaxCapacity > 0 ? Math.round((quarterlyTotalAllocated / quarterlyMaxCapacity) * 100) : 0;
+  const totalAllocated = teamSprints.reduce((sum, s) => sum + getSprintTotal(s.id), 0);
+  const maxCapacity = maxCapacityPerSprint * teamSprints.length;
+  const sprintUtilPct = maxCapacity > 0 ? Math.round((totalAllocated / maxCapacity) * 100) : null;
 
   if (teamSprints.length === 0) {
     return (
-      <Card className="border-border/60">
-        <CardHeader className="pb-3">
-          <TeamCardTitle team={team} memberCount={teamMembers.length} quarterlyPct={null} />
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-6">No sprints in this quarter.</p>
-        </CardContent>
-      </Card>
+      <div className="py-4">
+        <p className="text-sm text-muted-foreground text-center py-4">No sprints in this quarter.</p>
+      </div>
     );
   }
 
   return (
-    <Card className="border-border/60">
-      <CardHeader className="pb-3">
-        <TeamCardTitle team={team} memberCount={teamMembers.length} quarterlyPct={quarterlyPct} />
-      </CardHeader>
-      <CardContent>
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Sprint Plan</span>
+        {sprintUtilPct !== null && (
+          <span className={cn(
+            "text-xs font-medium px-2 py-0.5 rounded-full border",
+            sprintUtilPct > 100 ? "bg-destructive/10 text-destructive border-destructive/20"
+            : sprintUtilPct >= 80 ? "bg-amber-50 text-amber-700 border-amber-200"
+            : "bg-muted text-muted-foreground border-border"
+          )}>
+            Sprint utilization: {sprintUtilPct}%
+          </span>
+        )}
+      </div>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/40">
+              <TableHead className="text-xs min-w-[100px]">Sprint</TableHead>
+              {teamWorkAreas.map(wa => (
+                <TableHead key={wa.id} className="text-center text-xs min-w-[70px]">
+                  <div className="flex items-center justify-center gap-1">
+                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                    <span className="truncate max-w-[80px]">{wa.name}</span>
+                  </div>
+                </TableHead>
+              ))}
+              <TableHead className="text-center text-xs min-w-[90px]">Utilization</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {teamSprints.map(s => {
+              const total = getSprintTotal(s.id);
+              return (
+                <TableRow key={s.id}>
+                  <TableCell className="py-2 text-xs font-medium">{s.name}</TableCell>
+                  {teamWorkAreas.map(wa => {
+                    const val = getSprintWorkAreaTotal(s.id, wa.id);
+                    return (
+                      <TableCell key={wa.id} className="text-center py-2">
+                        <span className={cn("text-xs tabular-nums", val > 0 ? "font-medium" : "text-muted-foreground")}>
+                          {val > 0 ? `${val}%` : "—"}
+                        </span>
+                      </TableCell>
+                    );
+                  })}
+                  <TableCell className="py-2 min-w-[90px]">
+                    <UtilBar value={total} max={maxCapacityPerSprint} />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            {teamWorkAreas.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={teamSprints.length + 2} className="text-center text-xs text-muted-foreground py-4">
+                  No work items assigned to sprints.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
+
+function QuarterlyPlanSection({ team, members, workAreas, quarterlyAllocations, workAreaSelections, quarter }) {
+  const teamMembers = members.filter(m => m.team_id === team.id);
+  const memberIds = new Set(teamMembers.map(m => m.id));
+
+  // Work areas selected for this team/quarter in the quarterly plan
+  const selection = workAreaSelections.find(s => s.team_id === team.id && s.quarter === quarter);
+  const selectedWaIds = new Set(selection?.work_area_ids || []);
+
+  // Also include any work area that has an actual quarterly allocation (in case selection wasn't saved)
+  const allocatedWaIds = new Set(
+    quarterlyAllocations
+      .filter(a => memberIds.has(a.team_member_id) && a.quarter === quarter && a.work_area_id)
+      .map(a => a.work_area_id)
+  );
+
+  const qaWaIds = new Set([...selectedWaIds, ...allocatedWaIds]);
+  const qaWorkAreas = [...qaWaIds].map(id => workAreas.find(wa => wa.id === id)).filter(Boolean);
+
+  const getQATotalForWA = (workAreaId) =>
+    quarterlyAllocations
+      .filter(a => memberIds.has(a.team_member_id) && a.quarter === quarter && a.work_area_id === workAreaId)
+      .reduce((sum, a) => sum + (a.percent || 0), 0);
+
+  const totalAllocated = qaWorkAreas.reduce((sum, wa) => sum + getQATotalForWA(wa.id), 0);
+  const maxCapacity = teamMembers.reduce((sum, m) => sum + (m.availability_percent || 100), 0);
+  const qtlPct = maxCapacity > 0 ? Math.round((totalAllocated / maxCapacity) * 100) : null;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Quarterly Plan</span>
+        {qtlPct !== null && (
+          <span className={cn(
+            "text-xs font-medium px-2 py-0.5 rounded-full border",
+            qtlPct > 100 ? "bg-destructive/10 text-destructive border-destructive/20"
+            : qtlPct >= 80 ? "bg-amber-50 text-amber-700 border-amber-200"
+            : "bg-muted text-muted-foreground border-border"
+          )}>
+            Quarterly utilization: {qtlPct}%
+          </span>
+        )}
+      </div>
+      {qaWorkAreas.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">No quarterly plan entries for this quarter.</p>
+      ) : (
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/40">
-                <TableHead className="text-xs min-w-[100px]">Sprint</TableHead>
-                {teamWorkAreas.map(wa => (
-                  <TableHead key={wa.id} className="text-center text-xs min-w-[70px]">
-                    <div className="flex items-center justify-center gap-1">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: wa.color || "#3b82f6" }} />
-                      <span className="truncate max-w-[80px]">{wa.name}</span>
-                    </div>
-                  </TableHead>
-                ))}
+                <TableHead className="text-xs min-w-[100px]">Work Item</TableHead>
+                <TableHead className="text-center text-xs min-w-[90px]">Total Alloc.</TableHead>
                 <TableHead className="text-center text-xs min-w-[90px]">Utilization</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {teamSprints.map(s => {
-                const total = getSprintTotal(s.id);
+              {qaWorkAreas.map(wa => {
+                const total = getQATotalForWA(wa.id);
                 return (
-                  <TableRow key={s.id}>
-                    <TableCell className="py-2 text-xs font-medium">{s.name}</TableCell>
-                    {teamWorkAreas.map(wa => {
-                      const val = getSprintWorkAreaTotal(s.id, wa.id);
-                      return (
-                        <TableCell key={wa.id} className="text-center py-2">
-                          <span className={cn("text-xs tabular-nums", val > 0 ? "font-medium" : "text-muted-foreground")}>
-                            {val > 0 ? `${val}%` : "—"}
-                          </span>
-                        </TableCell>
-                      );
-                    })}
+                  <TableRow key={wa.id}>
+                    <TableCell className="py-2">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: wa.color || "#3b82f6" }} />
+                        <span className="text-xs font-medium">{wa.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center py-2">
+                      <span className={cn("text-xs tabular-nums", total > 0 ? "font-medium" : "text-muted-foreground")}>
+                        {total > 0 ? `${total}%` : "—"}
+                      </span>
+                    </TableCell>
                     <TableCell className="py-2 min-w-[90px]">
-                      <UtilBar value={total} max={maxCapacityPerSprint} />
+                      <UtilBar value={total} max={maxCapacity} />
                     </TableCell>
                   </TableRow>
                 );
               })}
-              {teamWorkAreas.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={teamSprints.length + 2} className="text-center text-xs text-muted-foreground py-4">
-                    No work items assigned.
-                  </TableCell>
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
 
-function TeamCardTitle({ team, memberCount, quarterlyPct }) {
-  const capacityLabel = quarterlyPct === null ? null
-    : quarterlyPct > 100 ? { text: `Overcapacity (${quarterlyPct}%)`, cls: "bg-destructive/10 text-destructive border-destructive/20" }
-    : quarterlyPct >= 80 ? { text: `Well utilized (${quarterlyPct}%)`, cls: "bg-amber-50 text-amber-700 border-amber-200" }
-    : { text: `Undercapacity (${quarterlyPct}%)`, cls: "bg-green-50 text-green-700 border-green-200" };
+function TeamOverviewCard({ team, sprints, members, workAreas, allocations, quarterlyAllocations, workAreaSelections, quarter }) {
+  const teamMembers = members.filter(m => m.team_id === team.id);
 
   return (
-    <div className="flex items-center justify-between flex-wrap gap-2">
-      <div className="flex items-center gap-2.5">
-        <div className={`w-3 h-3 rounded-full ${teamColorMap[team.color] || "bg-primary"}`} />
-        <CardTitle className="text-sm font-semibold">{team.name}</CardTitle>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Users className="w-3.5 h-3.5" />
-          <span>{memberCount}</span>
+    <Card className="border-border/60">
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className={`w-3 h-3 rounded-full ${teamColorMap[team.color] || "bg-primary"}`} />
+          <CardTitle className="text-sm font-semibold">{team.name}</CardTitle>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Users className="w-3.5 h-3.5" />
+            <span>{teamMembers.length}</span>
+          </div>
         </div>
-      </div>
-      {capacityLabel && (
-        <Badge variant="outline" className={cn("text-xs font-medium", capacityLabel.cls)}>
-          {capacityLabel.text}
-        </Badge>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <SprintPlanSection
+          team={team}
+          sprints={sprints}
+          members={members}
+          workAreas={workAreas}
+          allocations={allocations}
+        />
+        <div className="border-t pt-4">
+          <QuarterlyPlanSection
+            team={team}
+            members={members}
+            workAreas={workAreas}
+            quarterlyAllocations={quarterlyAllocations}
+            workAreaSelections={workAreaSelections}
+            quarter={quarter}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -205,6 +310,16 @@ export default function TeamSprintOverview() {
   const { data: allocations = [] } = useQuery({
     queryKey: ["allocations"],
     queryFn: () => bragiQTC.entities.Allocation.list(),
+  });
+
+  const { data: quarterlyAllocations = [] } = useQuery({
+    queryKey: ["quarterlyAllocations"],
+    queryFn: () => bragiQTC.entities.QuarterlyAllocation.list(),
+  });
+
+  const { data: workAreaSelections = [] } = useQuery({
+    queryKey: ["workAreaSelections"],
+    queryFn: () => bragiQTC.entities.QuarterlyWorkAreaSelection.list(),
   });
 
   const quarterSprints = sprints.filter(s => s.quarter === selectedQuarter);
@@ -243,6 +358,9 @@ export default function TeamSprintOverview() {
               members={members}
               workAreas={workAreas}
               allocations={allocations}
+              quarterlyAllocations={quarterlyAllocations}
+              workAreaSelections={workAreaSelections}
+              quarter={selectedQuarter}
             />
           ))}
         </div>
