@@ -108,6 +108,7 @@ function CategorySection({ title, description, items, selectedIds, onSelectAll, 
 
 const EMPTY_SELECTION = {
   emptyTeams: new Set(),
+  sprintsForMemberlessTeams: new Set(),
   members: new Set(),
   sprints: new Set(),
   allocations: new Set(),
@@ -247,9 +248,17 @@ export default function CleanupPage() {
     // 15. Teams with no members — appear in Team Overview but have no capacity
     const memberTeamIds = new Set(members.map(m => m.team_id));
     const emptyTeams = teams.filter(t => !memberTeamIds.has(t.id));
+    const emptyTeamIds = new Set(emptyTeams.map(t => t.id));
+
+    // 16. Sprints belonging to memberless teams — directly deletable so the user
+    //     doesn't need to delete the team first (which would leave sprint orphans anyway)
+    const sprintsForMemberlessTeams = sprints.filter(s =>
+      !s.is_cross_team && emptyTeamIds.has(s.team_id)
+    );
 
     return {
       emptyTeams,
+      sprintsForMemberlessTeams,
       members: orphanMembers,
       sprints: orphanSprints,
       allocations: orphanAllocations,
@@ -280,8 +289,9 @@ export default function CleanupPage() {
   const deselectAll = (category) => setSelected(prev => ({ ...prev, [category]: new Set() }));
 
   const selectAllOrphans = () => setSelected({
-    emptyTeams:           new Set(orphans.emptyTeams.map(i => i.id)),
-    members:              new Set(orphans.members.map(i => i.id)),
+    emptyTeams:                   new Set(orphans.emptyTeams.map(i => i.id)),
+    sprintsForMemberlessTeams:    new Set(orphans.sprintsForMemberlessTeams.map(i => i.id)),
+    members:                      new Set(orphans.members.map(i => i.id)),
     sprints:              new Set(orphans.sprints.map(i => i.id)),
     allocations:          new Set(orphans.allocations.map(i => i.id)),
     templateAllocations:  new Set(orphans.templateAllocations.map(i => i.id)),
@@ -296,7 +306,7 @@ export default function CleanupPage() {
   });
 
   const totalSelected =
-    selected.emptyTeams.size +
+    selected.emptyTeams.size + selected.sprintsForMemberlessTeams.size +
     selected.members.size + selected.sprints.size + selected.allocations.size +
     selected.templateAllocations.size + selected.zeroAllocations.size +
     selected.quarterlyAllocations.size + selected.zeroQA.size +
@@ -304,7 +314,7 @@ export default function CleanupPage() {
     selected.workAreas.size + selected.unassignedAllocations.size + selected.detachedAllocations.size;
 
   const totalOrphans =
-    orphans.emptyTeams.length +
+    orphans.emptyTeams.length + orphans.sprintsForMemberlessTeams.length +
     orphans.members.length + orphans.sprints.length + orphans.allocations.length +
     orphans.templateAllocations.length + orphans.zeroAllocations.length +
     orphans.quarterlyAllocations.length + orphans.zeroQA.length +
@@ -362,8 +372,9 @@ export default function CleanupPage() {
 
   const handleDelete = async () => {
     const ops = [
-      ...[...selected.emptyTeams].map(id           => () => bragiQTC.entities.Team.delete(id)),
-      ...[...selected.members].map(id              => () => bragiQTC.entities.TeamMember.delete(id)),
+      ...[...selected.emptyTeams].map(id                    => () => bragiQTC.entities.Team.delete(id)),
+      ...[...selected.sprintsForMemberlessTeams].map(id     => () => bragiQTC.entities.Sprint.delete(id)),
+      ...[...selected.members].map(id                       => () => bragiQTC.entities.TeamMember.delete(id)),
       ...[...selected.sprints].map(id              => () => bragiQTC.entities.Sprint.delete(id)),
       ...[...selected.allocations].map(id          => () => bragiQTC.entities.Allocation.delete(id)),
       ...[...selected.templateAllocations].map(id  => () => bragiQTC.entities.Allocation.delete(id)),
@@ -422,6 +433,15 @@ export default function CleanupPage() {
         ].filter(Boolean)} />
     );
   };
+
+  const sprintForMemberlessTeamItem = (s) => (
+    <OrphanItem key={s.id} checked={selected.sprintsForMemberlessTeams.has(s.id)} onToggle={() => toggle("sprintsForMemberlessTeams", s.id)}
+      title={s.name} subtitle={s.quarter}
+      reasons={[
+        { label: `Team: ${teamName(s.team_id)}`, danger: false },
+        { label: "Team has no members", danger: true },
+      ]} />
+  );
 
   const memberItem = (m) => (
     <OrphanItem key={m.id} checked={selected.members.has(m.id)} onToggle={() => toggle("members", m.id)}
@@ -671,6 +691,12 @@ export default function CleanupPage() {
             onSelectAll={() => selectAll("emptyTeams")} onDeselectAll={() => deselectAll("emptyTeams")}
             renderItem={emptyTeamItem} defaultOpen={orphans.emptyTeams.length > 0} />
 
+          <CategorySection title="Sprints for Memberless Teams"
+            description="Sprints whose team has no members — invisible in Team Overview after this fix, safe to delete"
+            items={orphans.sprintsForMemberlessTeams} selectedIds={selected.sprintsForMemberlessTeams}
+            onSelectAll={() => selectAll("sprintsForMemberlessTeams")} onDeselectAll={() => deselectAll("sprintsForMemberlessTeams")}
+            renderItem={sprintForMemberlessTeamItem} defaultOpen={orphans.sprintsForMemberlessTeams.length > 0} />
+
           <CategorySection title="Team Members" description="Members whose team has been deleted"
             items={orphans.members} selectedIds={selected.members}
             onSelectAll={() => selectAll("members")} onDeselectAll={() => deselectAll("members")}
@@ -792,8 +818,9 @@ export default function CleanupPage() {
 
           <div className="space-y-2 py-2 max-h-52 overflow-y-auto">
             {[
-              { key: "emptyTeams",           label: "Teams (no members)",             nameFn: t => t.name,                             src: teams },
-              { key: "members",              label: "Team Members",                   nameFn: m => `${m.name} (${m.discipline})`,      src: members },
+              { key: "emptyTeams",                label: "Teams (no members)",               nameFn: t => t.name,                        src: teams },
+              { key: "sprintsForMemberlessTeams", label: "Sprints (memberless team)",        nameFn: s => `${s.name} — ${s.quarter}`,    src: sprints },
+              { key: "members",                   label: "Team Members",                     nameFn: m => `${m.name} (${m.discipline})`, src: members },
               { key: "sprints",              label: "Sprints",                        nameFn: s => `${s.name} — ${s.quarter}`,         src: sprints },
               { key: "allocations",          label: "Sprint Allocations",             nameFn: null,                                    src: allocations },
               { key: "templateAllocations",  label: "Template Sprint Allocations",    nameFn: null,                                    src: allocations },

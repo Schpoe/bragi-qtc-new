@@ -326,7 +326,9 @@ export default function TeamSprintOverview() {
 
   const quarters = useQuarters(sprints);
 
-  const filteredTeams = selectedTeam === "all" ? teams : teams.filter(t => t.id === selectedTeam);
+  const memberTeamIds = new Set(members.map(m => m.team_id));
+  const filteredTeams = (selectedTeam === "all" ? teams : teams.filter(t => t.id === selectedTeam))
+    .filter(t => memberTeamIds.has(t.id));
 
   return (
     <div>
