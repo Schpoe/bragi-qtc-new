@@ -34,7 +34,7 @@ services:
   frontend:
     build: .
     ports:
-      - "${PORT:-80}:80"
+      - "${PORT:-3003}:80"
     depends_on:
       - backend
 
